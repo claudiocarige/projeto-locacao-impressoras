@@ -61,7 +61,10 @@ public abstract class Customer implements Serializable {
     @OneToMany( fetch = FetchType.EAGER, mappedBy = "customer" )
     private List< MultiPrinter > multiPrinterList = new ArrayList<>();
 
-
+    @Setter( AccessLevel.NONE )
+    @JsonIgnore
+    @OneToMany( fetch = FetchType.EAGER, mappedBy = "customer" )
+    private List< MonthlyPayment > monthlyPaymentList = new ArrayList<>();
 
     @Override
     public boolean equals( Object o ) {
