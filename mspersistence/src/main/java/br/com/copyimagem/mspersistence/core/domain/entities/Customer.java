@@ -47,6 +47,12 @@ public abstract class Customer implements Serializable {
     @JoinColumn( name = "adress_id" )
     private Address address;
 
+
+    @Setter( AccessLevel.NONE )
+    @JsonIgnore
+    @OneToMany( fetch = FetchType.EAGER, mappedBy = "customer" )
+    private List< MultiPrinter > multiPrinterList = new ArrayList<>();
+
     @Override
     public boolean equals( Object o ) {
 
