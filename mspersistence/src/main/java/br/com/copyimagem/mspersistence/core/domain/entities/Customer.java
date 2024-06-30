@@ -46,6 +46,11 @@ public abstract class Customer implements Serializable {
     @JoinColumn( name = "adress_id" )
     private Address address;
 
+    @Enumerated( EnumType.STRING )
+    private FinancialSituation financialSituation;
+
+    private byte payDay;
+
 
     @Setter( AccessLevel.NONE )
     @JsonIgnore
