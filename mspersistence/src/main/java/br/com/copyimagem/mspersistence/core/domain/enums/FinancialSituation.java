@@ -1,4 +1,4 @@
-package br.com.copyimagem.mspersistence.core.domain.entities;
+package br.com.copyimagem.mspersistence.core.domain.enums;
 
 public enum FinancialSituation {
     PAGO,
