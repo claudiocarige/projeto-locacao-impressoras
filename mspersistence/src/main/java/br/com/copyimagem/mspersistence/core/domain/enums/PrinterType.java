@@ -1,6 +1,7 @@
 package br.com.copyimagem.mspersistence.core.domain.enums;
 
 public enum PrinterType {
+
     LASER_BLACK_AND_WHITE_EASY( 0.04, "Black_Laser" ),
     LASER_BLACK_AND_WHITE_MEDIUM( 0.05, "Black_Laser" ),
     LASER_BLACK_AND_WHITE_HARD( 0.08, "Black_Laser" ),

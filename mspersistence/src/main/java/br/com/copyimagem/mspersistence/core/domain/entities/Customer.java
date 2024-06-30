@@ -20,7 +20,6 @@ import java.util.Objects;
 @DiscriminatorColumn( name = "dtype" )
 public abstract class Customer implements Serializable {
 
-
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -52,6 +51,8 @@ public abstract class Customer implements Serializable {
     @JsonIgnore
     @OneToMany( fetch = FetchType.EAGER, mappedBy = "customer" )
     private List< MultiPrinter > multiPrinterList = new ArrayList<>();
+
+
 
     @Override
     public boolean equals( Object o ) {

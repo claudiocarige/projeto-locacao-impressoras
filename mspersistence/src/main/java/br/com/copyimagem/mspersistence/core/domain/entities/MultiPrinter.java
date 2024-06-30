@@ -20,7 +20,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class MultiPrinter implements Serializable {
 
-
     @Serial
     private static final long serialVersionUID = 1L;
 
