@@ -1,6 +1,7 @@
 package br.com.copyimagem.mspersistence.core.domain.entities;
 
 
+import br.com.copyimagem.mspersistence.core.domain.enums.FinancialSituation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -51,6 +52,9 @@ public abstract class Customer implements Serializable {
 
     private byte payDay;
 
+    @OneToOne( cascade = CascadeType.ALL )
+    @JoinColumn( name = "contract_id" )
+    private CustomerContract customerContract;
 
     @Setter( AccessLevel.NONE )
     @JsonIgnore
