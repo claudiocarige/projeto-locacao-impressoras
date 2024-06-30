@@ -66,6 +66,17 @@ public abstract class Customer implements Serializable {
     @OneToMany( fetch = FetchType.EAGER, mappedBy = "customer" )
     private List< MonthlyPayment > monthlyPaymentList = new ArrayList<>();
 
+
+    public void addMultiPrinter( MultiPrinter multiPrinter ) {
+
+        multiPrinterList.add( multiPrinter );
+    }
+
+    public void addMonthlyPayment( MonthlyPayment monthlyPayment ) {
+
+        monthlyPaymentList.add( monthlyPayment );
+    }
+
     @Override
     public boolean equals( Object o ) {
 
