@@ -8,9 +8,10 @@ import java.util.Optional;
 
 public interface LegalPersonalCustomerRepository extends JpaRepository< LegalPersonalCustomer, Long > {
 
-
     Optional< LegalPersonalCustomer > findByPrimaryEmail( String primaryEmail );
 
     Optional< LegalPersonalCustomer > findByCnpj( String cpf );
+
+    boolean existsLegalPersonalCustomerByCnpj( String cnpj );
 
 }
