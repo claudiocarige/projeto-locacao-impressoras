@@ -1,8 +1,10 @@
 package br.com.copyimagem.mspersistence.core.usecases.impl;
 
+import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.DataIntegrityViolationException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.LegalPersonalCustomerService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRepository;
@@ -11,6 +13,7 @@ import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRe
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.LegalPersonalCustomerRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,10 +69,18 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
         return legalPersonalCustomerDTO;
     }
 
+    @Transactional
     @Override
-    public LegalPersonalCustomerDTO saveLegalPersonalCustomer( LegalPersonalCustomerDTO legalPersonalCustomer ) {
+    public LegalPersonalCustomerDTO saveLegalPersonalCustomer( LegalPersonalCustomerDTO legalPersonalCustomerDTO ) {
 
-        return null;
+        log.info( "[ INFO ] Saving LegalPersonalCustomer" );
+        legalPersonalCustomerDTO.setId( null );
+        saveAddress( legalPersonalCustomerDTO );
+        existsCnpjOrEmail( legalPersonalCustomerDTO );
+        generateCustomerContract( legalPersonalCustomerDTO );
+        LegalPersonalCustomer saveLegalPersonalCustomer = legalPersonalCustomerRepository
+                .save( convertObjectToObjectDTOService.convertToLegalPersonalCustomer( legalPersonalCustomerDTO ) );
+        return convertObjectToObjectDTOService.convertToLegalPersonalCustomerDTO( saveLegalPersonalCustomer );
     }
 
     @Override
@@ -78,4 +89,32 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
         return null;
     }
 
+    private void existsCnpjOrEmail( LegalPersonalCustomerDTO legalPersonalCustomerDTO ) {
+
+        if( customerRepository.existsCustomerByPrimaryEmail( legalPersonalCustomerDTO.getPrimaryEmail() ) ) {
+            log.error( "[ ERROR ] Exception : Email already exists! : {}.", customerRepository.existsCustomerByPrimaryEmail( legalPersonalCustomerDTO.getPrimaryEmail() ) );
+            throw new DataIntegrityViolationException( "Email already exists!" );
+        } else if( legalPersonalCustomerRepository.existsLegalPersonalCustomerByCnpj( legalPersonalCustomerDTO.getCnpj() ) ) {
+            log.error( "[ ERROR ] Exception : CNPJ already exists! : {}.", DataIntegrityViolationException.class );
+            throw new DataIntegrityViolationException( "CNPJ already exists!" );
+        }
+    }
+
+    private void generateCustomerContract( LegalPersonalCustomerDTO legalPersonalCustomerDTO ) {
+
+        if( legalPersonalCustomerDTO.getCustomerContract() == null ) {
+            CustomerContract contract = new CustomerContract();
+            CustomerContract savedContract = customerContractRepository.save( contract );
+            legalPersonalCustomerDTO.setCustomerContract( savedContract );
+        }
+    }
+
+    private void saveAddress( LegalPersonalCustomerDTO legalPersonalCustomerDTO ) {
+
+        if( legalPersonalCustomerDTO.getAddress() != null ) {
+            legalPersonalCustomerDTO.setAddress( addressRepository.save( legalPersonalCustomerDTO.getAddress() ) );
+        } else {
+            throw new DataIntegrityViolationException( "Address is null!" );
+        }
+    }
 }
