@@ -4,6 +4,7 @@ import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustome
 import br.com.copyimagem.mspersistence.core.domain.entities.MonthlyPayment;
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.DataIntegrityViolationException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerContractRepository;
@@ -162,6 +163,15 @@ class LegalPersonalCustomerServiceImplTest {
         verify(customerRepository, times(1))
                 .existsCustomerByPrimaryEmail(customerPjDTO.getPrimaryEmail());
         verify(legalPersonalCustomerRepository, times(1)).existsLegalPersonalCustomerByCnpj(customerPj.getCnpj());
+    }
+
+    @Test
+    @DisplayName("Must return exception when Address is null")
+    void mustReturnExceptionWhenAddressIsNull(){
+        customerPjDTO.setAddress(null);
+        String message = assertThrows( DataIntegrityViolationException.class,
+                () -> legalPersonalCustomerService.saveLegalPersonalCustomer(customerPjDTO)).getMessage();
+        assertEquals("Address is null!", message);
     }
 
     private void start() {
