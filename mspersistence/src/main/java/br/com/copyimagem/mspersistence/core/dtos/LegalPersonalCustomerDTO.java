@@ -5,6 +5,10 @@ import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
 import br.com.copyimagem.mspersistence.core.domain.entities.MonthlyPayment;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.validator.constraints.br.CNPJ;
 
 import java.io.Serial;
@@ -13,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class LegalPersonalCustomerDTO implements Serializable {
 
 
@@ -53,5 +61,6 @@ public class LegalPersonalCustomerDTO implements Serializable {
     private List< MultiPrinterDTO > multiPrinterList = new ArrayList<>();
 
     private List< MonthlyPayment > monthlyPaymentList = new ArrayList<>();
+
 
 }
