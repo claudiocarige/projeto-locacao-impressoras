@@ -1,7 +1,9 @@
 package br.com.copyimagem.mspersistence.core.usecases.impl;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
+import br.com.copyimagem.mspersistence.core.domain.entities.MonthlyPayment;
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
+import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerContractRepository;
@@ -14,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
 import java.util.Optional;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.LegalPersonalCustomerBuilder.oneLegalPersonalCustomer;
@@ -61,7 +64,8 @@ class LegalPersonalCustomerServiceImplTest {
         when(legalPersonalCustomerRepository.findById(ID1L)).thenReturn( Optional.of(customerPj));
         when(convertObjectToObjectDTOService.convertToLegalPersonalCustomerDTO(customerPj)).thenReturn(customerPjDTO);
 
-        LegalPersonalCustomerDTO legalPersonalCustomerDTO = legalPersonalCustomerService.findLegalPersonalCustomerById(ID1L);
+        LegalPersonalCustomerDTO legalPersonalCustomerDTO =
+                                                     legalPersonalCustomerService.findLegalPersonalCustomerById(ID1L);
 
         assertAll("LegalPersonalCustomer",
                 () -> assertNotNull(legalPersonalCustomerDTO),
@@ -84,6 +88,41 @@ class LegalPersonalCustomerServiceImplTest {
             assertEquals( NoSuchElementException.class, message.getClass());
         }
     }
+
+    @Test
+    @DisplayName("should return a list of legalPersonalCustomer")
+    void shouldReturnAListLegalPersonalCustomer() {
+        when(legalPersonalCustomerRepository.findAll()).thenReturn( List.of(customerPj));
+        when(convertObjectToObjectDTOService.convertToLegalPersonalCustomerDTO(customerPj)).thenReturn(customerPjDTO);
+
+        List<LegalPersonalCustomerDTO> legalPersonalCustomerList =
+                                                          legalPersonalCustomerService.findAllLegalPersonalCustomer();
+        assertAll("LegalPersonalCustomerLis",
+                () -> assertNotNull(legalPersonalCustomerList),
+                () -> assertEquals(1, legalPersonalCustomerList.size()),
+                () -> assertEquals(LegalPersonalCustomerDTO.class, legalPersonalCustomerList.get(0).getClass()),
+                () -> {
+                    assertAll("MultPrint",
+                            () -> assertNotNull(legalPersonalCustomerList.get(0).getMultiPrinterList()),
+                            () -> assertEquals( MultiPrinterDTO.class, legalPersonalCustomerList.get(0)
+                                                                           .getMultiPrinterList().get(0).getClass()),
+                            () -> assertEquals(1, legalPersonalCustomerList.get(0)
+                                                                                      .getMultiPrinterList().size())
+                    );
+                },
+                () -> {
+                    assertAll("MonthlyPayment",
+                            () -> assertEquals(1, legalPersonalCustomerList.get(0)
+                                                                                    .getMonthlyPaymentList().size()),
+                            () -> assertEquals( MonthlyPayment.class, legalPersonalCustomerList.get(0)
+                                                                         .getMonthlyPaymentList().get(0).getClass())
+                    );
+                }
+        );
+
+    }
+
+
 
     private void start() {
 
