@@ -4,6 +4,7 @@ import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustome
 import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
+import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -49,6 +50,11 @@ public class ModelMapperConfig {
 
                 map().setCpfOrCnpj( source.getCpf() );
             }
+        } );
+
+        modelMapper.addMappings( new PropertyMap< MultiPrinter, MultiPrinterDTO >() {
+            @Override
+            protected void configure() { map().setCustomer_id( source.getCustomer().getId().toString() ); }
         } );
 
         return modelMapper;
