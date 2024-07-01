@@ -3,6 +3,7 @@ package br.com.copyimagem.mspersistence.core.usecases.impl;
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.LegalPersonalCustomerService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerContractRepository;
@@ -12,7 +13,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -45,7 +45,10 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
     @Override
     public List< LegalPersonalCustomerDTO > findAllLegalPersonalCustomer() {
 
-        return List.of();
+        log.info( "[ INFO ] Finding all LegalPersonalCustomers." );
+        List< LegalPersonalCustomer > legalPersonalCustumerList = legalPersonalCustomerRepository.findAll();
+        return legalPersonalCustumerList.stream()
+                .map( convertObjectToObjectDTOService::convertToLegalPersonalCustomerDTO ).toList();
     }
 
     @Override
