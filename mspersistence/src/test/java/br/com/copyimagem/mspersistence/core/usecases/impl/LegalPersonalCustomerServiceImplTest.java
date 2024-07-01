@@ -22,7 +22,7 @@ import java.util.Optional;
 import static br.com.copyimagem.mspersistence.core.domain.builders.LegalPersonalCustomerBuilder.oneLegalPersonalCustomer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 class LegalPersonalCustomerServiceImplTest {
@@ -122,7 +122,47 @@ class LegalPersonalCustomerServiceImplTest {
 
     }
 
-
+    @Test
+    @DisplayName("should save a LegalPersonalCustomer")
+    void shouldSaveALegalPersonalCustomer() {
+        when(customerRepository.existsCustomerByPrimaryEmail(customerPjDTO.getPrimaryEmail()))
+                .thenReturn(false);
+        when(legalPersonalCustomerRepository.existsLegalPersonalCustomerByCnpj(CNPJ)).thenReturn(false);
+        when(legalPersonalCustomerRepository.save(customerPj)).thenReturn(customerPj);
+        when(convertObjectToObjectDTOService.convertToLegalPersonalCustomerDTO(customerPj)).thenReturn(customerPjDTO);
+        when(convertObjectToObjectDTOService.convertToLegalPersonalCustomer(customerPjDTO)).thenReturn(customerPj);
+        when(addressRepository.save(customerPj.getAddress())).thenReturn(customerPjDTO.getAddress());
+        LegalPersonalCustomerDTO legalPersonalCustomerDTO = legalPersonalCustomerService
+                .saveLegalPersonalCustomer(customerPjDTO);
+        assertAll("LegalPersonalCustomer",
+                () -> assertNotNull(legalPersonalCustomerDTO),
+                () -> assertEquals(customerPjDTO.getId(), legalPersonalCustomerDTO.getId()),
+                () -> assertEquals(LegalPersonalCustomerDTO.class, legalPersonalCustomerDTO.getClass()),
+                () -> assertEquals(customerPjDTO, legalPersonalCustomerDTO),
+                () -> assertEquals(customerPjDTO.getPrimaryEmail(), legalPersonalCustomerDTO.getPrimaryEmail()),
+                () -> assertEquals(customerPjDTO.getClass(), legalPersonalCustomerDTO.getClass()),
+                () -> {
+                    assertAll("MultPrint",
+                            () -> assertNotNull(legalPersonalCustomerDTO.getMultiPrinterList()),
+                            () -> assertEquals(MultiPrinterDTO.class, legalPersonalCustomerDTO.getMultiPrinterList().get(0).getClass()),
+                            () -> assertEquals(1, legalPersonalCustomerDTO.getMultiPrinterList().size())
+                    );
+                },
+                () -> {
+                    assertAll("MonthlyPayment",
+                            () -> assertEquals(1, legalPersonalCustomerDTO.getMonthlyPaymentList().size()),
+                            () -> assertEquals(MonthlyPayment.class, legalPersonalCustomerDTO.getMonthlyPaymentList().get(0).getClass())
+                    );
+                }
+        );
+        verify(convertObjectToObjectDTOService, times(1))
+                .convertToLegalPersonalCustomerDTO(customerPj);
+        verify(convertObjectToObjectDTOService, times(1))
+                .convertToLegalPersonalCustomer(customerPjDTO);
+        verify(customerRepository, times(1))
+                .existsCustomerByPrimaryEmail(customerPjDTO.getPrimaryEmail());
+        verify(legalPersonalCustomerRepository, times(1)).existsLegalPersonalCustomerByCnpj(customerPj.getCnpj());
+    }
 
     private void start() {
 
