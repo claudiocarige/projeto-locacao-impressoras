@@ -2,6 +2,7 @@ package br.com.copyimagem.mspersistence.core.usecases.impl;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerContractRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
@@ -70,6 +71,19 @@ class LegalPersonalCustomerServiceImplTest {
         );
     }
 
+    @Test
+    @DisplayName("shoul return a empty when LegalPersonalCustomer not found")
+    void shoulReturnEmptyWhenNaturalPersonCustomerNotFound() {
+        when(legalPersonalCustomerRepository.findById(ID1L)).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class,
+                () -> legalPersonalCustomerService.findLegalPersonalCustomerById(ID1L));
+        try {
+            legalPersonalCustomerService.findLegalPersonalCustomerById(ID1L);
+        } catch (NoSuchElementException message) {
+            assertEquals("Customer not found", message.getMessage());
+            assertEquals( NoSuchElementException.class, message.getClass());
+        }
+    }
 
     private void start() {
 
