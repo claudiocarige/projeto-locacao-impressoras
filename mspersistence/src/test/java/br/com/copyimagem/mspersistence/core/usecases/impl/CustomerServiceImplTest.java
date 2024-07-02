@@ -14,6 +14,8 @@ import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRe
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -22,8 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -273,6 +274,45 @@ class CustomerServiceImplTest {
         assertEquals(legalPersonalCustomer.getId(), customerResponseDTO.get(0).getId());
         assertEquals(CustomerResponseDTO.class, customerResponseDTO.get(0).getClass());
         assertEquals(situation, customerResponseDTO.get(0).getFinancialSituation());
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "cpf, 156.258.240-29, 2",
+            "cnpj, 14.124.420/0001-94, 1",
+            "primaryEmail, claudio@mail.com.br, 1",
+            "clientName, Claudio Carigé, 1",
+            "phoneNumber, 7132104567, 1",
+            "whatsapp, 71998987878, 1",
+            "bankCode, 123, 1",
+            "payDay, 5, 1",
+            "financialSituation, PAGO, 1",
+    })
+    @DisplayName("Should update the Customer by attribute")
+    void shouldUpdateTheCustomerByAttribute(String attribute, String val, String id) {
+
+        when( customerRepository.findById( 1L ) ).thenReturn( Optional.of( legalPersonalCustomer ) );
+        when( customerRepository.findById( 2L ) ).thenReturn( Optional.of( naturalPersonCustomer ) );
+        when( customerRepository.save( legalPersonalCustomer ) ).thenReturn( legalPersonalCustomer );
+        when( customerRepository.save( naturalPersonCustomer ) ).thenReturn( naturalPersonCustomer );
+        when( convertObjectToObjectDTOService.convertToUpdateCustomerDTO( legalPersonalCustomer ) ).thenReturn( updateCustomerDTOPJ );
+        when( convertObjectToObjectDTOService.convertToUpdateCustomerDTO( naturalPersonCustomer ) ).thenReturn( updateCustomerDTOPF );
+        UpdateCustomerDTO updateCustomerResultDTO = customerService.updateCustomerAttribute( attribute, val, Long.parseLong( id ) );
+
+        assertNotNull( updateCustomerResultDTO );
+        assertEquals( UpdateCustomerDTO.class, updateCustomerResultDTO.getClass() );
+
+        switch (attribute) {
+            case "cnpj" -> assertEquals(val, updateCustomerDTOPJ.getCpfOrCnpj());
+            case "cpf" -> assertEquals(val, updateCustomerDTOPF.getCpfOrCnpj());
+            case "primaryEmail" -> assertEquals(val, updateCustomerDTOPJ.getPrimaryEmail());
+            case "clienteName" -> assertEquals(val, updateCustomerDTOPJ.getClientName());
+            case "phoneNumber" -> assertEquals(val, updateCustomerDTOPJ.getPhoneNumber());
+            case "whatsapp" -> assertEquals(val, updateCustomerDTOPJ.getWhatsapp());
+            case "bankCode" -> assertEquals(val, updateCustomerDTOPJ.getBankCode());
+            case "payDay" -> assertEquals(Byte.parseByte(val), updateCustomerDTOPJ.getPayDay());
+            case "financialSituation" -> assertEquals(val, updateCustomerDTOPJ.getFinancialSituation());
+        }
     }
 
     private void start() {
