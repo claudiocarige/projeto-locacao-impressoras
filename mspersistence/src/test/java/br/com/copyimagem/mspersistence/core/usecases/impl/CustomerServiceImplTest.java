@@ -139,6 +139,17 @@ class CustomerServiceImplTest {
         }
     }
 
+    @Test
+    @DisplayName("Should return a Customer by Email")
+    void shouldReturnACustomerByEmail() {
+        when(customerRepository.findByPrimaryEmail(EMAIL)).thenReturn(Optional.of(naturalPersonCustomer));
+        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(naturalPersonCustomer)).thenReturn(customerResponseDTOPF);
+        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer("email", EMAIL);
+        assertEquals(customerResponseDTOPF, customerResponseDTO);
+        assertEquals(CustomerResponseDTO.class, customerResponseDTOPF.getClass());
+        assertEquals(customerResponseDTO.getCpfOrCnpj(), customerResponseDTOPF.getCpfOrCnpj());
+    }
+
     private void start() {
 
         customer = LegalPersonalCustomerBuilder.oneLegalPersonalCustomer().nowCustomerPJ();
