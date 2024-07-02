@@ -19,6 +19,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final NaturalPersonCustomerService naturalPersonCustomerService;
 
+    @Autowired
     public CustomerServiceImpl( CustomerRepository customerRepository,
                                 ConvertObjectToObjectDTOService convertObjectToObjectDTOService,
                                 LegalPersonalCustomerServiceImpl legalPersonalCustomerService,

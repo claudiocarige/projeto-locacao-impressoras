@@ -13,6 +13,7 @@ import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerCo
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.NaturalPersonCustomerRepository;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +35,7 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
 
     private final ConvertObjectToObjectDTOService convertObjectToObjectDTOService;
 
+    @Autowired
     public NaturalPersonCustomerServiceImpl( NaturalPersonCustomerRepository naturalPersonCustomerRepository,
                                              CustomerRepository customerRepository,
                                              AddressRepository addressRepository,

@@ -5,6 +5,7 @@ import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.LegalPersonalCustomerService;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ public class LegalPersonalCustomerController {
 
     private final LegalPersonalCustomerService legalPersonalCustomerService;
 
+    @Autowired
     public LegalPersonalCustomerController( LegalPersonalCustomerService legalPersonalCustomerService ) {
 
         this.legalPersonalCustomerService = legalPersonalCustomerService;

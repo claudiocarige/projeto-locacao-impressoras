@@ -4,6 +4,7 @@ import br.com.copyimagem.mspersistence.core.dtos.NaturalPersonCustomerDTO;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.NaturalPersonCustomerService;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class NaturalPersonCustomerController {
 
     private final NaturalPersonCustomerService naturalPersonCustomerService;
 
+    @Autowired
     public NaturalPersonCustomerController( NaturalPersonCustomerService naturalPersonCustomerService ) {
 
         this.naturalPersonCustomerService = naturalPersonCustomerService;
