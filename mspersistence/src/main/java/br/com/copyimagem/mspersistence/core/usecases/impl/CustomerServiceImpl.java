@@ -2,19 +2,27 @@ package br.com.copyimagem.mspersistence.core.usecases.impl;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.Customer;
 import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
+import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
+import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.domain.enums.FinancialSituation;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
+import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
+import br.com.copyimagem.mspersistence.core.dtos.NaturalPersonCustomerDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.LegalPersonalCustomerService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.NaturalPersonCustomerService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Log4j2
@@ -84,7 +92,13 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public UpdateCustomerDTO updateCustomerAttribute( String attribute, String value, Long id ) {
 
-        return null;
+        log.info( "[ INFO ] Updating Customer attribute : {}", attribute );
+        isNotNull( attribute, value );
+        Customer customer = customerRepository.findById( id )
+                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+        isContainsAnyOfTheAttributes( attribute );
+        needsValidations( attribute, value );
+        return getUpdateCustomerAttribute( attribute, value, customer );
     }
 
     @Override
@@ -143,4 +157,110 @@ public class CustomerServiceImpl implements CustomerService {
         return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
     }
 
+    private void isNotNull( String attribute, String value ) {
+
+        String[] attributes = {"cpf", "cnpj", "primaryEmail", "phoneNumber", "clientName", "whatsapp"};
+        for( String attribute1 : attributes ) {
+            if( attribute1.equals( attribute ) ) {
+                if( value == null ) {
+                    throw new IllegalArgumentException( attribute.toUpperCase() + " cannot be null." );
+                }
+            }
+        }
+    }
+
+    private void isContainsAnyOfTheAttributes( String attribute ) {
+
+        if( List.of( "emailList", "multiPrinterList", "monthlyPaymentList" ).contains( attribute ) ) {
+            throw new IllegalArgumentException( "This attribute cannot be changed on this endpoint." );
+        }
+    }
+
+    private void needsValidations( String attribute, String value ) {
+
+        if( List.of( "cpf", "cnpj", "primaryEmail" ).contains( attribute ) ) {
+            validateAttribute( attribute, value );
+        }
+    }
+
+    private void validateAttribute( String attribute, String value ) {
+
+        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
+        switch( attribute ) {
+            case "cnpj" -> {
+                Set< ConstraintViolation< LegalPersonalCustomerDTO > > cnpjViolations = validator.validateValue( LegalPersonalCustomerDTO.class, attribute, value );
+                if( ! cnpjViolations.isEmpty() ) {
+                    throw new IllegalArgumentException( cnpjViolations.iterator().next().getMessage() );
+                }
+            }
+            case "primaryEmail" -> {
+                Set< ConstraintViolation< NaturalPersonCustomerDTO > > emailViolations = validator.validateValue( NaturalPersonCustomerDTO.class, attribute, value );
+                log.info( "[ INFO ] emailViolations : {}", emailViolations );
+                if( ! emailViolations.isEmpty() ) {
+                    throw new IllegalArgumentException( emailViolations.iterator().next().getMessage() );
+                }
+            }
+            case "cpf" -> {
+                Set< ConstraintViolation< NaturalPersonCustomerDTO > > cpfViolations = validator.validateValue( NaturalPersonCustomerDTO.class, attribute, value );
+                if( ! cpfViolations.isEmpty() ) {
+                    throw new IllegalArgumentException( cpfViolations.iterator().next().getMessage() );
+                }
+            }
+        }
+    }
+
+    private UpdateCustomerDTO getUpdateCustomerAttribute( String attribute, String value, Customer customer ) {
+
+        switch( attribute ) {
+            case "cpf" -> {
+                NaturalPersonCustomer naturalPersonCustomer = ( NaturalPersonCustomer ) customer;
+                naturalPersonCustomer.setCpf( value );
+                return convertObjectToObjectDTOService
+                        .convertToUpdateCustomerDTO( customerRepository.save( naturalPersonCustomer ) );
+            }
+            case "cnpj" -> {
+                LegalPersonalCustomer legalPersonalCustomer = ( LegalPersonalCustomer ) customer;
+                legalPersonalCustomer.setCnpj( value );
+                return convertObjectToObjectDTOService
+                        .convertToUpdateCustomerDTO( customerRepository.save( legalPersonalCustomer ) );
+            }
+            case "primaryEmail" -> {
+                customer.setPrimaryEmail( value );
+                return convertObjectToObjectDTOService
+                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
+            }
+            case "phoneNumber" -> {
+                customer.setPhoneNumber( value );
+                return convertObjectToObjectDTOService
+                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
+            }
+            case "clientName" -> {
+                customer.setClientName( value );
+                return convertObjectToObjectDTOService
+                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
+            }
+            case "whatsapp" -> {
+                customer.setWhatsapp( value );
+                return convertObjectToObjectDTOService
+                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
+            }
+            case "bankCode" -> {
+                customer.setBankCode( value );
+                return convertObjectToObjectDTOService
+                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
+            }
+            case "financialSituation" -> {
+                customer.setFinancialSituation( FinancialSituation.valueOf( value ) );
+                return convertObjectToObjectDTOService
+                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
+            }
+            case "payDay" -> {
+                customer.setPayDay( Byte.parseByte( value ) );
+                return convertObjectToObjectDTOService
+                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
+            }
+            default -> throw new IllegalArgumentException( "Attribute not found." );
+        }
+    }
 }
