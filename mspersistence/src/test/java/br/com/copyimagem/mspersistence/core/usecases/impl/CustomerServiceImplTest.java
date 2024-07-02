@@ -324,6 +324,15 @@ class CustomerServiceImplTest {
         assertEquals(attribute.toUpperCase() +" cannot be null.", message);
     }
 
+    @Test
+    @DisplayName("Should return a exception when the attribute is in the list")
+    void shouldReturnAExceptionWhenTheAttributeIsInTheList() {
+        String attribute = "emailList";
+        when(customerRepository.findById(ID1L)).thenReturn(Optional.of(customer));
+        String message = assertThrows(IllegalArgumentException.class, () -> customerService.updateCustomerAttribute(attribute, "mail@mail.com", ID1L)).getMessage();
+        assertEquals("This attribute cannot be changed on this endpoint.", message);
+    }
+
     private void start() {
 
         customer = LegalPersonalCustomerBuilder.oneLegalPersonalCustomer().nowCustomerPJ();
