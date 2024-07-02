@@ -104,8 +104,26 @@ class NaturalPersonCustomerServiceImplTest {
     }
 
     @Test
-    void saveNaturalPersonCustomer() {
-
+    @DisplayName("Should save a NaturalPersonCustomer")
+    void shouldSaveANaturalPersonCustomer(){
+        when(convertObjectToObjectDTOService.convertToNaturalPersonCustomer(customerPfDTO)).thenReturn(customerPf);
+        when(customerRepository.existsCustomerByPrimaryEmail(customerPfDTO.getPrimaryEmail())).thenReturn(false);
+        when(naturalPersonCustomerRepository.existsNaturalPersonCustomerByCpf(customerPfDTO.getCpf())).thenReturn(false);
+        when(naturalPersonCustomerRepository.save(customerPf)).thenReturn(customerPf);
+        when(convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO(customerPf)).thenReturn(customerPfDTO);
+        when(addressRepository.save(customerPf.getAddress())).thenReturn(customerPfDTO.getAddress());
+        NaturalPersonCustomerDTO natural = naturalPersonCustomerService.saveNaturalPersonCustomer(customerPfDTO);
+        assertAll("NaturalPersonCustomerDTO",
+                () -> assertNotNull(natural),
+                () -> assertEquals(customerPfDTO, natural),
+                () ->  assertEquals(customerPfDTO.getId(), natural.getId()),
+                () ->  assertEquals(customerPfDTO.getCpf(), natural.getCpf()),
+                () ->  assertEquals(customerPfDTO.getClass(), natural.getClass())
+        );
+        verify(convertObjectToObjectDTOService, times(1)).convertToNaturalPersonCustomer(customerPfDTO);
+        verify(customerRepository, times(1)).existsCustomerByPrimaryEmail(customerPfDTO.getPrimaryEmail());
+        verify(naturalPersonCustomerRepository, times(1)).existsNaturalPersonCustomerByCpf(customerPfDTO.getCpf());
+        verify(naturalPersonCustomerRepository, times(1)).save(customerPf);
     }
 
     @Test
