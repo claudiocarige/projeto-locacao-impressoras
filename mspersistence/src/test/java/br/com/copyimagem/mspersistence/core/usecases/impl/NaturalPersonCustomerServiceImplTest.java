@@ -2,6 +2,7 @@ package br.com.copyimagem.mspersistence.core.usecases.impl;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.NaturalPersonCustomerDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.NaturalPersonCustomerRepository;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import static br.com.copyimagem.mspersistence.core.domain.builders.NaturalPersonCustomerBuilder.oneNaturalPersonCustomer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 class NaturalPersonCustomerServiceImplTest {
@@ -85,6 +86,21 @@ class NaturalPersonCustomerServiceImplTest {
                 () -> assertEquals(expectedDTO, customerPfDTO),
                 () -> assertEquals(NaturalPersonCustomerDTO.class, expectedDTO.getClass())
         );
+    }
+
+    @Test
+    @DisplayName("Should return a empty when NaturalPersonCustomer not found")
+    void shouldReturnEmptyWhenNaturalPersonCustomerNotFound(){
+        when(naturalPersonCustomerRepository.findById(11L)).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> naturalPersonCustomerService
+                .findNaturalPersonCustomerById(11L));
+        verify(naturalPersonCustomerRepository, times(1)).findById(11L);
+        try {
+            naturalPersonCustomerService.findNaturalPersonCustomerById(11L);
+        } catch (Exception ex) {
+            assertEquals( NoSuchElementException.class, ex.getClass());
+            assertEquals("Customer not found", ex.getMessage());
+        }
     }
 
     @Test
