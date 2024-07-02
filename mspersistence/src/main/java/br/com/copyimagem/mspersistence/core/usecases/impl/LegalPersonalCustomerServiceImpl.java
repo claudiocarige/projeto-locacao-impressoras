@@ -16,11 +16,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 @Log4j2
 @Service
-public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerService{
+public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerService {
 
     private final LegalPersonalCustomerRepository legalPersonalCustomerRepository;
 
@@ -86,7 +88,13 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
     @Override
     public CustomerResponseDTO findByCnpj( String cnpj ) {
 
-        return null;
+        log.info( "[ INFO ] Finding LegalPersonalCustomer by CNPJ." );
+        Optional< LegalPersonalCustomer > legalPersonalCustomer = legalPersonalCustomerRepository.findByCnpj( cnpj );
+        if( legalPersonalCustomer.isEmpty() ) {
+            log.error( "[ ERROR ] Exception : Customer not found :  {}.", NoSuchElementException.class );
+            throw new NoSuchElementException( "Customer not found" );
+        }
+        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer.get() );
     }
 
     private void existsCnpjOrEmail( LegalPersonalCustomerDTO legalPersonalCustomerDTO ) {
@@ -117,4 +125,5 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
             throw new DataIntegrityViolationException( "Address is null!" );
         }
     }
+
 }
