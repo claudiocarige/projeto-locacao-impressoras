@@ -203,6 +203,15 @@ class CustomerServiceImplTest {
         assertEquals(customer.getPhoneNumber(), customerResponseDTO.getPhoneNumber());
     }
 
+    @Test
+    @DisplayName("Should return a Exception when not found Customer by PhoneNumber")
+    void shouldReturnAExceptionWhenNotFoundCustomerByPhoneNumber(){
+        when(customerRepository.findByPhoneNumber(customer.getPhoneNumber())).thenReturn(Optional.empty());
+        String message = assertThrows(NoSuchElementException.class,
+                () -> customerService.searchCustomer("phoneNumber", "7132100000")).getMessage();
+        assertEquals("Customer not found", message);
+    }
+
     private void start() {
 
         customer = LegalPersonalCustomerBuilder.oneLegalPersonalCustomer().nowCustomerPJ();
