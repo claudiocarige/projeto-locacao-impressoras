@@ -4,19 +4,61 @@ import br.com.copyimagem.mspersistence.core.domain.entities.Customer;
 import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
+import br.com.copyimagem.mspersistence.core.usecases.interfaces.LegalPersonalCustomerService;
+import br.com.copyimagem.mspersistence.core.usecases.interfaces.NaturalPersonCustomerService;
+import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-
+@Log4j2
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    @Override
-    public CustomerResponseDTO searchCustomer( String type, String value ) {
+    private final CustomerRepository customerRepository;
 
-        return null;
+    private final ConvertObjectToObjectDTOService convertObjectToObjectDTOService;
+
+    private final LegalPersonalCustomerService legalPersonalCustomerService;
+
+    private final NaturalPersonCustomerService naturalPersonCustomerService;
+
+    public CustomerServiceImpl( CustomerRepository customerRepository,
+                                ConvertObjectToObjectDTOService convertObjectToObjectDTOService,
+                                LegalPersonalCustomerServiceImpl legalPersonalCustomerService,
+                                NaturalPersonCustomerServiceImpl naturalPersonCustomerService ) {
+
+        this.customerRepository = customerRepository;
+        this.convertObjectToObjectDTOService = convertObjectToObjectDTOService;
+        this.legalPersonalCustomerService = legalPersonalCustomerService;
+        this.naturalPersonCustomerService = naturalPersonCustomerService;
+    }
+
+    @Override
+    public CustomerResponseDTO searchCustomer( String typeParam, String valueParam ) {
+
+        return
+                switch( typeParam.toLowerCase() ) {
+                    case "id" -> findById( Long.parseLong( valueParam ) );
+
+                    default ->
+                            throw new IllegalArgumentException( "Parameter [ " + typeParam + " ] type not accepted." );
+                };
+    }
+
+    private CustomerResponseDTO findById( Long id ) {
+
+        Optional< Customer > customerOptional = customerRepository.findById( id );
+        if( customerOptional.isEmpty() ) {
+            log.error( "[ ERROR ] Exception (findById() method in CustomerServiceImpl class):  {}.",
+                    NoSuchElementException.class );
+            throw new NoSuchElementException( "Customer not found" );
+        }
+        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
     }
 
     @Override
