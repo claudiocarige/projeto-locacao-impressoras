@@ -315,6 +315,15 @@ class CustomerServiceImplTest {
         }
     }
 
+    @Test
+    @DisplayName("Should return  a exception when the attribute is null")
+    void shouldReturnAExceptionWhenTheAttributeIsNull() {
+        String attribute = "clientName";
+        String message = assertThrows(IllegalArgumentException.class,
+                () -> customerService.updateCustomerAttribute(attribute, null, ID1L)).getMessage();
+        assertEquals(attribute.toUpperCase() +" cannot be null.", message);
+    }
+
     private void start() {
 
         customer = LegalPersonalCustomerBuilder.oneLegalPersonalCustomer().nowCustomerPJ();
