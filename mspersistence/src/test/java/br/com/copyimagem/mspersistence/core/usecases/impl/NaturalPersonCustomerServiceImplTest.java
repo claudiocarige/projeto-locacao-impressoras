@@ -142,6 +142,17 @@ class NaturalPersonCustomerServiceImplTest {
     }
 
     @Test
+    @DisplayName("Should throw return Exception when CPF already exists")
+    void shouldReturnThrowExceptionWhenCpfAlreadyExists() {
+        when(naturalPersonCustomerRepository.existsNaturalPersonCustomerByCpf(customerPfDTO.getCpf()))
+                .thenReturn(true);
+        String dataException = assertThrows(DataIntegrityViolationException.class,() ->
+                naturalPersonCustomerService.saveNaturalPersonCustomer(customerPfDTO)).getMessage();
+        assertTrue(dataException.startsWith("CPF"));
+        assertEquals("CPF already exists!", dataException);
+    }
+
+    @Test
     void findByCpf() {
 
     }
