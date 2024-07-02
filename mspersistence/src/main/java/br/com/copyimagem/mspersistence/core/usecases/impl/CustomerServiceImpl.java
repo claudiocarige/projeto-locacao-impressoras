@@ -46,6 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
                     case "id" -> findById( Long.parseLong( valueParam ) );
                     case "cpf" -> findByCpf( valueParam );
                     case "cnpj" -> findByCnpj( valueParam );
+                    case "email" -> findByPrimaryEmail( valueParam );
                     default ->
                             throw new IllegalArgumentException( "Parameter [ " + typeParam + " ] type not accepted." );
                 };
@@ -101,5 +102,17 @@ public class CustomerServiceImpl implements CustomerService {
 
         return legalPersonalCustomerService.findByCnpj( valueParam );
     }
+
+    private CustomerResponseDTO findByPrimaryEmail( String email ) {
+
+        Optional< Customer > customerOptional = customerRepository.findByPrimaryEmail( email );
+        if( customerOptional.isEmpty() ) {
+            log.error( "[ ERROR ] Exception (findByPrimaryEmail() method in CustomerServiceImpl class) :  {}.",
+                    NoSuchElementException.class );
+            throw new NoSuchElementException( "Customer not found" );
+        }
+        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
+    }
+
 
 }
