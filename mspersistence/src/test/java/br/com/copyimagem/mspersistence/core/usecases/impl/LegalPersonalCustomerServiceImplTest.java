@@ -217,6 +217,20 @@ class LegalPersonalCustomerServiceImplTest {
         );
     }
 
+    @Test
+    @DisplayName("must return a empty when CNPJ not found")
+    void mustReturnEmptyWhenCnpjNotFound(){
+        when(legalPersonalCustomerRepository.findByCnpj(CNPJ)).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class,
+                () -> legalPersonalCustomerService.findByCnpj(CNPJ));
+        try {
+            legalPersonalCustomerService.findByCnpj(CNPJ);
+        } catch (NoSuchElementException message) {
+            assertEquals("Customer not found", message.getMessage());
+            assertEquals(NoSuchElementException.class, message.getClass());
+        }
+    }
+
     private void start() {
 
         customerPj = oneLegalPersonalCustomer()
