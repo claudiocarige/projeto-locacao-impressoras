@@ -1,6 +1,7 @@
 package br.com.copyimagem.mspersistence.core.usecases.impl;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
+import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.NaturalPersonCustomerDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.DataIntegrityViolationException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
@@ -153,8 +154,23 @@ class NaturalPersonCustomerServiceImplTest {
     }
 
     @Test
-    void findByCpf() {
-
+    @DisplayName("Should return a NaturalPersonCustomer by CPF.")
+    void shouldReturnANaturalPersonCustomerByCPF() {
+        CustomerResponseDTO customerResponseDTO = new CustomerResponseDTO();
+        customerResponseDTO.setId(ID1L);
+        customerResponseDTO.setCpfOrCnpj(CPF);
+        customerResponseDTO.setClientName(customerPf.getClientName());
+        customerResponseDTO.setAddress(customerPf.getAddress());
+        when(naturalPersonCustomerRepository.findByCpf(customerPf.getCpf()))
+                .thenReturn(Optional.of(customerPf));
+        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(customerPf))
+                .thenReturn(customerResponseDTO);
+        CustomerResponseDTO customerDTO = naturalPersonCustomerService.findByCpf(customerPf.getCpf());
+        assertNotNull(customerDTO);
+        assertEquals(customerResponseDTO, customerDTO);
+        assertEquals(customerResponseDTO.getId(), customerDTO.getId());
+        assertEquals(CustomerResponseDTO.class, customerDTO.getClass());
+        assertEquals(CPF, customerDTO.getCpfOrCnpj());
     }
 
     private void start() {
