@@ -127,6 +127,18 @@ class CustomerServiceImplTest {
         assertEquals(customerResponseDTOPJ.getCpfOrCnpj(), customerResponseDTO.getCpfOrCnpj());
     }
 
+    @Test
+    @DisplayName("Should return a empty when Customer not found by CNPJ")
+    void shouldReturnAEmptyWhenCustomerNotFounfByCNPJ(){
+        when(legalPersonalCustomerService.findByCnpj(CNPJ)).thenReturn(null);
+        try{
+            customerService.searchCustomer("cnpj", CNPJ);
+        }catch (NoSuchElementException ex){
+            assertEquals("Customer not found", ex.getMessage());
+            assertEquals(NoSuchElementException.class, ex.getClass());
+        }
+    }
+
     private void start() {
 
         customer = LegalPersonalCustomerBuilder.oneLegalPersonalCustomer().nowCustomerPJ();
