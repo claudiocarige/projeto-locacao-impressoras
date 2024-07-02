@@ -239,14 +239,40 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return all customers")
+    @DisplayName( "Should return exception when typeParam is not accepted" )
+    void shouldReturnExceptionWhenTypeParamIsNotAccepted() {
+
+        String typeParam = "teste";
+        String message = assertThrows( IllegalArgumentException.class,
+                () -> customerService.searchCustomer( typeParam, "teste" ) ).getMessage();
+        assertEquals( "Parameter [ " + typeParam + " ] type not accepted.", message );
+    }
+
+    @Test
+    @DisplayName( "Should return all customers" )
     void shouldReturnAllCustomers() {
-        when(customerRepository.findAll()).thenReturn( Collections.singletonList(legalPersonalCustomer));
-        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(legalPersonalCustomer)).thenReturn(customerResponseDTOPJ);
-        List<CustomerResponseDTO> customerResponseDTO = customerService.searchAllCustomers();
+
+        when( customerRepository.findAll() ).thenReturn( Collections.singletonList( legalPersonalCustomer ) );
+        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer ) ).thenReturn( customerResponseDTOPJ );
+        List< CustomerResponseDTO > customerResponseDTO = customerService.searchAllCustomers();
+        assertEquals( 1, customerResponseDTO.size() );
+        assertEquals( legalPersonalCustomer.getId(), customerResponseDTO.get( 0 ).getId() );
+        assertEquals( CustomerResponseDTO.class, customerResponseDTO.get( 0 ).getClass() );
+    }
+
+    @Test
+    @DisplayName("Should return all customers by FinancialSituation")
+    void shouldReturnAllCustomersByFinancialSituation() {
+        String situation = "PAGO";
+        when(customerRepository.findAllByFinancialSituation(any())).
+                thenReturn(Collections.singletonList(legalPersonalCustomer));
+        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(legalPersonalCustomer))
+                .thenReturn(customerResponseDTOPJ);
+        List<CustomerResponseDTO> customerResponseDTO = customerService.searchFinancialSituation(situation);
         assertEquals(1, customerResponseDTO.size());
         assertEquals(legalPersonalCustomer.getId(), customerResponseDTO.get(0).getId());
         assertEquals(CustomerResponseDTO.class, customerResponseDTO.get(0).getClass());
+        assertEquals(situation, customerResponseDTO.get(0).getFinancialSituation());
     }
 
     private void start() {
