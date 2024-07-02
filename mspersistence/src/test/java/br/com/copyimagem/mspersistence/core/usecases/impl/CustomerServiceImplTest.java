@@ -8,6 +8,7 @@ import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustome
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 
@@ -67,17 +69,28 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return a Customer by ID ")
+    @DisplayName( "Should return a Customer by ID " )
     void shouldReturnACustomerByID() {
-        when(customerRepository.findById(ID1L)).thenReturn( Optional.of(legalPersonalCustomer));
-        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(legalPersonalCustomer)).thenReturn(customerResponseDTOPJ);
-        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer("id", "1");
-        assertEquals(customerResponseDTOPJ, customerResponseDTO);
-        assertEquals(CustomerResponseDTO.class, customerResponseDTOPJ.getClass());
-        assertEquals(customerResponseDTO.getCpfOrCnpj(),  customerResponseDTOPJ.getCpfOrCnpj());
+
+        when( customerRepository.findById( ID1L ) ).thenReturn( Optional.of( legalPersonalCustomer ) );
+        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer ) )
+                                                                                 .thenReturn( customerResponseDTOPJ );
+        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "id", "1" );
+        assertEquals( customerResponseDTOPJ, customerResponseDTO );
+        assertEquals( CustomerResponseDTO.class, customerResponseDTOPJ.getClass() );
+        assertEquals( customerResponseDTO.getCpfOrCnpj(), customerResponseDTOPJ.getCpfOrCnpj() );
     }
 
+    @Test
+    @DisplayName( "Should return a empty when Customer not found by ID" )
+    void shouldReturnAEmptyWhenCustomerNotFoundById() {
 
+        when( customerRepository.findById( ID1L ) ).thenReturn( Optional.empty() );
+        String message = assertThrows( NoSuchElementException.class,
+                () -> customerService.searchCustomer( "id", "1" ) ).getMessage();
+        assertEquals( "Customer not found", message );
+
+    }
 
     private void start() {
 
