@@ -4,6 +4,8 @@ import br.com.copyimagem.mspersistence.core.domain.builders.NaturalPersonCustome
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.NaturalPersonCustomerDTO;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.NaturalPersonCustomerService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -79,6 +82,31 @@ class NaturalPersonCustomerControllerTest {
                 .andExpect(jsonPath("$.clientName").value(customerPfDTO.getClientName())); // Add assertions for other fields
         verify(naturalPersonCustomerService, times(1))
                 .findNaturalPersonCustomerById(customerPf.getId());
+    }
+
+    @Test
+    @DisplayName("Should save a NaturalPersonCustomer")
+    void shouldSaveANaturalPersonCustomer() throws Exception {
+
+        when(naturalPersonCustomerService.saveNaturalPersonCustomer(customerPfDTO)).thenReturn(customerPfDTO);
+        mockMvc.perform(post("/api/v1/customers/pf/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJsonString(customerPfDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string("Location", "http://localhost/api/v1/customers/pf/save/1"));
+
+        verify(naturalPersonCustomerService, times(1)).saveNaturalPersonCustomer(customerPfDTO);
+    }
+
+    private static String toJsonString(final Object obj) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            return mapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void start() {
