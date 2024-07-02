@@ -184,6 +184,16 @@ class LegalPersonalCustomerServiceImplTest {
         assertEquals("Email already exists!", message);
     }
 
+    @Test
+    @DisplayName("Must return exception when Cnpj exist")
+    void mustReturnExceptionWhenCnpjExist(){
+        when(legalPersonalCustomerRepository.existsLegalPersonalCustomerByCnpj(customerPjDTO.getCnpj()))
+                .thenReturn(true);
+        String message = assertThrows(DataIntegrityViolationException.class,
+                () -> legalPersonalCustomerService.saveLegalPersonalCustomer(customerPjDTO)).getMessage();
+        assertEquals("CNPJ already exists!", message);
+    }
+
     private void start() {
 
         customerPj = oneLegalPersonalCustomer()
