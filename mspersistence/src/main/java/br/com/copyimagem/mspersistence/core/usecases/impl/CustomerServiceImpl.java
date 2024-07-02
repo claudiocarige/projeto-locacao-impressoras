@@ -58,7 +58,9 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List< CustomerResponseDTO > searchAllCustomers() {
 
-        return List.of();
+        List< Customer > customerList = customerRepository.findAll();
+        return customerList.stream()
+                .map( convertObjectToObjectDTOService::convertToCustomerResponseDTO ).toList();
     }
 
     @Override
