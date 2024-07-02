@@ -8,7 +8,8 @@ import java.util.Optional;
 
 public interface NaturalPersonCustomerRepository extends JpaRepository< NaturalPersonCustomer, Long > {
 
-
     Optional< NaturalPersonCustomer > findByCpf( String cpf );
+
+    Boolean existsNaturalPersonCustomerByCpf( String cpf );
 
 }
