@@ -193,33 +193,47 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return a Customer by PhoneNumber")
-    void shouldReturnACustomerByPhoneNumber(){
-        when(customerRepository.findByPhoneNumber(customer.getPhoneNumber())).thenReturn(Optional.of(customer));
-        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(customer)).thenReturn(customerResponseDTOPJ);
+    @DisplayName( "Should return a Customer by PhoneNumber" )
+    void shouldReturnACustomerByPhoneNumber() {
+
+        when( customerRepository.findByPhoneNumber( customer.getPhoneNumber() ) ).thenReturn( Optional.of( customer ) );
+        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( customer ) ).thenReturn( customerResponseDTOPJ );
         CustomerResponseDTO customerResponseDTO = customerService
-                .searchCustomer("phoneNumber", "7132104567");
-        assertEquals(customerResponseDTOPJ, customerResponseDTO);
-        assertEquals(CustomerResponseDTO.class, customerResponseDTO.getClass());
-        assertEquals(customer.getPhoneNumber(), customerResponseDTO.getPhoneNumber());
+                .searchCustomer( "phoneNumber", "7132104567" );
+        assertEquals( customerResponseDTOPJ, customerResponseDTO );
+        assertEquals( CustomerResponseDTO.class, customerResponseDTO.getClass() );
+        assertEquals( customer.getPhoneNumber(), customerResponseDTO.getPhoneNumber() );
     }
 
     @Test
-    @DisplayName("Should return a Exception when not found Customer by PhoneNumber")
-    void shouldReturnAExceptionWhenNotFoundCustomerByPhoneNumber(){
-        when(customerRepository.findByPhoneNumber(customer.getPhoneNumber())).thenReturn(Optional.empty());
-        String message = assertThrows(NoSuchElementException.class,
-                () -> customerService.searchCustomer("phoneNumber", "7132100000")).getMessage();
-        assertEquals("Customer not found", message);
+    @DisplayName( "Should return a Exception when not found Customer by PhoneNumber" )
+    void shouldReturnAExceptionWhenNotFoundCustomerByPhoneNumber() {
+
+        when( customerRepository.findByPhoneNumber( customer.getPhoneNumber() ) ).thenReturn( Optional.empty() );
+        var message = assertThrows( NoSuchElementException.class,
+                () -> customerService.searchCustomer( "phoneNumber", "7132100000" ) ).getMessage();
+        assertEquals( "Customer not found", message );
     }
 
     @Test
-    @DisplayName("Should return a CustomerContract with sucess.")
-    void shouldReturnACustomerContractWithSucess(){
-        when(customerRepository.findById(ID1L)).thenReturn(Optional.of(legalPersonalCustomer));
-        CustomerContract customerContract = customerService.getCustomerContract(ID1L);
-        assertEquals(CustomerContract.class, customerContract.getClass());
-        assertEquals(legalPersonalCustomer.getCustomerContract().getId(), customerContract.getId());
+    @DisplayName( "Should return a CustomerContract with sucess." )
+    void shouldReturnACustomerContractWithSucess() {
+
+        when( customerRepository.findById( ID1L ) ).thenReturn( Optional.of( legalPersonalCustomer ) );
+        CustomerContract customerContract = customerService.getCustomerContract( ID1L );
+        assertEquals( CustomerContract.class, customerContract.getClass() );
+        assertEquals( legalPersonalCustomer.getCustomerContract().getId(), customerContract.getId() );
+    }
+
+    @Test
+    @DisplayName( "Should return a not found CustomerContract" )
+    void shouldReturnANotFoundCustomerContract() {
+
+        when( customerRepository.findById( ID1L ) ).thenReturn( Optional.empty() );
+        var message = assertThrows( NoSuchElementException.class, () ->
+                customerService.getCustomerContract( ID1L ) ).getMessage();
+
+        assertEquals( "Customer not found", message );
     }
 
     private void start() {
