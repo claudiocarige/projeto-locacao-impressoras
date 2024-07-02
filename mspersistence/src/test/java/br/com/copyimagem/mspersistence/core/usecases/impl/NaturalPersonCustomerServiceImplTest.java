@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
+import java.util.Optional;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.NaturalPersonCustomerBuilder.oneNaturalPersonCustomer;
 import static org.junit.jupiter.api.Assertions.*;
@@ -71,8 +72,19 @@ class NaturalPersonCustomerServiceImplTest {
     }
 
     @Test
-    void findNaturalPersonCustomerById() {
+    @DisplayName("should return a NaturalPersonCustomerDTO by Id")
+    void shouldReturnANaturalPersonCustomerDTOById(){
+        when(naturalPersonCustomerRepository.findById(ID1L)).thenReturn( Optional.of(customerPf));
 
+        when(convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO(customerPf)).thenReturn(customerPfDTO);
+        NaturalPersonCustomerDTO expectedDTO = naturalPersonCustomerService.findNaturalPersonCustomerById(1L);
+
+        assertAll("NaturalPersonCustomer",
+                () -> assertNotNull(expectedDTO),
+                () -> assertEquals(ID1L, expectedDTO.getId()),
+                () -> assertEquals(expectedDTO, customerPfDTO),
+                () -> assertEquals(NaturalPersonCustomerDTO.class, expectedDTO.getClass())
+        );
     }
 
     @Test
