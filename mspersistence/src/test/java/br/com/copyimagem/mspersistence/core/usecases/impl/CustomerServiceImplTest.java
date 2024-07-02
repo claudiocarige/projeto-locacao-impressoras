@@ -26,7 +26,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 class CustomerServiceImplTest {
@@ -342,6 +342,20 @@ class CustomerServiceImplTest {
         String message = assertThrows(IllegalArgumentException.class,
                 () -> customerService.updateCustomerAttribute(attribute, "5", ID1L)).getMessage();
         assertEquals("Attribute not found.", message);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "primaryEmail,Email format is invalid,ccarige.mail ",
+            "cnpj, CNPJ format is invalid, il.123.com/1234-br",
+            "cpf, CPF format is invalid, 894.965.31-02"})
+    @DisplayName("Should return a exception when Attributes are invalid")
+    void shouldReturnAExceptionWhenAttributesAreInvalid(String attribute,String messages, String val ){
+        when(customerRepository.findById(ID1L)).thenReturn(Optional.of(customer));
+        String message = assertThrows(IllegalArgumentException.class,
+                () -> customerService.updateCustomerAttribute(attribute, val, ID1L)).getMessage();
+        assertEquals(messages, message);
+        verify(customerRepository, times(1)).findById(ID1L);
     }
 
     private void start() {
