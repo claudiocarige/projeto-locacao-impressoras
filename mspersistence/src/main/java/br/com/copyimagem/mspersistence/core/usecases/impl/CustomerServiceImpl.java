@@ -45,6 +45,7 @@ public class CustomerServiceImpl implements CustomerService {
                 switch( typeParam.toLowerCase() ) {
                     case "id" -> findById( Long.parseLong( valueParam ) );
                     case "cpf" -> findByCpf( valueParam );
+                    case "cnpj" -> findByCnpj( valueParam );
                     default ->
                             throw new IllegalArgumentException( "Parameter [ " + typeParam + " ] type not accepted." );
                 };
@@ -94,6 +95,11 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerResponseDTO findByCpf( String valueParam ) {
 
         return naturalPersonCustomerService.findByCpf( valueParam );
+    }
+
+    private CustomerResponseDTO findByCnpj( String valueParam ) {
+
+        return legalPersonalCustomerService.findByCnpj( valueParam );
     }
 
 }
