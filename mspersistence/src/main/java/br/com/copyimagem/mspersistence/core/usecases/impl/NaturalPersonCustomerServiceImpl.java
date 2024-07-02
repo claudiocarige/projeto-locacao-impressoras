@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+
 
 @Log4j2
 @Service
@@ -81,7 +83,12 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
     @Override
     public CustomerResponseDTO findByCpf( String cpf ) {
 
-        return null;
+        Optional< NaturalPersonCustomer > naturalPersonCustomer = naturalPersonCustomerRepository.findByCpf( cpf );
+        if( naturalPersonCustomer.isEmpty() ) {
+            log.error( "[ ERROR ] Exception :  {}.", NoSuchElementException.class );
+            throw new NoSuchElementException( "Customer not found" );
+        }
+        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( naturalPersonCustomer.get() );
     }
 
     private void existsCpfOrEmail( NaturalPersonCustomerDTO naturalPersonCustomerDTO ) {
