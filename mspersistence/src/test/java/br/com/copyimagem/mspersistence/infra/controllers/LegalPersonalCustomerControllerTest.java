@@ -2,6 +2,7 @@ package br.com.copyimagem.mspersistence.infra.controllers;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.LegalPersonalCustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.LegalPersonalCustomerBuilder.oneLegalPersonalCustomer;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -78,6 +79,20 @@ class LegalPersonalCustomerControllerTest {
                 .andExpect(jsonPath("$.clientName").value(customerPjDTO.getClientName()));
         verify(legalPersonalCustomerService, times(1))
                 .findLegalPersonalCustomerById(customerPjDTO.getId());
+    }
+
+    @Test
+    @DisplayName("Should return a exception when LegalPersonalCustomer not found")
+    void shouldReturnAExceptionWhenLegalPersonalCustomerNotFound() {
+        when(legalPersonalCustomerService.findLegalPersonalCustomerById(anyLong()))
+                .thenThrow(new NoSuchElementException("Customer not found"));
+
+        assertThrows(NoSuchElementException.class,
+                () ->  LegalPersonalCustomerController.getLegalPersonalCustomerById(ID1L));
+        String legalPersonalCustomerById = assertThrows(NoSuchElementException.class,
+                () -> LegalPersonalCustomerController.getLegalPersonalCustomerById(ID1L)).getMessage();
+        assertEquals("Customer not found", legalPersonalCustomerById);
+        verify(legalPersonalCustomerService, times(2)).findLegalPersonalCustomerById(ID1L);
     }
 
     private void start() {
