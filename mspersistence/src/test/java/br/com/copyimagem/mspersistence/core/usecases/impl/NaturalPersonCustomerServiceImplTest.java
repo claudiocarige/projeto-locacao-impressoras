@@ -2,6 +2,7 @@ package br.com.copyimagem.mspersistence.core.usecases.impl;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.NaturalPersonCustomerDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.DataIntegrityViolationException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
@@ -108,7 +109,8 @@ class NaturalPersonCustomerServiceImplTest {
     void shouldSaveANaturalPersonCustomer(){
         when(convertObjectToObjectDTOService.convertToNaturalPersonCustomer(customerPfDTO)).thenReturn(customerPf);
         when(customerRepository.existsCustomerByPrimaryEmail(customerPfDTO.getPrimaryEmail())).thenReturn(false);
-        when(naturalPersonCustomerRepository.existsNaturalPersonCustomerByCpf(customerPfDTO.getCpf())).thenReturn(false);
+        when(naturalPersonCustomerRepository
+                                    .existsNaturalPersonCustomerByCpf(customerPfDTO.getCpf())).thenReturn(false);
         when(naturalPersonCustomerRepository.save(customerPf)).thenReturn(customerPf);
         when(convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO(customerPf)).thenReturn(customerPfDTO);
         when(addressRepository.save(customerPf.getAddress())).thenReturn(customerPfDTO.getAddress());
@@ -120,10 +122,23 @@ class NaturalPersonCustomerServiceImplTest {
                 () ->  assertEquals(customerPfDTO.getCpf(), natural.getCpf()),
                 () ->  assertEquals(customerPfDTO.getClass(), natural.getClass())
         );
-        verify(convertObjectToObjectDTOService, times(1)).convertToNaturalPersonCustomer(customerPfDTO);
-        verify(customerRepository, times(1)).existsCustomerByPrimaryEmail(customerPfDTO.getPrimaryEmail());
-        verify(naturalPersonCustomerRepository, times(1)).existsNaturalPersonCustomerByCpf(customerPfDTO.getCpf());
+        verify(convertObjectToObjectDTOService, times(1))
+                                                                        .convertToNaturalPersonCustomer(customerPfDTO);
+        verify(customerRepository, times(1))
+                                                        .existsCustomerByPrimaryEmail(customerPfDTO.getPrimaryEmail());
+        verify(naturalPersonCustomerRepository, times(1))
+                                                             .existsNaturalPersonCustomerByCpf(customerPfDTO.getCpf());
         verify(naturalPersonCustomerRepository, times(1)).save(customerPf);
+    }
+
+    @Test
+    @DisplayName("Should throw Exceptionn return when EMAIL already exists")
+    void shouldReturnThrowExceptionWhenEmailAlreadyExists() {
+        when(customerRepository.existsCustomerByPrimaryEmail(customerPfDTO.getPrimaryEmail()))
+                .thenReturn(true);
+        DataIntegrityViolationException dataException = assertThrows(DataIntegrityViolationException.class,() ->
+                naturalPersonCustomerService.saveNaturalPersonCustomer(customerPfDTO));
+        assertTrue(dataException.getMessage().startsWith("Email"));
     }
 
     @Test
