@@ -6,12 +6,18 @@ import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRep
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.NaturalPersonCustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
+
 import static br.com.copyimagem.mspersistence.core.domain.builders.NaturalPersonCustomerBuilder.oneNaturalPersonCustomer;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 
 class NaturalPersonCustomerServiceImplTest {
@@ -47,7 +53,20 @@ class NaturalPersonCustomerServiceImplTest {
     }
 
     @Test
-    void findAllNaturalPersonCustomer() {
+    @DisplayName("Should return a list of NaturalPersonCustomer")
+    void shouldReturnAListOfNaturalPersonCustomer(){
+        String email = "carige@mail.com";
+        when(naturalPersonCustomerRepository.findAll()).thenReturn( List.of(customerPf));
+        when(convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO(customerPf)).thenReturn(customerPfDTO);
+        List<NaturalPersonCustomerDTO> natural = naturalPersonCustomerService.findAllNaturalPersonCustomer();
+        assertAll("NaturalPersonCustomer",
+                () -> assertNotNull(natural),
+                () -> assertEquals(1, natural.size()),
+                () -> assertEquals(NaturalPersonCustomerDTO.class, natural.get(0).getClass()),
+                () -> assertEquals(customerPfDTO, natural.get(0)),
+                () -> assertEquals(email, natural.get(0).getPrimaryEmail()),
+                () -> assertEquals(CPF, natural.get(0).getCpf())
+        );
 
     }
 
