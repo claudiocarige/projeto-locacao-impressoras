@@ -10,9 +10,16 @@ import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 
 class CustomerServiceImplTest {
@@ -59,6 +66,16 @@ class CustomerServiceImplTest {
         start();
     }
 
+    @Test
+    @DisplayName("Should return a Customer by ID ")
+    void shouldReturnACustomerByID() {
+        when(customerRepository.findById(ID1L)).thenReturn( Optional.of(legalPersonalCustomer));
+        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(legalPersonalCustomer)).thenReturn(customerResponseDTOPJ);
+        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer("id", "1");
+        assertEquals(customerResponseDTOPJ, customerResponseDTO);
+        assertEquals(CustomerResponseDTO.class, customerResponseDTOPJ.getClass());
+        assertEquals(customerResponseDTO.getCpfOrCnpj(),  customerResponseDTOPJ.getCpfOrCnpj());
+    }
 
 
 
