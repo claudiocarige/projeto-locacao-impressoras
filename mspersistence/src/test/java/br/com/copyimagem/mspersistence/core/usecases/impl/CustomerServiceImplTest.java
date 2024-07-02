@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
@@ -77,7 +78,7 @@ class CustomerServiceImplTest {
 
         when( customerRepository.findById( ID1L ) ).thenReturn( Optional.of( legalPersonalCustomer ) );
         when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer ) )
-                                                                               .thenReturn( customerResponseDTOPJ );
+                .thenReturn( customerResponseDTOPJ );
         CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "id", "1" );
         assertEquals( customerResponseDTOPJ, customerResponseDTO );
         assertEquals( CustomerResponseDTO.class, customerResponseDTOPJ.getClass() );
@@ -149,7 +150,7 @@ class CustomerServiceImplTest {
 
         when( customerRepository.findByPrimaryEmail( EMAIL ) ).thenReturn( Optional.of( naturalPersonCustomer ) );
         when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( naturalPersonCustomer ) )
-                                                                                  .thenReturn( customerResponseDTOPF );
+                .thenReturn( customerResponseDTOPF );
         CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "email", EMAIL );
         assertEquals( customerResponseDTOPF, customerResponseDTO );
         assertEquals( CustomerResponseDTO.class, customerResponseDTOPF.getClass() );
@@ -168,16 +169,27 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return a Customer by clientName")
-    void shouldReturnACustomerByClientName(){
-        when(customerRepository.findByClientName(customer.getClientName())).thenReturn(Optional.of(customer));
-        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(customer)).thenReturn(customerResponseDTOPJ);
-        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer("clientName", "Claudio Carigé");
-        assertEquals(customerResponseDTOPJ, customerResponseDTO);
-        assertEquals(CustomerResponseDTO.class, customerResponseDTO.getClass());
-        assertEquals(customer.getClientName(), customerResponseDTO.getClientName());
+    @DisplayName( "Should return a Customer by clientName" )
+    void shouldReturnACustomerByClientName() {
+
+        when( customerRepository.findByClientName( customer.getClientName() ) ).thenReturn( Optional.of( customer ) );
+        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( customer ) ).thenReturn( customerResponseDTOPJ );
+        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "clientName", "Claudio Carigé" );
+        assertEquals( customerResponseDTOPJ, customerResponseDTO );
+        assertEquals( CustomerResponseDTO.class, customerResponseDTO.getClass() );
+        assertEquals( customer.getClientName(), customerResponseDTO.getClientName() );
     }
 
+    @Test
+    @DisplayName( "Should return a not Found Customer by clientName" )
+    void shouldReturnANotFoundCustomerByClientName() {
+
+        when( customerRepository.findByClientName( customer.getClientName() ) ).thenReturn( Optional.empty() );
+        var message = assertThrows( NoSuchElementException.class, () ->
+                customerService.searchCustomer( "clientName", "Claudio Carigé" ) ).getMessage();
+        assertEquals( "Customer not found", message );
+
+    }
 
     private void start() {
 
