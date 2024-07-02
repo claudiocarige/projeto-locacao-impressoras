@@ -191,6 +191,18 @@ class CustomerServiceImplTest {
 
     }
 
+    @Test
+    @DisplayName("Should return a Customer by PhoneNumber")
+    void shouldReturnACustomerByPhoneNumber(){
+        when(customerRepository.findByPhoneNumber(customer.getPhoneNumber())).thenReturn(Optional.of(customer));
+        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(customer)).thenReturn(customerResponseDTOPJ);
+        CustomerResponseDTO customerResponseDTO = customerService
+                .searchCustomer("phoneNumber", "7132104567");
+        assertEquals(customerResponseDTOPJ, customerResponseDTO);
+        assertEquals(CustomerResponseDTO.class, customerResponseDTO.getClass());
+        assertEquals(customer.getPhoneNumber(), customerResponseDTO.getPhoneNumber());
+    }
+
     private void start() {
 
         customer = LegalPersonalCustomerBuilder.oneLegalPersonalCustomer().nowCustomerPJ();
