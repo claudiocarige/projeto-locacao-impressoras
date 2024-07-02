@@ -77,7 +77,7 @@ class CustomerServiceImplTest {
 
         when( customerRepository.findById( ID1L ) ).thenReturn( Optional.of( legalPersonalCustomer ) );
         when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer ) )
-                                                                                 .thenReturn( customerResponseDTOPJ );
+                                                                               .thenReturn( customerResponseDTOPJ );
         CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "id", "1" );
         assertEquals( customerResponseDTOPJ, customerResponseDTO );
         assertEquals( CustomerResponseDTO.class, customerResponseDTOPJ.getClass() );
@@ -96,69 +96,88 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return a Customer by CPF")
+    @DisplayName( "Should return a Customer by CPF" )
     void shouldReturnACustomerByCPF() {
-        when(naturalPersonCustomerService.findByCpf(CPF)).thenReturn(customerResponseDTOPF);
-        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer("cpf", CPF);
-        assertEquals(customerResponseDTOPF, customerResponseDTO);
-        assertEquals(CustomerResponseDTO.class, customerResponseDTOPF.getClass());
-        assertEquals(customerResponseDTO.getCpfOrCnpj(), customerResponseDTOPF.getCpfOrCnpj());
+
+        when( naturalPersonCustomerService.findByCpf( CPF ) ).thenReturn( customerResponseDTOPF );
+        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "cpf", CPF );
+        assertEquals( customerResponseDTOPF, customerResponseDTO );
+        assertEquals( CustomerResponseDTO.class, customerResponseDTOPF.getClass() );
+        assertEquals( customerResponseDTO.getCpfOrCnpj(), customerResponseDTOPF.getCpfOrCnpj() );
     }
 
     @Test
-    @DisplayName("Should return a empty when Customer not found by CPF")
+    @DisplayName( "Should return a empty when Customer not found by CPF" )
     void shouldReturnAEmptyWhenCustomerNotFoundByCPF() {
-        when(naturalPersonCustomerService.findByCpf(CPF)).thenReturn(null);
-        try{
-            customerService.searchCustomer("cpf", CPF);
-        }catch (NoSuchElementException ex){
-            assertEquals("Customer not found", ex.getMessage());
-            assertEquals(NoSuchElementException.class, ex.getClass());
+
+        when( naturalPersonCustomerService.findByCpf( CPF ) ).thenReturn( null );
+        try {
+            customerService.searchCustomer( "cpf", CPF );
+        } catch( NoSuchElementException ex ) {
+            assertEquals( "Customer not found", ex.getMessage() );
+            assertEquals( NoSuchElementException.class, ex.getClass() );
         }
     }
 
     @Test
-    @DisplayName("Should return a Customer by CNPJ")
-    void shouldReturnACustomerByCNPJ(){
-        when(legalPersonalCustomerService.findByCnpj(CNPJ)).thenReturn(customerResponseDTOPJ);
-        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer("cnpj", CNPJ);
+    @DisplayName( "Should return a Customer by CNPJ" )
+    void shouldReturnACustomerByCNPJ() {
+
+        when( legalPersonalCustomerService.findByCnpj( CNPJ ) ).thenReturn( customerResponseDTOPJ );
+        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "cnpj", CNPJ );
+        assertEquals( customerResponseDTOPJ, customerResponseDTO );
+        assertEquals( CustomerResponseDTO.class, customerResponseDTO.getClass() );
+        assertEquals( customerResponseDTOPJ.getCpfOrCnpj(), customerResponseDTO.getCpfOrCnpj() );
+    }
+
+    @Test
+    @DisplayName( "Should return a empty when Customer not found by CNPJ" )
+    void shouldReturnAEmptyWhenCustomerNotFounfByCNPJ() {
+
+        when( legalPersonalCustomerService.findByCnpj( CNPJ ) ).thenReturn( null );
+        try {
+            customerService.searchCustomer( "cnpj", CNPJ );
+        } catch( NoSuchElementException ex ) {
+            assertEquals( "Customer not found", ex.getMessage() );
+            assertEquals( NoSuchElementException.class, ex.getClass() );
+        }
+    }
+
+    @Test
+    @DisplayName( "Should return a Customer by Email" )
+    void shouldReturnACustomerByEmail() {
+
+        when( customerRepository.findByPrimaryEmail( EMAIL ) ).thenReturn( Optional.of( naturalPersonCustomer ) );
+        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( naturalPersonCustomer ) )
+                                                                                  .thenReturn( customerResponseDTOPF );
+        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "email", EMAIL );
+        assertEquals( customerResponseDTOPF, customerResponseDTO );
+        assertEquals( CustomerResponseDTO.class, customerResponseDTOPF.getClass() );
+        assertEquals( customerResponseDTO.getCpfOrCnpj(), customerResponseDTOPF.getCpfOrCnpj() );
+    }
+
+    @Test
+    @DisplayName( "Should return a not found Customer by Email" )
+    void shouldReturnAEmptyWhenCustomerNotFoundByEmail() {
+
+        when( customerRepository.findByPrimaryEmail( EMAIL ) ).thenReturn( Optional.empty() );
+        String message = assertThrows( NoSuchElementException.class,
+                () -> customerService.searchCustomer( "email", EMAIL ) ).getMessage();
+        assertEquals( "Customer not found", message );
+
+    }
+
+    @Test
+    @DisplayName("Should return a Customer by clientName")
+    void shouldReturnACustomerByClientName(){
+        when(customerRepository.findByClientName(customer.getClientName())).thenReturn(Optional.of(customer));
+        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(customer)).thenReturn(customerResponseDTOPJ);
+        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer("clientName", "Claudio Carigé");
         assertEquals(customerResponseDTOPJ, customerResponseDTO);
         assertEquals(CustomerResponseDTO.class, customerResponseDTO.getClass());
-        assertEquals(customerResponseDTOPJ.getCpfOrCnpj(), customerResponseDTO.getCpfOrCnpj());
+        assertEquals(customer.getClientName(), customerResponseDTO.getClientName());
     }
 
-    @Test
-    @DisplayName("Should return a empty when Customer not found by CNPJ")
-    void shouldReturnAEmptyWhenCustomerNotFounfByCNPJ(){
-        when(legalPersonalCustomerService.findByCnpj(CNPJ)).thenReturn(null);
-        try{
-            customerService.searchCustomer("cnpj", CNPJ);
-        }catch (NoSuchElementException ex){
-            assertEquals("Customer not found", ex.getMessage());
-            assertEquals(NoSuchElementException.class, ex.getClass());
-        }
-    }
-
-    @Test
-    @DisplayName("Should return a Customer by Email")
-    void shouldReturnACustomerByEmail() {
-        when(customerRepository.findByPrimaryEmail(EMAIL)).thenReturn(Optional.of(naturalPersonCustomer));
-        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(naturalPersonCustomer)).thenReturn(customerResponseDTOPF);
-        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer("email", EMAIL);
-        assertEquals(customerResponseDTOPF, customerResponseDTO);
-        assertEquals(CustomerResponseDTO.class, customerResponseDTOPF.getClass());
-        assertEquals(customerResponseDTO.getCpfOrCnpj(), customerResponseDTOPF.getCpfOrCnpj());
-    }
-
-    @Test
-    @DisplayName("Should return a not found Customer by Email")
-    void shouldReturnAEmptyWhenCustomerNotFoundByEmail() {
-        when(customerRepository.findByPrimaryEmail(EMAIL)).thenReturn(Optional.empty());
-        String message = assertThrows(NoSuchElementException.class,
-                () -> customerService.searchCustomer("email", EMAIL)).getMessage();
-        assertEquals("Customer not found", message);
-
-    }
 
     private void start() {
 
