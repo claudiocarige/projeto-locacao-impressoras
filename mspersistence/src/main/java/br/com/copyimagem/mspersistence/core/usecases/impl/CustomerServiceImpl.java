@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+
 @Log4j2
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -47,6 +48,7 @@ public class CustomerServiceImpl implements CustomerService {
                     case "cpf" -> findByCpf( valueParam );
                     case "cnpj" -> findByCnpj( valueParam );
                     case "email" -> findByPrimaryEmail( valueParam );
+                    case "clientname" -> findByClientName( valueParam );
                     default ->
                             throw new IllegalArgumentException( "Parameter [ " + typeParam + " ] type not accepted." );
                 };
@@ -112,6 +114,13 @@ public class CustomerServiceImpl implements CustomerService {
             throw new NoSuchElementException( "Customer not found" );
         }
         return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
+    }
+
+    private CustomerResponseDTO findByClientName( String valueParam ) {
+
+        return customerRepository.findByClientName( valueParam )
+                .map( convertObjectToObjectDTOService::convertToCustomerResponseDTO )
+                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
     }
 
 
