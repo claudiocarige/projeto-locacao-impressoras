@@ -103,9 +103,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer returnCustomer( Long aLong ) {
+    public Customer returnCustomer( Long id ) {
 
-        return null;
+        return customerRepository.findById( id )
+                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
     }
 
     private CustomerResponseDTO findById( Long id ) {
