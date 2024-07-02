@@ -2,6 +2,7 @@ package br.com.copyimagem.mspersistence.core.usecases.impl;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.Customer;
 import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
+import br.com.copyimagem.mspersistence.core.domain.enums.FinancialSituation;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
@@ -66,7 +67,10 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List< CustomerResponseDTO > searchFinancialSituation( String situation ) {
 
-        return List.of();
+        FinancialSituation financialSituation = FinancialSituation.valueOf( situation );
+        List< Customer > customerList = customerRepository.findAllByFinancialSituation( financialSituation );
+        return customerList.stream().
+                map( convertObjectToObjectDTOService::convertToCustomerResponseDTO ).toList();
     }
 
     @Override
