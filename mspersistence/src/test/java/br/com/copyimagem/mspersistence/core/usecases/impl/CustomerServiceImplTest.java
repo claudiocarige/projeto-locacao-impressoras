@@ -1,8 +1,5 @@
 package br.com.copyimagem.mspersistence.core.usecases.impl;
 
-import br.com.copyimagem.mspersistence.core.domain.builders.CustomerResponseDTOBuilder;
-import br.com.copyimagem.mspersistence.core.domain.builders.LegalPersonalCustomerBuilder;
-import br.com.copyimagem.mspersistence.core.domain.builders.NaturalPersonCustomerBuilder;
 import br.com.copyimagem.mspersistence.core.domain.entities.Customer;
 import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
@@ -25,6 +22,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static br.com.copyimagem.mspersistence.core.domain.builders.CustomerResponseDTOBuilder.oneCustomerResponseDTO;
+import static br.com.copyimagem.mspersistence.core.domain.builders.LegalPersonalCustomerBuilder.oneLegalPersonalCustomer;
+import static br.com.copyimagem.mspersistence.core.domain.builders.NaturalPersonCustomerBuilder.oneNaturalPersonCustomer;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -372,13 +372,24 @@ class CustomerServiceImplTest {
         verify( customerRepository, times( 1 ) ).findById( ID1L );
     }
 
+    @Test
+    @DisplayName( "Should return Customer by id" )
+    void shouldReturnCustomerById() {
+
+        when( customerRepository.findById( ID1L ) ).thenReturn( Optional.of( legalPersonalCustomer ) );
+        Customer customerResult = customerService.returnCustomer( ID1L );
+        assertEquals( customer, customerResult );
+        assertEquals( LegalPersonalCustomer.class, customerResult.getClass() );
+        assertEquals( customer.getId(), customerResult.getId() );
+    }
+
     private void start() {
 
-        customer = LegalPersonalCustomerBuilder.oneLegalPersonalCustomer().nowCustomerPJ();
-        legalPersonalCustomer = LegalPersonalCustomerBuilder.oneLegalPersonalCustomer().nowCustomerPJ();
-        naturalPersonCustomer = NaturalPersonCustomerBuilder.oneNaturalPersonCustomer().nowCustomerPF();
-        customerResponseDTOPJ = CustomerResponseDTOBuilder.oneCustomerResponseDTO().withCpfOrCnpj( CNPJ ).now();
-        customerResponseDTOPF = CustomerResponseDTOBuilder.oneCustomerResponseDTO().withCpfOrCnpj( CPF ).now();
+        customer = oneLegalPersonalCustomer().nowCustomerPJ();
+        legalPersonalCustomer = oneLegalPersonalCustomer().nowCustomerPJ();
+        naturalPersonCustomer = oneNaturalPersonCustomer().nowCustomerPF();
+        customerResponseDTOPJ = oneCustomerResponseDTO().withCpfOrCnpj( CNPJ ).now();
+        customerResponseDTOPF = oneCustomerResponseDTO().withCpfOrCnpj( CPF ).now();
         updateCustomerDTOPJ = new UpdateCustomerDTO();
         updateCustomerDTOPJ.setPrimaryEmail( EMAIL );
         updateCustomerDTOPJ.setId( ID1L );
