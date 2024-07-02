@@ -117,6 +117,16 @@ class CustomerServiceImplTest {
         }
     }
 
+    @Test
+    @DisplayName("Should return a Customer by CNPJ")
+    void shouldReturnACustomerByCNPJ(){
+        when(legalPersonalCustomerService.findByCnpj(CNPJ)).thenReturn(customerResponseDTOPJ);
+        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer("cnpj", CNPJ);
+        assertEquals(customerResponseDTOPJ, customerResponseDTO);
+        assertEquals(CustomerResponseDTO.class, customerResponseDTO.getClass());
+        assertEquals(customerResponseDTOPJ.getCpfOrCnpj(), customerResponseDTO.getCpfOrCnpj());
+    }
+
     private void start() {
 
         customer = LegalPersonalCustomerBuilder.oneLegalPersonalCustomer().nowCustomerPJ();
