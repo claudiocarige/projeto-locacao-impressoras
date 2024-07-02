@@ -49,6 +49,7 @@ public class CustomerServiceImpl implements CustomerService {
                     case "cnpj" -> findByCnpj( valueParam );
                     case "email" -> findByPrimaryEmail( valueParam );
                     case "clientname" -> findByClientName( valueParam );
+                    case "phonenumber" -> findByPhoneNumber( valueParam );
                     default ->
                             throw new IllegalArgumentException( "Parameter [ " + typeParam + " ] type not accepted." );
                 };
@@ -123,5 +124,15 @@ public class CustomerServiceImpl implements CustomerService {
                 .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
     }
 
+    private CustomerResponseDTO findByPhoneNumber( String phoneNumber ) {
+
+        Optional< Customer > customerOptional = customerRepository.findByPhoneNumber( phoneNumber );
+        if( customerOptional.isEmpty() ) {
+            log.error( "[ ERROR ] Exception (findByPhoneNumber() method in CustomerServiceImpl class) :  {}.",
+                    NoSuchElementException.class );
+            throw new NoSuchElementException( "Customer not found" );
+        }
+        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
+    }
 
 }
