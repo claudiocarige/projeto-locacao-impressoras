@@ -4,6 +4,8 @@ import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustome
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.LegalPersonalCustomerService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,7 @@ import static br.com.copyimagem.mspersistence.core.domain.builders.LegalPersonal
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -95,10 +98,36 @@ class LegalPersonalCustomerControllerTest {
         verify(legalPersonalCustomerService, times(2)).findLegalPersonalCustomerById(ID1L);
     }
 
+    @Test
+    @DisplayName("Should save a LegalPersonalCustomer")
+    void shouldSaveALegalPersonalCustomer() throws Exception {
+        when(legalPersonalCustomerService.saveLegalPersonalCustomer(any(LegalPersonalCustomerDTO.class)))
+                .thenReturn(customerPjDTO);
+
+        mockMvc.perform(post("/api/v1/customers/pj/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJsonString(customerPjDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string("Location", "http://localhost/api/v1/customers/pj/save/1"));
+
+        verify(legalPersonalCustomerService, times(1)).saveLegalPersonalCustomer(any(LegalPersonalCustomerDTO.class));
+    }
+
+    private static String toJsonString(final Object obj) {
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                return mapper.writeValueAsString(obj);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+    }
+
     private void start() {
 
-        customerPj = oneLegalPersonalCustomer().withId( ID1L ).withCnpj( CNPJ ).nowCustomerPJ();
-        customerPjDTO = oneLegalPersonalCustomer().withId( ID1L ).withCnpj( CNPJ ).nowCustomerPJDTO();
+        customerPj = oneLegalPersonalCustomer().withId( ID1L ).withCnpj( CNPJ ).withPrimaryEmail( "carige@mail.com" ).nowCustomerPJ();
+        customerPjDTO = oneLegalPersonalCustomer().withId( ID1L ).withCnpj( CNPJ ).withPrimaryEmail( "carige@mail.com" ).nowCustomerPJDTO();
     }
 
 }
