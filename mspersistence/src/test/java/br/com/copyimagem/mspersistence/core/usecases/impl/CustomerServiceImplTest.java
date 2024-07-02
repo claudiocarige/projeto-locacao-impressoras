@@ -9,6 +9,7 @@ import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustome
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.IllegalArgumentException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;

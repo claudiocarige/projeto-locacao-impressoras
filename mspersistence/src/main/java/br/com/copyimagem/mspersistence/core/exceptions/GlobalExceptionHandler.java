@@ -14,20 +14,32 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler( NoSuchElementException.class )
-    public ResponseEntity< StandardError > noSuchElementException( NoSuchElementException ex, HttpServletRequest request ) {
+    public ResponseEntity< StandardError > noSuchElementException( NoSuchElementException ex,
+                                                                   HttpServletRequest request ) {
 
         StandardError error = new StandardError( System.currentTimeMillis(), HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(), request.getRequestURI() );
+                                                                            ex.getMessage(), request.getRequestURI() );
         log.error( String.format( "[ ERROR ] NoSuchElementException Classs : %S", error.getMessage() ) );
         return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( error );
     }
 
     @ExceptionHandler( DataIntegrityViolationException.class )
-    public ResponseEntity< StandardError > dataIntegrityViolationException( DataIntegrityViolationException ex, HttpServletRequest request ) {
+    public ResponseEntity< StandardError > dataIntegrityViolationException( DataIntegrityViolationException ex,
+                                                                            HttpServletRequest request ) {
 
         StandardError error = new StandardError( System.currentTimeMillis(), HttpStatus.BAD_REQUEST.value(),
-                ex.getMessage(), request.getRequestURI() );
+                                                                            ex.getMessage(), request.getRequestURI() );
         log.error( String.format( "[ ERROR ] DataIntegrityViolationException Classs : %S", error.getMessage() ) );
+        return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( error );
+    }
+
+    @ExceptionHandler( IllegalArgumentException.class )
+    public ResponseEntity< StandardError > illegalArgumentException( IllegalArgumentException ex,
+                                                                     HttpServletRequest request ) {
+
+        StandardError error = new StandardError( System.currentTimeMillis(), HttpStatus.BAD_REQUEST.value(),
+                                                                            ex.getMessage(), request.getRequestURI() );
+        log.error( String.format( "[ ERROR ] IllegalArgumentException Classs : %S", error.getMessage() ) );
         return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( error );
     }
 
