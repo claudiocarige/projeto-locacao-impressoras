@@ -4,6 +4,7 @@ import br.com.copyimagem.mspersistence.core.domain.builders.CustomerResponseDTOB
 import br.com.copyimagem.mspersistence.core.domain.builders.LegalPersonalCustomerBuilder;
 import br.com.copyimagem.mspersistence.core.domain.builders.NaturalPersonCustomerBuilder;
 import br.com.copyimagem.mspersistence.core.domain.entities.Customer;
+import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
@@ -210,6 +211,15 @@ class CustomerServiceImplTest {
         String message = assertThrows(NoSuchElementException.class,
                 () -> customerService.searchCustomer("phoneNumber", "7132100000")).getMessage();
         assertEquals("Customer not found", message);
+    }
+
+    @Test
+    @DisplayName("Should return a CustomerContract with sucess.")
+    void shouldReturnACustomerContractWithSucess(){
+        when(customerRepository.findById(ID1L)).thenReturn(Optional.of(legalPersonalCustomer));
+        CustomerContract customerContract = customerService.getCustomerContract(ID1L);
+        assertEquals(CustomerContract.class, customerContract.getClass());
+        assertEquals(legalPersonalCustomer.getCustomerContract().getId(), customerContract.getId());
     }
 
     private void start() {
