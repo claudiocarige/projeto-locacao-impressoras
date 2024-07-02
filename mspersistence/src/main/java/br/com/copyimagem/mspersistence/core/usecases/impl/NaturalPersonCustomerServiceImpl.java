@@ -3,6 +3,7 @@ package br.com.copyimagem.mspersistence.core.usecases.impl;
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.NaturalPersonCustomerDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.NaturalPersonCustomerService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerContractRepository;
@@ -52,7 +53,10 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
     @Override
     public NaturalPersonCustomerDTO findNaturalPersonCustomerById( Long id ) {
 
-        return null;
+        log.info( "[ INFO ] Finding customer by id: {}", id );
+        NaturalPersonCustomer naturalPersonCustomer = naturalPersonCustomerRepository.findById( id )
+                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+        return convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO( naturalPersonCustomer );
     }
 
     @Override
