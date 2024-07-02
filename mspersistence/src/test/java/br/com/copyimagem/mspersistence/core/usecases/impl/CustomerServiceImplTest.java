@@ -57,6 +57,9 @@ class CustomerServiceImplTest {
     @Mock
     private LegalPersonalCustomerServiceImpl legalPersonalCustomerService;
 
+    @Mock
+    private NaturalPersonCustomerServiceImpl naturalPersonCustomerService;
+
 
     @InjectMocks
     private CustomerServiceImpl customerService;
@@ -90,6 +93,16 @@ class CustomerServiceImplTest {
                 () -> customerService.searchCustomer( "id", "1" ) ).getMessage();
         assertEquals( "Customer not found", message );
 
+    }
+
+    @Test
+    @DisplayName("Should return a Customer by CPF")
+    void shouldReturnACustomerByCPF() {
+        when(naturalPersonCustomerService.findByCpf(CPF)).thenReturn(customerResponseDTOPF);
+        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer("cpf", CPF);
+        assertEquals(customerResponseDTOPF, customerResponseDTO);
+        assertEquals(CustomerResponseDTO.class, customerResponseDTOPF.getClass());
+        assertEquals(customerResponseDTO.getCpfOrCnpj(), customerResponseDTOPF.getCpfOrCnpj());
     }
 
     private void start() {
