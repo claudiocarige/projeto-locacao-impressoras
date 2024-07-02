@@ -2,14 +2,15 @@ package br.com.copyimagem.mspersistence.infra.controllers;
 
 import br.com.copyimagem.mspersistence.core.dtos.NaturalPersonCustomerDTO;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.NaturalPersonCustomerService;
+import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 
@@ -38,6 +39,20 @@ public class NaturalPersonCustomerController {
         NaturalPersonCustomerDTO naturalPersonCustomerById =
                 naturalPersonCustomerService.findNaturalPersonCustomerById( id );
         return ResponseEntity.ok().contentType( MediaType.APPLICATION_JSON ).body( naturalPersonCustomerById );
+    }
+
+    @PostMapping( value = "/save", produces = "application/json" )
+    public ResponseEntity< HttpStatus > saveNaturalPersonCustomer(
+            @Valid @RequestBody NaturalPersonCustomerDTO naturalPersonCustomerDTO ) {
+
+        log.info( "[ INFO ] HTTP call with POST method with path: ../customers/pf/save" );
+        NaturalPersonCustomerDTO naturalPersonCustomer1 =
+                naturalPersonCustomerService.saveNaturalPersonCustomer( naturalPersonCustomerDTO );
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path( "/{id}" )
+                .buildAndExpand( naturalPersonCustomer1.getId() )
+                .toUri();
+        log.info( "[ INFO ] New NaturalPersonCustomer created with success." );
+        return ResponseEntity.created( uri ).build();
     }
 
 }
