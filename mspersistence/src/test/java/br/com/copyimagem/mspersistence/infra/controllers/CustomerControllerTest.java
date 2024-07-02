@@ -2,12 +2,14 @@ package br.com.copyimagem.mspersistence.infra.controllers;
 
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.CustomerResponseDTOBuilder.oneCustomerResponseDTO;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -64,6 +67,18 @@ class CustomerControllerTest {
                         .contentType( MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
+    }
+
+    @Test
+    @DisplayName("Should return a exception when customer not found.")
+    void shouldReturnAExceptionWhenCustomerNotFound(){
+        when(customerService.searchCustomer(ID_TYPE_PARAM, NUMBER_1))
+                .thenThrow(new NoSuchElementException("Customer not found"));
+        NoSuchElementException exception = assertThrows(NoSuchElementException.class,
+                () -> customerService.searchCustomer(ID_TYPE_PARAM, NUMBER_1));
+        assertEquals(CUSTOMER_NOT_FOUND, exception.getMessage());
+
+        verify(customerService, Mockito.times(1)).searchCustomer(ID_TYPE_PARAM, NUMBER_1);
     }
 
     private void start() {
