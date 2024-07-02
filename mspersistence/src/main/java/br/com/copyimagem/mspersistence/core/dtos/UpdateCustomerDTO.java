@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateCustomerDTO implements Serializable {
-
 
     @Serial
     private static final long serialVersionUID = 1L;

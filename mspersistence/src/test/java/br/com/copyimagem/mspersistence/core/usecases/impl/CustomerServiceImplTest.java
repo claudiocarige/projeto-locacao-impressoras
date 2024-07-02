@@ -82,7 +82,7 @@ class CustomerServiceImplTest {
 
         when( customerRepository.findById( ID1L ) ).thenReturn( Optional.of( legalPersonalCustomer ) );
         when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer ) )
-                .thenReturn( customerResponseDTOPJ );
+                                                                                  .thenReturn( customerResponseDTOPJ );
         CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "id", "1" );
         assertEquals( customerResponseDTOPJ, customerResponseDTO );
         assertEquals( CustomerResponseDTO.class, customerResponseDTOPJ.getClass() );
@@ -154,7 +154,7 @@ class CustomerServiceImplTest {
 
         when( customerRepository.findByPrimaryEmail( EMAIL ) ).thenReturn( Optional.of( naturalPersonCustomer ) );
         when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( naturalPersonCustomer ) )
-                .thenReturn( customerResponseDTOPF );
+                                                                                  .thenReturn( customerResponseDTOPF );
         CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "email", EMAIL );
         assertEquals( customerResponseDTOPF, customerResponseDTO );
         assertEquals( CustomerResponseDTO.class, customerResponseDTOPF.getClass() );
@@ -177,8 +177,10 @@ class CustomerServiceImplTest {
     void shouldReturnACustomerByClientName() {
 
         when( customerRepository.findByClientName( customer.getClientName() ) ).thenReturn( Optional.of( customer ) );
-        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( customer ) ).thenReturn( customerResponseDTOPJ );
-        CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "clientName", "Claudio Carigé" );
+        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( customer ) )
+                                                                                 .thenReturn( customerResponseDTOPJ );
+        CustomerResponseDTO customerResponseDTO = customerService
+                                                .searchCustomer( "clientName", "Claudio Carigé" );
         assertEquals( customerResponseDTOPJ, customerResponseDTO );
         assertEquals( CustomerResponseDTO.class, customerResponseDTO.getClass() );
         assertEquals( customer.getClientName(), customerResponseDTO.getClientName() );
@@ -200,7 +202,8 @@ class CustomerServiceImplTest {
     void shouldReturnACustomerByPhoneNumber() {
 
         when( customerRepository.findByPhoneNumber( customer.getPhoneNumber() ) ).thenReturn( Optional.of( customer ) );
-        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( customer ) ).thenReturn( customerResponseDTOPJ );
+        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( customer ) )
+                                                                                  .thenReturn( customerResponseDTOPJ );
         CustomerResponseDTO customerResponseDTO = customerService
                 .searchCustomer( "phoneNumber", "7132104567" );
         assertEquals( customerResponseDTOPJ, customerResponseDTO );
@@ -254,7 +257,8 @@ class CustomerServiceImplTest {
     void shouldReturnAllCustomers() {
 
         when( customerRepository.findAll() ).thenReturn( Collections.singletonList( legalPersonalCustomer ) );
-        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer ) ).thenReturn( customerResponseDTOPJ );
+        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer ) )
+                                                                                  .thenReturn( customerResponseDTOPJ );
         List< CustomerResponseDTO > customerResponseDTO = customerService.searchAllCustomers();
         assertEquals( 1, customerResponseDTO.size() );
         assertEquals( legalPersonalCustomer.getId(), customerResponseDTO.get( 0 ).getId() );
@@ -262,22 +266,23 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return all customers by FinancialSituation")
+    @DisplayName( "Should return all customers by FinancialSituation" )
     void shouldReturnAllCustomersByFinancialSituation() {
+
         String situation = "PAGO";
-        when(customerRepository.findAllByFinancialSituation(any())).
-                thenReturn(Collections.singletonList(legalPersonalCustomer));
-        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(legalPersonalCustomer))
-                .thenReturn(customerResponseDTOPJ);
-        List<CustomerResponseDTO> customerResponseDTO = customerService.searchFinancialSituation(situation);
-        assertEquals(1, customerResponseDTO.size());
-        assertEquals(legalPersonalCustomer.getId(), customerResponseDTO.get(0).getId());
-        assertEquals(CustomerResponseDTO.class, customerResponseDTO.get(0).getClass());
-        assertEquals(situation, customerResponseDTO.get(0).getFinancialSituation());
+        when( customerRepository.findAllByFinancialSituation( any() ) ).
+                thenReturn( Collections.singletonList( legalPersonalCustomer ) );
+        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer ) )
+                .thenReturn( customerResponseDTOPJ );
+        List< CustomerResponseDTO > customerResponseDTO = customerService.searchFinancialSituation( situation );
+        assertEquals( 1, customerResponseDTO.size() );
+        assertEquals( legalPersonalCustomer.getId(), customerResponseDTO.get( 0 ).getId() );
+        assertEquals( CustomerResponseDTO.class, customerResponseDTO.get( 0 ).getClass() );
+        assertEquals( situation, customerResponseDTO.get( 0 ).getFinancialSituation() );
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
+    @CsvSource( value = {
             "cpf, 156.258.240-29, 2",
             "cnpj, 14.124.420/0001-94, 1",
             "primaryEmail, claudio@mail.com.br, 1",
@@ -287,75 +292,83 @@ class CustomerServiceImplTest {
             "bankCode, 123, 1",
             "payDay, 5, 1",
             "financialSituation, PAGO, 1",
-    })
-    @DisplayName("Should update the Customer by attribute")
-    void shouldUpdateTheCustomerByAttribute(String attribute, String val, String id) {
+    } )
+    @DisplayName( "Should update the Customer by attribute" )
+    void shouldUpdateTheCustomerByAttribute( String attribute, String val, String id ) {
 
         when( customerRepository.findById( 1L ) ).thenReturn( Optional.of( legalPersonalCustomer ) );
         when( customerRepository.findById( 2L ) ).thenReturn( Optional.of( naturalPersonCustomer ) );
         when( customerRepository.save( legalPersonalCustomer ) ).thenReturn( legalPersonalCustomer );
         when( customerRepository.save( naturalPersonCustomer ) ).thenReturn( naturalPersonCustomer );
-        when( convertObjectToObjectDTOService.convertToUpdateCustomerDTO( legalPersonalCustomer ) ).thenReturn( updateCustomerDTOPJ );
-        when( convertObjectToObjectDTOService.convertToUpdateCustomerDTO( naturalPersonCustomer ) ).thenReturn( updateCustomerDTOPF );
-        UpdateCustomerDTO updateCustomerResultDTO = customerService.updateCustomerAttribute( attribute, val, Long.parseLong( id ) );
+        when( convertObjectToObjectDTOService.convertToUpdateCustomerDTO( legalPersonalCustomer ) )
+                                                                                   .thenReturn( updateCustomerDTOPJ );
+        when( convertObjectToObjectDTOService.convertToUpdateCustomerDTO( naturalPersonCustomer ) )
+                                                                                   .thenReturn( updateCustomerDTOPF );
+        UpdateCustomerDTO updateCustomerResultDTO = customerService
+                                                     .updateCustomerAttribute( attribute, val, Long.parseLong( id ) );
 
         assertNotNull( updateCustomerResultDTO );
         assertEquals( UpdateCustomerDTO.class, updateCustomerResultDTO.getClass() );
 
-        switch (attribute) {
-            case "cnpj" -> assertEquals(val, updateCustomerDTOPJ.getCpfOrCnpj());
-            case "cpf" -> assertEquals(val, updateCustomerDTOPF.getCpfOrCnpj());
-            case "primaryEmail" -> assertEquals(val, updateCustomerDTOPJ.getPrimaryEmail());
-            case "clienteName" -> assertEquals(val, updateCustomerDTOPJ.getClientName());
-            case "phoneNumber" -> assertEquals(val, updateCustomerDTOPJ.getPhoneNumber());
-            case "whatsapp" -> assertEquals(val, updateCustomerDTOPJ.getWhatsapp());
-            case "bankCode" -> assertEquals(val, updateCustomerDTOPJ.getBankCode());
-            case "payDay" -> assertEquals(Byte.parseByte(val), updateCustomerDTOPJ.getPayDay());
-            case "financialSituation" -> assertEquals(val, updateCustomerDTOPJ.getFinancialSituation());
+        switch( attribute ) {
+            case "cnpj" -> assertEquals( val, updateCustomerDTOPJ.getCpfOrCnpj() );
+            case "cpf" -> assertEquals( val, updateCustomerDTOPF.getCpfOrCnpj() );
+            case "primaryEmail" -> assertEquals( val, updateCustomerDTOPJ.getPrimaryEmail() );
+            case "clienteName" -> assertEquals( val, updateCustomerDTOPJ.getClientName() );
+            case "phoneNumber" -> assertEquals( val, updateCustomerDTOPJ.getPhoneNumber() );
+            case "whatsapp" -> assertEquals( val, updateCustomerDTOPJ.getWhatsapp() );
+            case "bankCode" -> assertEquals( val, updateCustomerDTOPJ.getBankCode() );
+            case "payDay" -> assertEquals( Byte.parseByte( val ), updateCustomerDTOPJ.getPayDay() );
+            case "financialSituation" -> assertEquals( val, updateCustomerDTOPJ.getFinancialSituation() );
         }
     }
 
     @Test
-    @DisplayName("Should return  a exception when the attribute is null")
+    @DisplayName( "Should return  a exception when the attribute is null" )
     void shouldReturnAExceptionWhenTheAttributeIsNull() {
+
         String attribute = "clientName";
-        String message = assertThrows(IllegalArgumentException.class,
-                () -> customerService.updateCustomerAttribute(attribute, null, ID1L)).getMessage();
-        assertEquals(attribute.toUpperCase() +" cannot be null.", message);
+        String message = assertThrows( IllegalArgumentException.class,
+                () -> customerService.updateCustomerAttribute( attribute, null, ID1L ) ).getMessage();
+        assertEquals( attribute.toUpperCase() + " cannot be null.", message );
     }
 
     @Test
-    @DisplayName("Should return a exception when the attribute is in the list")
+    @DisplayName( "Should return a exception when the attribute is in the list" )
     void shouldReturnAExceptionWhenTheAttributeIsInTheList() {
+
         String attribute = "emailList";
-        when(customerRepository.findById(ID1L)).thenReturn(Optional.of(customer));
-        String message = assertThrows(IllegalArgumentException.class, () -> customerService.updateCustomerAttribute(attribute, "mail@mail.com", ID1L)).getMessage();
-        assertEquals("This attribute cannot be changed on this endpoint.", message);
+        when( customerRepository.findById( ID1L ) ).thenReturn( Optional.of( customer ) );
+        String message = assertThrows( IllegalArgumentException.class, () -> customerService
+                                    .updateCustomerAttribute( attribute, "mail@mail.com", ID1L ) ).getMessage();
+        assertEquals( "This attribute cannot be changed on this endpoint.", message );
     }
 
     @Test
-    @DisplayName("Should return a exception when attribute not found")
-    void shouldReturnAExceptionWhenAttributeNotFound(){
-        String attribute = "homeNumber";
-        when(customerRepository.findById(ID1L)).thenReturn(Optional.of(customer));
+    @DisplayName( "Should return a exception when attribute not found" )
+    void shouldReturnAExceptionWhenAttributeNotFound() {
 
-        String message = assertThrows(IllegalArgumentException.class,
-                () -> customerService.updateCustomerAttribute(attribute, "5", ID1L)).getMessage();
-        assertEquals("Attribute not found.", message);
+        String attribute = "homeNumber";
+        when( customerRepository.findById( ID1L ) ).thenReturn( Optional.of( customer ) );
+
+        String message = assertThrows( IllegalArgumentException.class,
+                () -> customerService.updateCustomerAttribute( attribute, "5", ID1L ) ).getMessage();
+        assertEquals( "Attribute not found.", message );
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
+    @CsvSource( value = {
             "primaryEmail,Email format is invalid,ccarige.mail ",
             "cnpj, CNPJ format is invalid, il.123.com/1234-br",
-            "cpf, CPF format is invalid, 894.965.31-02"})
-    @DisplayName("Should return a exception when Attributes are invalid")
-    void shouldReturnAExceptionWhenAttributesAreInvalid(String attribute,String messages, String val ){
-        when(customerRepository.findById(ID1L)).thenReturn(Optional.of(customer));
-        String message = assertThrows(IllegalArgumentException.class,
-                () -> customerService.updateCustomerAttribute(attribute, val, ID1L)).getMessage();
-        assertEquals(messages, message);
-        verify(customerRepository, times(1)).findById(ID1L);
+            "cpf, CPF format is invalid, 894.965.31-02"} )
+    @DisplayName( "Should return a exception when Attributes are invalid" )
+    void shouldReturnAExceptionWhenAttributesAreInvalid( String attribute, String messages, String val ) {
+
+        when( customerRepository.findById( ID1L ) ).thenReturn( Optional.of( customer ) );
+        String message = assertThrows( IllegalArgumentException.class,
+                () -> customerService.updateCustomerAttribute( attribute, val, ID1L ) ).getMessage();
+        assertEquals( messages, message );
+        verify( customerRepository, times( 1 ) ).findById( ID1L );
     }
 
     private void start() {

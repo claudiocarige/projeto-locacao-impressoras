@@ -23,7 +23,6 @@ import java.util.List;
 @NoArgsConstructor
 public class LegalPersonalCustomerDTO implements Serializable {
 
-
     @Serial
     private static final long serialVersionUID = 1L;
 

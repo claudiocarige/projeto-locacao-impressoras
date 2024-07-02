@@ -7,7 +7,6 @@ import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
 import br.com.copyimagem.mspersistence.core.domain.enums.FinancialSituation;
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
-import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 
 import java.io.Serial;
 import java.io.Serializable;

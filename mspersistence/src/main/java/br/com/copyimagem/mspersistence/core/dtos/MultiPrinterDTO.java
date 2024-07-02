@@ -14,7 +14,6 @@ import java.util.Objects;
 @ToString
 public class MultiPrinterDTO {
 
-
     private Integer id;
 
     private String brand;

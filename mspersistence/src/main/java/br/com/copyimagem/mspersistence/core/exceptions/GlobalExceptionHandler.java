@@ -30,4 +30,5 @@ public class GlobalExceptionHandler {
         log.error( String.format( "[ ERROR ] DataIntegrityViolationException Classs : %S", error.getMessage() ) );
         return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( error );
     }
+
 }

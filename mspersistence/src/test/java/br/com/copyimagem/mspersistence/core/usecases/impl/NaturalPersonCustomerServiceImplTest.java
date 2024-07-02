@@ -57,120 +57,132 @@ class NaturalPersonCustomerServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should return a list of NaturalPersonCustomer")
-    void shouldReturnAListOfNaturalPersonCustomer(){
+    @DisplayName( "Should return a list of NaturalPersonCustomer" )
+    void shouldReturnAListOfNaturalPersonCustomer() {
+
         String email = "carige@mail.com";
-        when(naturalPersonCustomerRepository.findAll()).thenReturn( List.of(customerPf));
-        when(convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO(customerPf)).thenReturn(customerPfDTO);
-        List<NaturalPersonCustomerDTO> natural = naturalPersonCustomerService.findAllNaturalPersonCustomer();
-        assertAll("NaturalPersonCustomer",
-                () -> assertNotNull(natural),
-                () -> assertEquals(1, natural.size()),
-                () -> assertEquals(NaturalPersonCustomerDTO.class, natural.get(0).getClass()),
-                () -> assertEquals(customerPfDTO, natural.get(0)),
-                () -> assertEquals(email, natural.get(0).getPrimaryEmail()),
-                () -> assertEquals(CPF, natural.get(0).getCpf())
+        when( naturalPersonCustomerRepository.findAll() ).thenReturn( List.of( customerPf ) );
+        when( convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO( customerPf ) )
+                                                                                        .thenReturn( customerPfDTO );
+        List< NaturalPersonCustomerDTO > natural = naturalPersonCustomerService.findAllNaturalPersonCustomer();
+        assertAll( "NaturalPersonCustomer",
+                () -> assertNotNull( natural ),
+                () -> assertEquals( 1, natural.size() ),
+                () -> assertEquals( NaturalPersonCustomerDTO.class, natural.get( 0 ).getClass() ),
+                () -> assertEquals( customerPfDTO, natural.get( 0 ) ),
+                () -> assertEquals( email, natural.get( 0 ).getPrimaryEmail() ),
+                () -> assertEquals( CPF, natural.get( 0 ).getCpf() )
         );
 
     }
 
     @Test
-    @DisplayName("should return a NaturalPersonCustomerDTO by Id")
-    void shouldReturnANaturalPersonCustomerDTOById(){
-        when(naturalPersonCustomerRepository.findById(ID1L)).thenReturn( Optional.of(customerPf));
+    @DisplayName( "should return a NaturalPersonCustomerDTO by Id" )
+    void shouldReturnANaturalPersonCustomerDTOById() {
 
-        when(convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO(customerPf)).thenReturn(customerPfDTO);
-        NaturalPersonCustomerDTO expectedDTO = naturalPersonCustomerService.findNaturalPersonCustomerById(1L);
+        when( naturalPersonCustomerRepository.findById( ID1L ) ).thenReturn( Optional.of( customerPf ) );
 
-        assertAll("NaturalPersonCustomer",
-                () -> assertNotNull(expectedDTO),
-                () -> assertEquals(ID1L, expectedDTO.getId()),
-                () -> assertEquals(expectedDTO, customerPfDTO),
-                () -> assertEquals(NaturalPersonCustomerDTO.class, expectedDTO.getClass())
+        when( convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO( customerPf ) )
+                                                                                        .thenReturn( customerPfDTO );
+        NaturalPersonCustomerDTO expectedDTO = naturalPersonCustomerService.findNaturalPersonCustomerById( 1L );
+
+        assertAll( "NaturalPersonCustomer",
+                () -> assertNotNull( expectedDTO ),
+                () -> assertEquals( ID1L, expectedDTO.getId() ),
+                () -> assertEquals( expectedDTO, customerPfDTO ),
+                () -> assertEquals( NaturalPersonCustomerDTO.class, expectedDTO.getClass() )
         );
     }
 
     @Test
-    @DisplayName("Should return a empty when NaturalPersonCustomer not found")
-    void shouldReturnEmptyWhenNaturalPersonCustomerNotFound(){
-        when(naturalPersonCustomerRepository.findById(11L)).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> naturalPersonCustomerService
-                .findNaturalPersonCustomerById(11L));
-        verify(naturalPersonCustomerRepository, times(1)).findById(11L);
+    @DisplayName( "Should return a empty when NaturalPersonCustomer not found" )
+    void shouldReturnEmptyWhenNaturalPersonCustomerNotFound() {
+
+        when( naturalPersonCustomerRepository.findById( 11L ) ).thenReturn( Optional.empty() );
+        assertThrows( RuntimeException.class, () -> naturalPersonCustomerService
+                .findNaturalPersonCustomerById( 11L ) );
+        verify( naturalPersonCustomerRepository, times( 1 ) ).findById( 11L );
         try {
-            naturalPersonCustomerService.findNaturalPersonCustomerById(11L);
-        } catch (Exception ex) {
-            assertEquals( NoSuchElementException.class, ex.getClass());
-            assertEquals("Customer not found", ex.getMessage());
+            naturalPersonCustomerService.findNaturalPersonCustomerById( 11L );
+        } catch( Exception ex ) {
+            assertEquals( NoSuchElementException.class, ex.getClass() );
+            assertEquals( "Customer not found", ex.getMessage() );
         }
     }
 
     @Test
-    @DisplayName("Should save a NaturalPersonCustomer")
-    void shouldSaveANaturalPersonCustomer(){
-        when(convertObjectToObjectDTOService.convertToNaturalPersonCustomer(customerPfDTO)).thenReturn(customerPf);
-        when(customerRepository.existsCustomerByPrimaryEmail(customerPfDTO.getPrimaryEmail())).thenReturn(false);
-        when(naturalPersonCustomerRepository
-                                    .existsNaturalPersonCustomerByCpf(customerPfDTO.getCpf())).thenReturn(false);
-        when(naturalPersonCustomerRepository.save(customerPf)).thenReturn(customerPf);
-        when(convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO(customerPf)).thenReturn(customerPfDTO);
-        when(addressRepository.save(customerPf.getAddress())).thenReturn(customerPfDTO.getAddress());
-        NaturalPersonCustomerDTO natural = naturalPersonCustomerService.saveNaturalPersonCustomer(customerPfDTO);
-        assertAll("NaturalPersonCustomerDTO",
-                () -> assertNotNull(natural),
-                () -> assertEquals(customerPfDTO, natural),
-                () ->  assertEquals(customerPfDTO.getId(), natural.getId()),
-                () ->  assertEquals(customerPfDTO.getCpf(), natural.getCpf()),
-                () ->  assertEquals(customerPfDTO.getClass(), natural.getClass())
+    @DisplayName( "Should save a NaturalPersonCustomer" )
+    void shouldSaveANaturalPersonCustomer() {
+
+        when( convertObjectToObjectDTOService.convertToNaturalPersonCustomer( customerPfDTO ) )
+                                                                                            .thenReturn( customerPf );
+        when( customerRepository.existsCustomerByPrimaryEmail( customerPfDTO.getPrimaryEmail() ) )
+                                                                                              .thenReturn( false );
+        when( naturalPersonCustomerRepository
+                .existsNaturalPersonCustomerByCpf( customerPfDTO.getCpf() ) ).thenReturn( false );
+        when( naturalPersonCustomerRepository.save( customerPf ) ).thenReturn( customerPf );
+        when( convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO( customerPf ) )
+                                                                                        .thenReturn( customerPfDTO );
+        when( addressRepository.save( customerPf.getAddress() ) ).thenReturn( customerPfDTO.getAddress() );
+        NaturalPersonCustomerDTO natural = naturalPersonCustomerService.saveNaturalPersonCustomer( customerPfDTO );
+        assertAll( "NaturalPersonCustomerDTO",
+                () -> assertNotNull( natural ),
+                () -> assertEquals( customerPfDTO, natural ),
+                () -> assertEquals( customerPfDTO.getId(), natural.getId() ),
+                () -> assertEquals( customerPfDTO.getCpf(), natural.getCpf() ),
+                () -> assertEquals( customerPfDTO.getClass(), natural.getClass() )
         );
-        verify(convertObjectToObjectDTOService, times(1))
-                                                                        .convertToNaturalPersonCustomer(customerPfDTO);
-        verify(customerRepository, times(1))
-                                                        .existsCustomerByPrimaryEmail(customerPfDTO.getPrimaryEmail());
-        verify(naturalPersonCustomerRepository, times(1))
-                                                             .existsNaturalPersonCustomerByCpf(customerPfDTO.getCpf());
-        verify(naturalPersonCustomerRepository, times(1)).save(customerPf);
+        verify( convertObjectToObjectDTOService, times( 1 ) )
+                .convertToNaturalPersonCustomer( customerPfDTO );
+        verify( customerRepository, times( 1 ) )
+                .existsCustomerByPrimaryEmail( customerPfDTO.getPrimaryEmail() );
+        verify( naturalPersonCustomerRepository, times( 1 ) )
+                .existsNaturalPersonCustomerByCpf( customerPfDTO.getCpf() );
+        verify( naturalPersonCustomerRepository, times( 1 ) ).save( customerPf );
     }
 
     @Test
-    @DisplayName("Should throw Exceptionn return when EMAIL already exists")
+    @DisplayName( "Should throw Exceptionn return when EMAIL already exists" )
     void shouldReturnThrowExceptionWhenEmailAlreadyExists() {
-        when(customerRepository.existsCustomerByPrimaryEmail(customerPfDTO.getPrimaryEmail()))
-                .thenReturn(true);
-        DataIntegrityViolationException dataException = assertThrows(DataIntegrityViolationException.class,() ->
-                naturalPersonCustomerService.saveNaturalPersonCustomer(customerPfDTO));
-        assertTrue(dataException.getMessage().startsWith("Email"));
+
+        when( customerRepository.existsCustomerByPrimaryEmail( customerPfDTO.getPrimaryEmail() ) )
+                .thenReturn( true );
+        DataIntegrityViolationException dataException = assertThrows( DataIntegrityViolationException.class,
+                                      () -> naturalPersonCustomerService.saveNaturalPersonCustomer( customerPfDTO ) );
+        assertTrue( dataException.getMessage().startsWith( "Email" ) );
     }
 
     @Test
-    @DisplayName("Should throw return Exception when CPF already exists")
+    @DisplayName( "Should throw return Exception when CPF already exists" )
     void shouldReturnThrowExceptionWhenCpfAlreadyExists() {
-        when(naturalPersonCustomerRepository.existsNaturalPersonCustomerByCpf(customerPfDTO.getCpf()))
-                .thenReturn(true);
-        String dataException = assertThrows(DataIntegrityViolationException.class,() ->
-                naturalPersonCustomerService.saveNaturalPersonCustomer(customerPfDTO)).getMessage();
-        assertTrue(dataException.startsWith("CPF"));
-        assertEquals("CPF already exists!", dataException);
+
+        when( naturalPersonCustomerRepository.existsNaturalPersonCustomerByCpf( customerPfDTO.getCpf() ) )
+                                                                                               .thenReturn( true );
+        String dataException = assertThrows( DataIntegrityViolationException.class, () ->
+                               naturalPersonCustomerService.saveNaturalPersonCustomer( customerPfDTO ) ).getMessage();
+        assertTrue( dataException.startsWith( "CPF" ) );
+        assertEquals( "CPF already exists!", dataException );
     }
 
     @Test
-    @DisplayName("Should return a NaturalPersonCustomer by CPF.")
+    @DisplayName( "Should return a NaturalPersonCustomer by CPF." )
     void shouldReturnANaturalPersonCustomerByCPF() {
+
         CustomerResponseDTO customerResponseDTO = new CustomerResponseDTO();
-        customerResponseDTO.setId(ID1L);
-        customerResponseDTO.setCpfOrCnpj(CPF);
-        customerResponseDTO.setClientName(customerPf.getClientName());
-        customerResponseDTO.setAddress(customerPf.getAddress());
-        when(naturalPersonCustomerRepository.findByCpf(customerPf.getCpf()))
-                .thenReturn(Optional.of(customerPf));
-        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(customerPf))
-                .thenReturn(customerResponseDTO);
-        CustomerResponseDTO customerDTO = naturalPersonCustomerService.findByCpf(customerPf.getCpf());
-        assertNotNull(customerDTO);
-        assertEquals(customerResponseDTO, customerDTO);
-        assertEquals(customerResponseDTO.getId(), customerDTO.getId());
-        assertEquals(CustomerResponseDTO.class, customerDTO.getClass());
-        assertEquals(CPF, customerDTO.getCpfOrCnpj());
+        customerResponseDTO.setId( ID1L );
+        customerResponseDTO.setCpfOrCnpj( CPF );
+        customerResponseDTO.setClientName( customerPf.getClientName() );
+        customerResponseDTO.setAddress( customerPf.getAddress() );
+        when( naturalPersonCustomerRepository.findByCpf( customerPf.getCpf() ) )
+                .thenReturn( Optional.of( customerPf ) );
+        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerPf ) )
+                .thenReturn( customerResponseDTO );
+        CustomerResponseDTO customerDTO = naturalPersonCustomerService.findByCpf( customerPf.getCpf() );
+        assertNotNull( customerDTO );
+        assertEquals( customerResponseDTO, customerDTO );
+        assertEquals( customerResponseDTO.getId(), customerDTO.getId() );
+        assertEquals( CustomerResponseDTO.class, customerDTO.getClass() );
+        assertEquals( CPF, customerDTO.getCpfOrCnpj() );
     }
 
     private void start() {

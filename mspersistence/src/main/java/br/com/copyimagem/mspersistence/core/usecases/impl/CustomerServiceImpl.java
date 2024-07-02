@@ -85,7 +85,7 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerContract getCustomerContract( Long id ) {
 
         Customer customer = customerRepository.findById( id )
-                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+                                             .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
         return customer.getCustomerContract();
     }
 
@@ -95,7 +95,7 @@ public class CustomerServiceImpl implements CustomerService {
         log.info( "[ INFO ] Updating Customer attribute : {}", attribute );
         isNotNull( attribute, value );
         Customer customer = customerRepository.findById( id )
-                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+                                             .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
         isContainsAnyOfTheAttributes( attribute );
         needsValidations( attribute, value );
         return getUpdateCustomerAttribute( attribute, value, customer );
@@ -112,7 +112,7 @@ public class CustomerServiceImpl implements CustomerService {
         Optional< Customer > customerOptional = customerRepository.findById( id );
         if( customerOptional.isEmpty() ) {
             log.error( "[ ERROR ] Exception (findById() method in CustomerServiceImpl class):  {}.",
-                    NoSuchElementException.class );
+                                                                                        NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
         return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
@@ -133,7 +133,7 @@ public class CustomerServiceImpl implements CustomerService {
         Optional< Customer > customerOptional = customerRepository.findByPrimaryEmail( email );
         if( customerOptional.isEmpty() ) {
             log.error( "[ ERROR ] Exception (findByPrimaryEmail() method in CustomerServiceImpl class) :  {}.",
-                    NoSuchElementException.class );
+                                                                                        NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
         return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
@@ -151,7 +151,7 @@ public class CustomerServiceImpl implements CustomerService {
         Optional< Customer > customerOptional = customerRepository.findByPhoneNumber( phoneNumber );
         if( customerOptional.isEmpty() ) {
             log.error( "[ ERROR ] Exception (findByPhoneNumber() method in CustomerServiceImpl class) :  {}.",
-                    NoSuchElementException.class );
+                                                                                         NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
         return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
@@ -189,20 +189,23 @@ public class CustomerServiceImpl implements CustomerService {
 
         switch( attribute ) {
             case "cnpj" -> {
-                Set< ConstraintViolation< LegalPersonalCustomerDTO > > cnpjViolations = validator.validateValue( LegalPersonalCustomerDTO.class, attribute, value );
+                Set< ConstraintViolation< LegalPersonalCustomerDTO > > cnpjViolations = validator
+                                                    .validateValue( LegalPersonalCustomerDTO.class, attribute, value );
                 if( ! cnpjViolations.isEmpty() ) {
                     throw new IllegalArgumentException( cnpjViolations.iterator().next().getMessage() );
                 }
             }
             case "primaryEmail" -> {
-                Set< ConstraintViolation< NaturalPersonCustomerDTO > > emailViolations = validator.validateValue( NaturalPersonCustomerDTO.class, attribute, value );
+                Set< ConstraintViolation< NaturalPersonCustomerDTO > > emailViolations = validator
+                                                    .validateValue( NaturalPersonCustomerDTO.class, attribute, value );
                 log.info( "[ INFO ] emailViolations : {}", emailViolations );
                 if( ! emailViolations.isEmpty() ) {
                     throw new IllegalArgumentException( emailViolations.iterator().next().getMessage() );
                 }
             }
             case "cpf" -> {
-                Set< ConstraintViolation< NaturalPersonCustomerDTO > > cpfViolations = validator.validateValue( NaturalPersonCustomerDTO.class, attribute, value );
+                Set< ConstraintViolation< NaturalPersonCustomerDTO > > cpfViolations = validator
+                                                    .validateValue( NaturalPersonCustomerDTO.class, attribute, value );
                 if( ! cpfViolations.isEmpty() ) {
                     throw new IllegalArgumentException( cpfViolations.iterator().next().getMessage() );
                 }
@@ -263,4 +266,5 @@ public class CustomerServiceImpl implements CustomerService {
             default -> throw new IllegalArgumentException( "Attribute not found." );
         }
     }
+
 }

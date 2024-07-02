@@ -61,7 +61,7 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
 
         log.info( "[ INFO ] Finding customer by id: {}", id );
         NaturalPersonCustomer naturalPersonCustomer = naturalPersonCustomerRepository.findById( id )
-                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+                                             .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
         return convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO( naturalPersonCustomer );
     }
 
@@ -76,7 +76,7 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
         generateCustomerContract( naturalPersonCustomerDTO );
         existsCpfOrEmail( naturalPersonCustomerDTO );
         NaturalPersonCustomer savedNaturalCustomer = naturalPersonCustomerRepository
-                .save( convertObjectToObjectDTOService.convertToNaturalPersonCustomer( naturalPersonCustomerDTO ) );
+                   .save( convertObjectToObjectDTOService.convertToNaturalPersonCustomer( naturalPersonCustomerDTO ) );
         return convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO( savedNaturalCustomer );
     }
 
@@ -94,10 +94,13 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
     private void existsCpfOrEmail( NaturalPersonCustomerDTO naturalPersonCustomerDTO ) {
 
         if( customerRepository.existsCustomerByPrimaryEmail( naturalPersonCustomerDTO.getPrimaryEmail() ) ) {
-            log.error( "[ ERROR ] Exception : Email already exists! : {}.", DataIntegrityViolationException.class );
+            log.error( "[ ERROR ] Exception : Email already exists! : {}.",
+                                                                                DataIntegrityViolationException.class );
             throw new DataIntegrityViolationException( "Email already exists!" );
-        } else if( naturalPersonCustomerRepository.existsNaturalPersonCustomerByCpf( naturalPersonCustomerDTO.getCpf() ) ) {
-            log.error( "[ ERROR ] Exception : CPF already exists! : {}.", DataIntegrityViolationException.class );
+        } else if( naturalPersonCustomerRepository
+                                              .existsNaturalPersonCustomerByCpf( naturalPersonCustomerDTO.getCpf() ) ) {
+            log.error( "[ ERROR ] Exception : CPF already exists! : {}.",
+                                                                                DataIntegrityViolationException.class );
             throw new DataIntegrityViolationException( "CPF already exists!" );
         }
     }

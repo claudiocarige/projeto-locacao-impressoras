@@ -19,7 +19,6 @@ import java.time.LocalDate;
 @Entity
 public class MonthlyPayment implements Serializable {
 
-
     @Serial
     private static final long serialVersionUID = 1L;
 

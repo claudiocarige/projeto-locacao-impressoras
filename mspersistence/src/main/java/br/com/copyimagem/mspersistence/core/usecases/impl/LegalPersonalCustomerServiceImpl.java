@@ -100,10 +100,13 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
     private void existsCnpjOrEmail( LegalPersonalCustomerDTO legalPersonalCustomerDTO ) {
 
         if( customerRepository.existsCustomerByPrimaryEmail( legalPersonalCustomerDTO.getPrimaryEmail() ) ) {
-            log.error( "[ ERROR ] Exception : Email already exists! : {}.", customerRepository.existsCustomerByPrimaryEmail( legalPersonalCustomerDTO.getPrimaryEmail() ) );
+            log.error( "[ ERROR ] Exception : Email already exists! : {}.", customerRepository
+                                        .existsCustomerByPrimaryEmail( legalPersonalCustomerDTO.getPrimaryEmail() ) );
             throw new DataIntegrityViolationException( "Email already exists!" );
-        } else if( legalPersonalCustomerRepository.existsLegalPersonalCustomerByCnpj( legalPersonalCustomerDTO.getCnpj() ) ) {
-            log.error( "[ ERROR ] Exception : CNPJ already exists! : {}.", DataIntegrityViolationException.class );
+        } else if( legalPersonalCustomerRepository
+                                            .existsLegalPersonalCustomerByCnpj( legalPersonalCustomerDTO.getCnpj() ) ) {
+            log.error( "[ ERROR ] Exception : CNPJ already exists! : {}.",
+                                                                                DataIntegrityViolationException.class );
             throw new DataIntegrityViolationException( "CNPJ already exists!" );
         }
     }
