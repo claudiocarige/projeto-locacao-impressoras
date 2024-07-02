@@ -18,6 +18,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -234,6 +236,17 @@ class CustomerServiceImplTest {
                 customerService.getCustomerContract( ID1L ) ).getMessage();
 
         assertEquals( "Customer not found", message );
+    }
+
+    @Test
+    @DisplayName("Should return all customers")
+    void shouldReturnAllCustomers() {
+        when(customerRepository.findAll()).thenReturn( Collections.singletonList(legalPersonalCustomer));
+        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(legalPersonalCustomer)).thenReturn(customerResponseDTOPJ);
+        List<CustomerResponseDTO> customerResponseDTO = customerService.searchAllCustomers();
+        assertEquals(1, customerResponseDTO.size());
+        assertEquals(legalPersonalCustomer.getId(), customerResponseDTO.get(0).getId());
+        assertEquals(CustomerResponseDTO.class, customerResponseDTO.get(0).getClass());
     }
 
     private void start() {
