@@ -44,21 +44,10 @@ public class CustomerServiceImpl implements CustomerService {
         return
                 switch( typeParam.toLowerCase() ) {
                     case "id" -> findById( Long.parseLong( valueParam ) );
-
+                    case "cpf" -> findByCpf( valueParam );
                     default ->
                             throw new IllegalArgumentException( "Parameter [ " + typeParam + " ] type not accepted." );
                 };
-    }
-
-    private CustomerResponseDTO findById( Long id ) {
-
-        Optional< Customer > customerOptional = customerRepository.findById( id );
-        if( customerOptional.isEmpty() ) {
-            log.error( "[ ERROR ] Exception (findById() method in CustomerServiceImpl class):  {}.",
-                    NoSuchElementException.class );
-            throw new NoSuchElementException( "Customer not found" );
-        }
-        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
     }
 
     @Override
@@ -89,6 +78,22 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer returnCustomer( Long aLong ) {
 
         return null;
+    }
+
+    private CustomerResponseDTO findById( Long id ) {
+
+        Optional< Customer > customerOptional = customerRepository.findById( id );
+        if( customerOptional.isEmpty() ) {
+            log.error( "[ ERROR ] Exception (findById() method in CustomerServiceImpl class):  {}.",
+                    NoSuchElementException.class );
+            throw new NoSuchElementException( "Customer not found" );
+        }
+        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
+    }
+
+    private CustomerResponseDTO findByCpf( String valueParam ) {
+
+        return naturalPersonCustomerService.findByCpf( valueParam );
     }
 
 }
