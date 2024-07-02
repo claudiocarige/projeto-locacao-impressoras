@@ -2,6 +2,7 @@ package br.com.copyimagem.mspersistence.core.usecases.impl;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
 import br.com.copyimagem.mspersistence.core.domain.entities.MonthlyPayment;
+import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.DataIntegrityViolationException;
@@ -192,6 +193,28 @@ class LegalPersonalCustomerServiceImplTest {
         String message = assertThrows(DataIntegrityViolationException.class,
                 () -> legalPersonalCustomerService.saveLegalPersonalCustomer(customerPjDTO)).getMessage();
         assertEquals("CNPJ already exists!", message);
+    }
+
+    @Test
+    @DisplayName("Must retunr a Customer Response DTO By CNPJ")
+    void mustReturnACustomerResponseDTOByCpnj(){
+        CustomerResponseDTO customerResponseDTO = new CustomerResponseDTO();
+        customerResponseDTO.setId(ID1L);
+        customerResponseDTO.setCpfOrCnpj(CNPJ);
+        customerResponseDTO.setClientName(customerPj.getClientName());
+        customerResponseDTO.setAddress(customerPj.getAddress());
+        when(legalPersonalCustomerRepository.findByCnpj(CNPJ)).thenReturn(Optional.of(customerPj));
+        when(convertObjectToObjectDTOService.convertToCustomerResponseDTO(customerPj)).thenReturn(customerResponseDTO);
+        CustomerResponseDTO responseDTO = legalPersonalCustomerService.findByCnpj(CNPJ);
+        assertAll("CustomerResponseDTO",
+                () -> assertNotNull(responseDTO),
+                () -> assertEquals(customerResponseDTO, responseDTO),
+                () -> assertEquals(CustomerResponseDTO.class, responseDTO.getClass()),
+                () -> assertEquals(ID1L, responseDTO.getId()),
+                () -> assertEquals(CNPJ, responseDTO.getCpfOrCnpj()),
+                () -> assertEquals(customerResponseDTO.getClientName(), responseDTO.getClientName()),
+                () -> assertEquals(customerResponseDTO.getAddress(), responseDTO.getAddress())
+        );
     }
 
     private void start() {
