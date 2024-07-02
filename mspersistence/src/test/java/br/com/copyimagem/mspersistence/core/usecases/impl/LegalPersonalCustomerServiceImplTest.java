@@ -14,12 +14,16 @@ import br.com.copyimagem.mspersistence.infra.persistence.repositories.LegalPerso
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.LegalPersonalCustomerBuilder.oneLegalPersonalCustomer;
 import static org.junit.jupiter.api.Assertions.*;
@@ -229,6 +233,23 @@ class LegalPersonalCustomerServiceImplTest {
             assertEquals("Customer not found", message.getMessage());
             assertEquals(NoSuchElementException.class, message.getClass());
         }
+    }
+
+    @ParameterizedTest(name = "{1}")
+    @MethodSource(value = "mandatoryscenarios")
+    void mustValidateMandatoryFieldsWhenSaving(Long id, String cnpj, String message) {
+        String exMessage = assertThrows(IllegalArgumentException.class, () -> {
+            LegalPersonalCustomer legalPersonalCustomer = oneLegalPersonalCustomer().withId(id).withCnpj(cnpj).nowCustomerPJ();
+            LegalPersonalCustomerDTO legalPersonalCustomerDTO  =  convertObjectToObjectDTOService.convertToLegalPersonalCustomerDTO(legalPersonalCustomer);
+            legalPersonalCustomerService.saveLegalPersonalCustomer(legalPersonalCustomerDTO);
+        }).getMessage();
+        assertEquals(message, exMessage);
+    }
+
+    private static Stream< Arguments > mandatoryscenarios(){
+        return Stream.of(
+                Arguments.of(ID1L, null, "Invalid CNPJ")
+        );
     }
 
     private void start() {
