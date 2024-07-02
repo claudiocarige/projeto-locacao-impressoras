@@ -2,7 +2,6 @@ package br.com.copyimagem.mspersistence.infra.controllers;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
-import br.com.copyimagem.mspersistence.core.usecases.impl.ConvertObjectToObjectDTOService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.LegalPersonalCustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,7 +18,7 @@ import java.util.List;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.LegalPersonalCustomerBuilder.oneLegalPersonalCustomer;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -63,6 +61,23 @@ class LegalPersonalCustomerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(1));
+    }
+
+    @Test
+    @DisplayName("Should return a LegalPersonalCustomer by id")
+    void shouldReturnALegalPersonalCustomerById() throws Exception {
+        when(legalPersonalCustomerService.findLegalPersonalCustomerById(customerPj.getId()))
+                .thenReturn(customerPjDTO);
+
+        mockMvc.perform(get("/api/v1/customers/pj/{id}", customerPjDTO.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(customerPjDTO.getId()))
+                .andExpect(jsonPath("$.clientName").value(customerPjDTO.getClientName()));
+        verify(legalPersonalCustomerService, times(1))
+                .findLegalPersonalCustomerById(customerPjDTO.getId());
     }
 
     private void start() {
