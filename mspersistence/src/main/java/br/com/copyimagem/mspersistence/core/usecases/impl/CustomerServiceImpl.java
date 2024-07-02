@@ -70,7 +70,9 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerContract getCustomerContract( Long id ) {
 
-        return null;
+        Customer customer = customerRepository.findById( id )
+                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+        return customer.getCustomerContract();
     }
 
     @Override
