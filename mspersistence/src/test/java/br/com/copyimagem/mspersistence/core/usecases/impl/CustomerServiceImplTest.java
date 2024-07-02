@@ -333,6 +333,17 @@ class CustomerServiceImplTest {
         assertEquals("This attribute cannot be changed on this endpoint.", message);
     }
 
+    @Test
+    @DisplayName("Should return a exception when attribute not found")
+    void shouldReturnAExceptionWhenAttributeNotFound(){
+        String attribute = "homeNumber";
+        when(customerRepository.findById(ID1L)).thenReturn(Optional.of(customer));
+
+        String message = assertThrows(IllegalArgumentException.class,
+                () -> customerService.updateCustomerAttribute(attribute, "5", ID1L)).getMessage();
+        assertEquals("Attribute not found.", message);
+    }
+
     private void start() {
 
         customer = LegalPersonalCustomerBuilder.oneLegalPersonalCustomer().nowCustomerPJ();
