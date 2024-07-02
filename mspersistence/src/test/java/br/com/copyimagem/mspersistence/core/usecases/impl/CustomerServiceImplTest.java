@@ -150,6 +150,16 @@ class CustomerServiceImplTest {
         assertEquals(customerResponseDTO.getCpfOrCnpj(), customerResponseDTOPF.getCpfOrCnpj());
     }
 
+    @Test
+    @DisplayName("Should return a not found Customer by Email")
+    void shouldReturnAEmptyWhenCustomerNotFoundByEmail() {
+        when(customerRepository.findByPrimaryEmail(EMAIL)).thenReturn(Optional.empty());
+        String message = assertThrows(NoSuchElementException.class,
+                () -> customerService.searchCustomer("email", EMAIL)).getMessage();
+        assertEquals("Customer not found", message);
+
+    }
+
     private void start() {
 
         customer = LegalPersonalCustomerBuilder.oneLegalPersonalCustomer().nowCustomerPJ();
