@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
+
 @Log4j2
 @RestController
 @RequestMapping( "/api/v1/customers" )
@@ -35,5 +38,11 @@ public class CustomerController {
         return ResponseEntity.ok().body( response );
     }
 
+    @GetMapping( value = "/search-client-all" )
+    public ResponseEntity< List< CustomerResponseDTO > > searchAllCustomers() {
+
+        log.info( String.format( "[ INFO ] Search for all customers --- { %s }", CustomerController.class ) );
+        return ResponseEntity.ok().body( customerService.searchAllCustomers() );
+    }
 
 }
