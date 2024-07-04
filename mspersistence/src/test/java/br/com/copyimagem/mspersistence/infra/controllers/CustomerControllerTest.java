@@ -90,23 +90,43 @@ class CustomerControllerTest {
     }
 
     @Test
-    @DisplayName("Should return all customers")
+    @DisplayName( "Should return all customers" )
     void shouldReturnAllCustomers() throws Exception {
-        when(customerService.searchAllCustomers()).thenReturn( List.of(customerResponseDTO));
 
-        ResponseEntity<List<CustomerResponseDTO>> responseEntity =
+        when( customerService.searchAllCustomers() ).thenReturn( List.of( customerResponseDTO ) );
+
+        ResponseEntity< List< CustomerResponseDTO > > responseEntity =
                 customerController.searchAllCustomers();
+        assertEquals( HttpStatus.OK, responseEntity.getStatusCode() );
+        assertEquals( CustomerResponseDTO.class, Objects.requireNonNull( responseEntity.getBody() )
+                                                                                                .get( 0 ).getClass() );
+        assertEquals( 1, responseEntity.getBody().size() );
+
+        mockMvc.perform( get( "/api/v1/customers/search-client-all" )
+                        .contentType( MediaType.APPLICATION_JSON ) )
+                .andExpect( status().isOk() )
+                .andExpect( content().contentType( MediaType.APPLICATION_JSON ) )
+                .andExpect( jsonPath( "$[0].id" ).value( 1 ) )
+                .andExpect( jsonPath( "$[0].primaryEmail" ).value( "carige@mail.com" ) )
+                .andExpect( jsonPath( "$[0].cpfOrCnpj" ).value( CPF ) );
+    }
+
+    @Test
+    @DisplayName("Should return all customers by FinancialSituation")
+    void shouldReturnAllCustomersByFinancialSituation() throws Exception {
+        String situation = "PAGO";
+        when(customerService.searchFinancialSituation(situation)).thenReturn(List.of(customerResponseDTO));
+        ResponseEntity<List<CustomerResponseDTO>> responseEntity =
+                customerController.searchFinancialSituation(situation);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(CustomerResponseDTO.class, Objects.requireNonNull(responseEntity.getBody()).get(0).getClass());
         assertEquals(1, responseEntity.getBody().size());
 
-        mockMvc.perform(get("/api/v1/customers/search-client-all")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$[0].id").value(1))
-            .andExpect(jsonPath("$[0].primaryEmail").value("carige@mail.com"))
-            .andExpect(jsonPath("$[0].cpfOrCnpj").value(CPF));
+        mockMvc.perform( get( "/api/v1/customers/search-financial-situation" )
+                        .contentType( MediaType.APPLICATION_JSON )
+                        .param( "situation", situation ) )
+                .andExpect( status().isOk() )
+                .andExpect( content().contentType( MediaType.APPLICATION_JSON ) );
     }
 
     private void start() {
