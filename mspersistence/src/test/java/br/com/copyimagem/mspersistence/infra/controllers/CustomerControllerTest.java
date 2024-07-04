@@ -38,9 +38,13 @@ class CustomerControllerTest {
 
     public static final String CPF = "156.258.240-29";
 
-    public static final String CPF_PARAM = "cpf";
-
     public static final String ID_TYPE_PARAM = "id";
+
+    public static final String CPF_OR_CNPJ = "14.124.420/0001-94";
+
+    public static final String CNPJ_PARAM = "cnpj";
+
+    public static final String CCARIGE_GMAIL_COM = "ccarige@gmail.com";
 
     private CustomerResponseDTO customerResponseDTO;
 
@@ -66,8 +70,7 @@ class CustomerControllerTest {
     @DisplayName( "Should return a customer by id" )
     void shouldReturnACustomerById() throws Exception {
 
-        when( customerService.searchCustomer( ID_TYPE_PARAM, NUMBER_1 ) ).thenReturn(
-                customerResponseDTO );
+        when( customerService.searchCustomer( ID_TYPE_PARAM, NUMBER_1 ) ).thenReturn( customerResponseDTO );
         mockMvc.perform( get( "/api/v1/customers/search-client" )
                         .param( "typeParam", ID_TYPE_PARAM )
                         .param( "valueParam", NUMBER_1 )
@@ -81,9 +84,9 @@ class CustomerControllerTest {
     void shouldReturnAExceptionWhenCustomerNotFound() {
 
         when( customerService.searchCustomer( ID_TYPE_PARAM, NUMBER_1 ) )
-                .thenThrow( new NoSuchElementException( "Customer not found" ) );
+                                                     .thenThrow( new NoSuchElementException( "Customer not found" ) );
         NoSuchElementException exception = assertThrows( NoSuchElementException.class,
-                () -> customerService.searchCustomer( ID_TYPE_PARAM, NUMBER_1 ) );
+                                                    () -> customerService.searchCustomer( ID_TYPE_PARAM, NUMBER_1 ) );
         assertEquals( CUSTOMER_NOT_FOUND, exception.getMessage() );
 
         verify( customerService, Mockito.times( 1 ) ).searchCustomer( ID_TYPE_PARAM, NUMBER_1 );
@@ -95,11 +98,10 @@ class CustomerControllerTest {
 
         when( customerService.searchAllCustomers() ).thenReturn( List.of( customerResponseDTO ) );
 
-        ResponseEntity< List< CustomerResponseDTO > > responseEntity =
-                customerController.searchAllCustomers();
+        ResponseEntity< List< CustomerResponseDTO > > responseEntity = customerController.searchAllCustomers();
         assertEquals( HttpStatus.OK, responseEntity.getStatusCode() );
         assertEquals( CustomerResponseDTO.class, Objects.requireNonNull( responseEntity.getBody() )
-                                                                                                .get( 0 ).getClass() );
+                                                                                              .get( 0 ).getClass() );
         assertEquals( 1, responseEntity.getBody().size() );
 
         mockMvc.perform( get( "/api/v1/customers/search-client-all" )
@@ -107,20 +109,22 @@ class CustomerControllerTest {
                 .andExpect( status().isOk() )
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON ) )
                 .andExpect( jsonPath( "$[0].id" ).value( 1 ) )
-                .andExpect( jsonPath( "$[0].primaryEmail" ).value( "carige@mail.com" ) )
+                .andExpect( jsonPath( "$[0].primaryEmail" ).value( CCARIGE_GMAIL_COM ) )
                 .andExpect( jsonPath( "$[0].cpfOrCnpj" ).value( CPF ) );
     }
 
     @Test
-    @DisplayName("Should return all customers by FinancialSituation")
+    @DisplayName( "Should return all customers by FinancialSituation" )
     void shouldReturnAllCustomersByFinancialSituation() throws Exception {
+
         String situation = "PAGO";
-        when(customerService.searchFinancialSituation(situation)).thenReturn(List.of(customerResponseDTO));
-        ResponseEntity<List<CustomerResponseDTO>> responseEntity =
-                customerController.searchFinancialSituation(situation);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(CustomerResponseDTO.class, Objects.requireNonNull(responseEntity.getBody()).get(0).getClass());
-        assertEquals(1, responseEntity.getBody().size());
+        when( customerService.searchFinancialSituation( situation ) ).thenReturn( List.of( customerResponseDTO ) );
+        ResponseEntity< List< CustomerResponseDTO > > responseEntity =
+                                                             customerController.searchFinancialSituation( situation );
+        assertEquals( HttpStatus.OK, responseEntity.getStatusCode() );
+        assertEquals( CustomerResponseDTO.class,
+                                             Objects.requireNonNull( responseEntity.getBody() ).get( 0 ).getClass() );
+        assertEquals( 1, responseEntity.getBody().size() );
 
         mockMvc.perform( get( "/api/v1/customers/search-financial-situation" )
                         .contentType( MediaType.APPLICATION_JSON )
@@ -130,47 +134,44 @@ class CustomerControllerTest {
     }
 
     @Test
-    @DisplayName("Should return a exception when param invalid")
-    void shouldReturnAExceptionWhenParamInvalidByFinancialSituation(){
+    @DisplayName( "Should return a exception when param invalid" )
+    void shouldReturnAExceptionWhenParamInvalidByFinancialSituation() {
+
         String situation = "INVALID";
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () ->customerController.searchFinancialSituation(situation));
-        assertEquals("The argument is not correct", exception.getMessage());
-        verify(customerService, never()).searchFinancialSituation(situation);
+        IllegalArgumentException exception = assertThrows( IllegalArgumentException.class,
+                                                     () -> customerController.searchFinancialSituation( situation ) );
+        assertEquals( "The argument is not correct", exception.getMessage() );
+        verify( customerService, never() ).searchFinancialSituation( situation );
     }
 
     @Test
-    @DisplayName("Should return a ResponseEntity from UpdateCustomerDTO")
+    @DisplayName( "Should return a ResponseEntity from UpdateCustomerDTO" )
     void shouldReturnAResponseEntityFromUpdateCustomerDTO() throws Exception {
 
-        String attribute = "cnpj";
-        String value = "123.456.789-10";
-        when(customerService.updateCustomerAttribute(attribute, value, 1L)).thenReturn(updateCustomerDTO);
-        ResponseEntity<UpdateCustomerDTO> responseEntity =
-                customerController.updateCustomerAttribute(attribute, value, 1L);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(UpdateCustomerDTO.class, Objects.requireNonNull(responseEntity.getBody()).getClass());
-        assertEquals(customerResponseDTO.getId(), responseEntity.getBody().getId());
+        when( customerService.updateCustomerAttribute( CNPJ_PARAM, CPF_OR_CNPJ, 1L ) ).thenReturn( updateCustomerDTO );
+        ResponseEntity< UpdateCustomerDTO > responseEntity =
+                customerController.updateCustomerAttribute( CNPJ_PARAM, CPF_OR_CNPJ, 1L );
+        assertEquals( HttpStatus.OK, responseEntity.getStatusCode() );
+        assertEquals( UpdateCustomerDTO.class, Objects.requireNonNull( responseEntity.getBody() ).getClass() );
+        assertEquals( customerResponseDTO.getId(), responseEntity.getBody().getId() );
 
-        mockMvc.perform(patch("/api/v1/customers/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("attribute", attribute)
-                        .param("value", value))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.primaryEmail").value("ccarige@gmail.com"));
+        mockMvc.perform( patch( "/api/v1/customers/1" )
+                        .contentType( MediaType.APPLICATION_JSON )
+                        .param( "attribute", CNPJ_PARAM )
+                        .param( "value", CPF_OR_CNPJ ) )
+                .andExpect( status().isOk() )
+                .andExpect( content().contentType( MediaType.APPLICATION_JSON ) )
+                .andExpect( jsonPath( "$.id" ).value( 1L ) )
+                .andExpect( jsonPath( "$.primaryEmail" ).value( CCARIGE_GMAIL_COM ) );
     }
-
-
 
     private void start() {
 
         customerResponseDTO = oneCustomerResponseDTO().withCpfOrCnpj( CPF ).now();
         updateCustomerDTO = new UpdateCustomerDTO();
-        updateCustomerDTO.setPrimaryEmail( "ccarige@gmail.com" );
+        updateCustomerDTO.setPrimaryEmail( CCARIGE_GMAIL_COM );
         updateCustomerDTO.setId( 1L );
-        updateCustomerDTO.setCpfOrCnpj( "14.124.420/0001-94" );
+        updateCustomerDTO.setCpfOrCnpj( CPF_OR_CNPJ );
     }
 
 }
