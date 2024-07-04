@@ -45,4 +45,14 @@ public class CustomerController {
         return ResponseEntity.ok().body( customerService.searchAllCustomers() );
     }
 
+    @GetMapping( value = "/search-financial-situation" )
+    public ResponseEntity< List< CustomerResponseDTO > > searchFinancialSituation( @RequestParam( "situation" ) String situation ) {
+
+        if( situation == null || ( ! situation.equals( "PAGO" ) && ! situation.equals( "PENDENTE" ) && ! situation.equals( "INADIMPLENTE" ) && ! situation.equals( "CANCELADO" ) ) ) {
+            throw new IllegalArgumentException( "The argument is not correct" );
+        }
+        log.info( String.format( "[ INFO ] Search for all defaulting customers --- { %s }", CustomerController.class ) );
+        return ResponseEntity.ok().body( customerService.searchFinancialSituation( situation ) );
+    }
+
 }
