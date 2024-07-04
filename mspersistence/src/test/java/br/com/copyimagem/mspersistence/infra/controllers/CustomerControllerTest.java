@@ -24,6 +24,7 @@ import static br.com.copyimagem.mspersistence.core.domain.builders.CustomerRespo
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -137,6 +138,31 @@ class CustomerControllerTest {
         assertEquals("The argument is not correct", exception.getMessage());
         verify(customerService, never()).searchFinancialSituation(situation);
     }
+
+    @Test
+    @DisplayName("Should return a ResponseEntity from UpdateCustomerDTO")
+    void shouldReturnAResponseEntityFromUpdateCustomerDTO() throws Exception {
+
+        String attribute = "cnpj";
+        String value = "123.456.789-10";
+        when(customerService.updateCustomerAttribute(attribute, value, 1L)).thenReturn(updateCustomerDTO);
+        ResponseEntity<UpdateCustomerDTO> responseEntity =
+                customerController.updateCustomerAttribute(attribute, value, 1L);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(UpdateCustomerDTO.class, Objects.requireNonNull(responseEntity.getBody()).getClass());
+        assertEquals(customerResponseDTO.getId(), responseEntity.getBody().getId());
+
+        mockMvc.perform(patch("/api/v1/customers/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("attribute", attribute)
+                        .param("value", value))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.primaryEmail").value("ccarige@gmail.com"));
+    }
+
+
 
     private void start() {
 
