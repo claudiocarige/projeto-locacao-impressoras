@@ -1,14 +1,12 @@
 package br.com.copyimagem.mspersistence.infra.controllers;
 
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
+import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -53,6 +51,16 @@ public class CustomerController {
         }
         log.info( String.format( "[ INFO ] Search for all defaulting customers --- { %s }", CustomerController.class ) );
         return ResponseEntity.ok().body( customerService.searchFinancialSituation( situation ) );
+    }
+
+    @PatchMapping( value = "/{id}" )
+    public ResponseEntity< UpdateCustomerDTO > updateCustomerAttribute(
+            @RequestParam( name = "attribute" ) String attribute,
+            @RequestParam( name = "value" ) String value, @PathVariable Long id ) {
+
+        UpdateCustomerDTO updateDto = customerService
+                .updateCustomerAttribute( attribute, value, id );
+        return ResponseEntity.ok().body( updateDto );
     }
 
 }
