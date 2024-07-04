@@ -22,8 +22,7 @@ import java.util.Objects;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.CustomerResponseDTOBuilder.oneCustomerResponseDTO;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -127,6 +126,16 @@ class CustomerControllerTest {
                         .param( "situation", situation ) )
                 .andExpect( status().isOk() )
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON ) );
+    }
+
+    @Test
+    @DisplayName("Should return a exception when param invalid")
+    void shouldReturnAExceptionWhenParamInvalidByFinancialSituation(){
+        String situation = "INVALID";
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () ->customerController.searchFinancialSituation(situation));
+        assertEquals("The argument is not correct", exception.getMessage());
+        verify(customerService, never()).searchFinancialSituation(situation);
     }
 
     private void start() {
