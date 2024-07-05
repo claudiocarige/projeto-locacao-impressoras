@@ -238,6 +238,16 @@ class MultiPrinterServiceImplTest {
         assertEquals(10000, multiPrinterDto.getImpressionCounterInitial());
     }
 
+    @Test
+    @DisplayName("Should throw an exception with no rows updated")
+    void shouldThrowAnExceptionWithNoRowsUpdated(){
+        when(multiPrinterRepository.updateImpressionCounterByAttribute(1, 10000,
+                "impressionCounterInitial")).thenReturn(0);
+        String message = assertThrows(IllegalStateException.class, () -> multiPrinterServiceImpl
+                          .setImpressionCounter(1, 10000,"impressionCounterInitial")).getMessage();
+        assertEquals("No rows updated. Check the conditions and input values.", message);
+    }
+
     private void startEntities() {
 
         multiPrinter = oneMultiPrinter().now();
