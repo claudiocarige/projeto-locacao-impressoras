@@ -9,4 +9,6 @@ import java.util.List;
 public interface MultiPrinterRepository extends JpaRepository< MultiPrinter, Integer> {
 
     List< MultiPrinter > findAllByCustomerId( Long customerId );
+
+    boolean existsBySerialNumber( String serialNumber );
 }
