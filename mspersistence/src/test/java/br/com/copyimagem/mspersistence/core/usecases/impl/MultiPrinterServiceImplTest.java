@@ -205,8 +205,8 @@ class MultiPrinterServiceImplTest {
     }
 
     @Test
-    @DisplayName("Must SET Machine Status")
-    void mustSetMAchineStatus(){
+    @DisplayName("Should SET Machine Status")
+    void shouldSetMAchineStatus(){
         multiPrinterDTO.setMachineStatus(MachineStatus.MANUTENCAO);
         when(multiPrinterRepository.updateMachineStatusById(1, MachineStatus.MANUTENCAO)).thenReturn(1);
         when(multiPrinterRepository.findById(1)).thenReturn(Optional.ofNullable(multiPrinter));
@@ -214,6 +214,14 @@ class MultiPrinterServiceImplTest {
         MultiPrinterDTO multiPrinterDto = multiPrinterServiceImpl.setMachineStatus(1,"MANUTENCAO");
         assertEquals(multiPrinterDTO, multiPrinterDto);
         assertEquals(MachineStatus.MANUTENCAO, multiPrinterDto.getMachineStatus());
+    }
+
+    @Test
+    @DisplayName("Should throw an exception with invalid status")
+    void shouldThrowAnExceptionWithInvalidStatus(){
+        String message = assertThrows(IllegalArgumentException.class,
+                () -> multiPrinterServiceImpl.setMachineStatus(1, "INVALIDO")).getMessage();
+        assertEquals("Invalid Status: INVALIDO", message);
     }
 
     private void startEntities() {
