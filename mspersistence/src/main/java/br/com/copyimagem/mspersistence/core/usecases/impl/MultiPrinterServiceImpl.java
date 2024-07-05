@@ -37,4 +37,13 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
                 .toList();
     }
 
+    @Override
+    public List< MultiPrinterDTO > findAllMultiPrintersByCustomerId( Long customer_Id ) {
+
+        return multiPrinterRepository.findAllByCustomerId( customer_Id )
+                .stream()
+                .map( convertObjectToObjectDTOService::convertToMultiPrinterDTO )
+                .toList();
+    }
+
 }
