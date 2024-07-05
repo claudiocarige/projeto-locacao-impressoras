@@ -16,4 +16,6 @@ public interface MultiPrinterService {
 
     MultiPrinterDTO saveMultiPrinter( MultiPrinterDTO multiPrinterDTO );
 
+    MultiPrinterDTO setUpClientOnAMultiPrinter( Integer id, Long customer_Id );
+
 }
