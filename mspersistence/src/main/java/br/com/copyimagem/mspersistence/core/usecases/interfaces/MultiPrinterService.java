@@ -18,4 +18,6 @@ public interface MultiPrinterService {
 
     MultiPrinterDTO setUpClientOnAMultiPrinter( Integer id, Long customer_Id );
 
+    void deleteMultiPrinter( Integer id );
+
 }

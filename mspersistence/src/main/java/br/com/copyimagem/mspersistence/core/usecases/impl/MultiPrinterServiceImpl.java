@@ -60,7 +60,7 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
 
         checkSerialNumber( multiPrinterDTO.getSerialNumber() );
         MultiPrinter multiPrinter = multiPrinterRepository.save( convertObjectToObjectDTOService
-                .convertToMultiPrinter( multiPrinterDTO ) );
+                                                                          .convertToMultiPrinter( multiPrinterDTO ) );
         return convertObjectToObjectDTOService.convertToMultiPrinterDTO( multiPrinter );
     }
 
@@ -68,7 +68,7 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
     public MultiPrinterDTO setUpClientOnAMultiPrinter( Integer id, Long customer_Id ) {
 
         Customer customer = customerRepository.findById( customer_Id )
-                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+                                             .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
         MultiPrinterDTO multiPrinterDTO = findMultiPrinterById( id );
         if( multiPrinterDTO.getCustomer_id() != null ) {
             throw new IllegalArgumentException( "This printer is already Customer." );
@@ -79,6 +79,17 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
         multiPrinter.setCustomer( customer );
         multiPrinterRepository.save( multiPrinter );
         return multiPrinterDTO;
+    }
+
+    @Override
+    public void deleteMultiPrinter( Integer id ) {
+
+        MultiPrinter multiPrinter = multiPrinterRepository.findById( id )
+                                           .orElseThrow( () -> new NoSuchElementException( "MultiPrint not found" ) );
+        if( multiPrinter.getCustomer() != null ) {
+            throw new IllegalArgumentException( "This printer cannot be deleted." );
+        }
+        multiPrinterRepository.deleteById( id );
     }
 
     private void checkSerialNumber( String serialNumber ) {
