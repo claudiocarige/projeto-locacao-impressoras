@@ -180,6 +180,15 @@ class MultiPrinterServiceImplTest {
         verify(multiPrinterRepository, times(1)).deleteById(1);
     }
 
+    @Test
+    @DisplayName("Should throw an exception with existing Custome")
+    void shouldThrowAnExceptionWithExistingCustomer(){
+        multiPrinter.setCustomer(oneLegalPersonalCustomer().nowCustomerPJ());
+        when(multiPrinterRepository.findById(1)).thenReturn(Optional.ofNullable(multiPrinter));
+        String message = assertThrows(IllegalArgumentException.class,
+                                                () -> multiPrinterServiceImpl.deleteMultiPrinter(1)).getMessage();
+        assertEquals("This printer cannot be deleted.", message);
+    }
 
 
     private void startEntities() {
