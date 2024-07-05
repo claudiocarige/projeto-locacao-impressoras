@@ -102,6 +102,24 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
         return multiPrinterDTO;
     }
 
+    @Override
+    public MultiPrinterDTO setMachineStatus( Integer id, String status ) {
+
+        MultiPrinterDTO multiPrinterDTO;
+        int row;
+        switch( status ) {
+            case "DISPONIVEL", "MANUTENCAO", "LOCADA", "INATIVA" ->
+                    row = multiPrinterRepository.updateMachineStatusById( id, MachineStatus.valueOf( status ) );
+            default -> throw new IllegalArgumentException( "Invalid Status: " + status );
+        }
+        if( row > 0 ) {
+            multiPrinterDTO = findMultiPrinterById(id);
+        } else {
+            throw new IllegalStateException( "No rows updated. Check the conditions and input values." );
+        }
+        return multiPrinterDTO;
+    }
+
     private void checkSerialNumber( String serialNumber ) {
 
         if( multiPrinterRepository.existsBySerialNumber( serialNumber ) ) {

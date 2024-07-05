@@ -22,4 +22,6 @@ public interface MultiPrinterService {
 
     MultiPrinterDTO deleteCustomerFromMultiPrinter( Integer id );
 
+    MultiPrinterDTO setMachineStatus( Integer id, String status );
+
 }
