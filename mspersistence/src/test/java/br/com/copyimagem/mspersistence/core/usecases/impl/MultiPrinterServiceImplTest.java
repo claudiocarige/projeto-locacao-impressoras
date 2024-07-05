@@ -220,8 +220,22 @@ class MultiPrinterServiceImplTest {
     @DisplayName("Should throw an exception with invalid status")
     void shouldThrowAnExceptionWithInvalidStatus(){
         String message = assertThrows(IllegalArgumentException.class,
-                () -> multiPrinterServiceImpl.setMachineStatus(1, "INVALIDO")).getMessage();
+                                () -> multiPrinterServiceImpl.setMachineStatus(1, "INVALIDO")).getMessage();
         assertEquals("Invalid Status: INVALIDO", message);
+    }
+
+    @Test
+    @DisplayName("Should SET Impression Counter")
+    void shouldSetImpressionCounter(){
+        when(multiPrinterRepository.updateImpressionCounterByAttribute(1, 10000,
+                                                                "impressionCounterInitial")).thenReturn(1);
+        when(multiPrinterRepository.findById(1)).thenReturn(Optional.ofNullable(multiPrinter));
+        when(convertObjectToObjectDTOService.convertToMultiPrinterDTO(multiPrinter)).thenReturn(multiPrinterDTO);
+        multiPrinterDTO.setImpressionCounterInitial(10000);
+        MultiPrinterDTO multiPrinterDto = multiPrinterServiceImpl
+                                        .setImpressionCounter(1, 10000,"impressionCounterInitial");
+        assertEquals(multiPrinterDTO, multiPrinterDto);
+        assertEquals(10000, multiPrinterDto.getImpressionCounterInitial());
     }
 
     private void startEntities() {
