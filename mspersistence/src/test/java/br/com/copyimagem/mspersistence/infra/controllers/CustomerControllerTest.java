@@ -44,7 +44,7 @@ class CustomerControllerTest {
 
     public static final String CNPJ_PARAM = "cnpj";
 
-    public static final String CCARIGE_GMAIL_COM = "ccarige@gmail.com";
+    public static final String CCARIGE_GMAIL_COM = "carige@mail.com";
 
     private CustomerResponseDTO customerResponseDTO;
 
