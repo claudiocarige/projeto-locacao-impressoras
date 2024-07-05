@@ -159,6 +159,18 @@ class MultiPrinterServiceImplTest {
         assertEquals(multiPrinterDTO.getCustomer_id(), multiPrinterDto.getCustomer_id());
     }
 
+    @Test
+    @DisplayName("Should throw an exception with existing Custome")
+    void shouldThrowAnExceptionWithExistingCustomerOnMultiPrinter(){
+        when(multiPrinterRepository.findById(1)).thenReturn(Optional.ofNullable(multiPrinter));
+        when(customerRepository.findById(1L))
+                .thenReturn(Optional.ofNullable(oneLegalPersonalCustomer().nowCustomerPJ()));
+        when(convertObjectToObjectDTOService.convertToMultiPrinterDTO(multiPrinter)).thenReturn(multiPrinterDTO);
+        String message = assertThrows(IllegalArgumentException.class,
+                () -> multiPrinterServiceImpl.setUpClientOnAMultiPrinter(1, 1L)).getMessage();
+        assertEquals("This printer is already Customer.", message);
+    }
+
     private void startEntities() {
 
         multiPrinter = oneMultiPrinter().now();
