@@ -2,6 +2,7 @@ package br.com.copyimagem.mspersistence.core.usecases.impl;
 
 
 import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
+import br.com.copyimagem.mspersistence.core.domain.enums.MachineStatus;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
@@ -190,6 +191,18 @@ class MultiPrinterServiceImplTest {
         assertEquals("This printer cannot be deleted.", message);
     }
 
+    @Test
+    @DisplayName("Should delete Customer From Multiprinter")
+    void shouldDeleteCustomerFromMultiPrinter(){
+        when(multiPrinterRepository.findById(1)).thenReturn(Optional.ofNullable(multiPrinter));
+        when(convertObjectToObjectDTOService.convertToMultiPrinterDTO(multiPrinter)).thenReturn(multiPrinterDTO);
+        MultiPrinterDTO resultDTO = multiPrinterServiceImpl.deleteCustomerFromMultiPrinter(1);
+        assertEquals(multiPrinterDTO, resultDTO);
+        assertEquals(multiPrinterDTO.getId(), resultDTO.getId());
+        assertEquals(MultiPrinterDTO.class, resultDTO.getClass());
+        assertEquals( multiPrinterDTO.getMachineStatus(), MachineStatus.DISPONIVEL);
+        assertNull(resultDTO.getCustomer_id());
+    }
 
     private void startEntities() {
 
