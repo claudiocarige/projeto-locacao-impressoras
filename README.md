@@ -179,6 +179,7 @@ class Customer {
 
 - **Persistência**:
     - Spring Data JPA: Facilita a implementação da camada de acesso a dados.
+    - Hibernate: Fará as operações de acesso a dados e gerenciamento de transações e consultas SQL.
 
 - **Segurança**:
     - Spring Security: Gerenciamento de autenticação e autorização.
@@ -221,17 +222,17 @@ class Customer {
   - <span style="color:green; font-weight: bold"> [ addition ] : First commit</span>
 
   - **Tópicos de Commit:**
-    1. addition / inclusion: Usado especificamente para adicionar novos elementos ao código, como atributos, métodos, classes, etc.
-    2. feature: Usado para adicionar uma nova funcionalidade ao código.
-    3. refactor: Usado para fazer alterações no código para melhorar sua estrutura, legibilidade ou desempenho sem alterar seu comportamento externo.
-    4. enhancement: Usado para adicionar melhorias ou otimizações ao código existente.
-    5. update: Usado quando você está atualizando ou modificando partes existentes do código.
-    6. docs: Usado para fazer alterações na documentação do código, como adicionar ou corrigir comentários, atualizar documentação de API, etc.
-    7. cleanup: Usado para realizar tarefas de limpeza no código, como remover código morto, otimizar imports, etc.
-    8. bugfix: Usado para corrigir um bug existente no código.
-    9. test: Usado para adicionar, modificar ou corrigir testes de unidade, testes de integração, etc.
-    10. test refactor: Usado para informar alterações no código dos testes.
-    11. build: Usado para modificações nos arquivos de Build.
+    1. **addition / inclusion:** Usado especificamente para adicionar novos elementos ao código, como atributos, métodos, classes, etc.
+    2. **feature:** Usado para adicionar uma nova funcionalidade ao código.
+    3. **refactor:** Usado para fazer alterações no código para melhorar sua estrutura, legibilidade ou desempenho sem alterar seu comportamento externo.
+    4. **enhancement:** Usado para adicionar melhorias ou otimizações ao código existente.
+    5. **update:** Usado quando você está atualizando ou modificando partes existentes do código.
+    6. **docs:** Usado para fazer alterações na documentação do código, como adicionar ou corrigir comentários, atualizar documentação de API, etc.
+    7. **cleanup:** Usado para realizar tarefas de limpeza no código, como remover código morto, otimizar imports, etc.
+    8. **bugfix:** Usado para corrigir um bug existente no código.
+    9. **test:** Usado para adicionar, modificar ou corrigir testes de unidade, testes de integração, etc.
+    10. **test refactor:** Usado para informar alterações no código dos testes.
+    11. **build:** Usado para modificações nos arquivos de Build.
 
 ### 6. Arquitetura do Projeto Backend:
     
@@ -242,18 +243,21 @@ class Customer {
               - <span style="color:blue; font-weight: bold">domain</span>
                   - entities
                     - Customer
+                    - CustomerContract
                     - LegalPesonalCustomer
                     - NaturalPersonCustomer
                     - Address
                     - MonthlyPayment
                     - MultiPrinter
                   - enums
-                      - FinancialSituation.java
-                      - MachineStatus.java
+                      - FinancialSituation
+                      - MachineStatus
                       - PaymentStatus
+                      - PrinterType
               - <span style="color:blue; font-weight: bold">dto</span>
                 - CustomerResponseDTO
                 - LegalPersonalCustomerDTO
+                - MultiPrinterDTO
                 - NaturalPersonCustomrDTO
                 - UpdateCustometDTO
               - <span style="color:red; font-weight: bold">exceptions</span>
@@ -264,13 +268,16 @@ class Customer {
                 - StandardError
               - <span style="color:blue; font-weight: bold">usecases</span>
                   - interfaces
-                      - CustomerService.java
-                      - LegalPersonalCustomerService.java
-                      - NaturalPersonCustomerService.java
+                      - ConvertObjectToObjectDTOService
+                      - CustomerService
+                      - LegalPersonalCustomerService
+                      - MultiPrinterService
+                      - NaturalPersonCustomerService
                   - impl
-                      - CustomerServiceImpl.java
-                      - LegalPersonalCustomerServiceImpl.java
-                      - NaturalPersonCustomerServiceImpl.java
+                      - CustomerServiceImpl
+                      - LegalPersonalCustomerServiceImpl
+                      - MultiPrinterServiceImpl
+                      - NaturalPersonCustomerServiceImpl
           - <span style="color:yellow; font-weight: bold">infra</span>
               - <span style="color:blue; font-weight: bold">controllers</span>
                   - CustomerController
@@ -278,22 +285,24 @@ class Customer {
                   - NaturalPersonController
               - <span style="color:blue; font-weight: bold">adaptors
                   - apiexterna
-                      - ApiExternaAdapter.java
-                      - ApiExternaAdapterInterface.java
+                      - ApiExternaAdapter
+                      - ApiExternaAdapterInterface
                   - emailapi
-                      - MensageriaAdapter.java
-                      - MensageriaAdapterInterface.java
+                      - MensageriaAdapter
+                      - MensageriaAdapterInterface
             - <span style="color:blue; font-weight: bold">config</span>
                 - ModelMapperConfig
-                - SecurityConfig.java
+                - SecurityConfig
                 - security
                     - JwtTokenProvider.java  // Provedor JWT
             - <span style="color:blue; font-weight: bold">persistence
-                - repositorios
-                    - AddressRepository.java
-                    - CustomerRepository.java
-                    - LegalPersonalCustomerRepository.java
-                    - NaturalPersonCustomerRepository.java
+                - repositories
+                    - AddressRepository
+                    - CustomerContractRepository
+                    - CustomerRepository
+                    - LegalPersonalCustomerRepository
+                    - MultiPrinterRepository
+                    - NaturalPersonCustomerRepository
 
 - **Gerenciamento de Dependências**:
     - Utilizar uma ferramenta de gerenciamento de dependências, como Maven ou Gradle.
