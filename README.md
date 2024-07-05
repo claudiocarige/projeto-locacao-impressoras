@@ -228,7 +228,7 @@ class Customer {
     5. update: Usado quando você está atualizando ou modificando partes existentes do código.
     6. docs: Usado para fazer alterações na documentação do código, como adicionar ou corrigir comentários, atualizar documentação de API, etc.
     7. cleanup: Usado para realizar tarefas de limpeza no código, como remover código morto, otimizar imports, etc.
-    8. fix: Usado para corrigir um bug existente no código.
+    8. bugfix: Usado para corrigir um bug existente no código.
     9. test: Usado para adicionar, modificar ou corrigir testes de unidade, testes de integração, etc.
     10. test refactor: Usado para informar alterações no código dos testes.
     11. build: Usado para modificações nos arquivos de Build.
