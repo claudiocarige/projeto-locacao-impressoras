@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.MultiPrinterBuilder.oneMultiPrinter;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 class MultiPrinterServiceImplTest {
@@ -93,12 +93,32 @@ class MultiPrinterServiceImplTest {
         when( multiPrinterRepository.findAllByCustomerId( 1L ) ).thenReturn( List.of( multiPrinter ) );
         when( convertObjectToObjectDTOService.convertToMultiPrinterDTO( multiPrinter ) ).thenReturn( multiPrinterDTO );
 
-        List< MultiPrinterDTO > multiPrinters = multiPrinterServiceImpl.findAllMultiPrintersByCustomerId( 1L );
+        List< MultiPrinterDTO > multiPrinters =
+                                             multiPrinterServiceImpl.findAllMultiPrintersByCustomerId( 1L );
         assertAll( "MultiPrinter",
                 () -> assertNotNull( multiPrinters ),
                 () -> assertEquals( 1, multiPrinters.size() ),
                 () -> assertEquals( MultiPrinterDTO.class, multiPrinters.get( 0 ).getClass() ),
                 () -> assertEquals( multiPrinterDTO, multiPrinters.get( 0 ) ) );
+
+    }
+
+    @Test
+    @DisplayName( "Should save a MultiPrinter" )
+    void shouldSaveAMultiPrinter() {
+
+        when( multiPrinterRepository.save( multiPrinter ) ).thenReturn( multiPrinter );
+        when( convertObjectToObjectDTOService.convertToMultiPrinter( multiPrinterDTO ) ).thenReturn( multiPrinter );
+        when( convertObjectToObjectDTOService.convertToMultiPrinterDTO( multiPrinter ) ).thenReturn( multiPrinterDTO );
+
+        MultiPrinterDTO resultDTO = multiPrinterServiceImpl.saveMultiPrinter( multiPrinterDTO );
+        assertNotNull( resultDTO );
+        assertEquals( multiPrinterDTO, resultDTO );
+        assertEquals( multiPrinterDTO.getSerialNumber(), resultDTO.getSerialNumber() );
+        assertEquals( MultiPrinterDTO.class, resultDTO.getClass() );
+
+        verify( multiPrinterRepository, times( 1 ) )
+                                                            .existsBySerialNumber( multiPrinterDTO.getSerialNumber() );
 
     }
 
