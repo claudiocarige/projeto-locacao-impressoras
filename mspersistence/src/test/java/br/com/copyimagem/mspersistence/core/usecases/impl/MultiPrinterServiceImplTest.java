@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
 import java.util.Optional;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.MultiPrinterBuilder.oneMultiPrinter;
@@ -66,6 +67,22 @@ class MultiPrinterServiceImplTest {
         String message = assertThrows( NoSuchElementException.class,
                                                 () -> multiPrinterServiceImpl.findMultiPrinterById( 1 ) ).getMessage();
         assertEquals( "MultiPrint not found", message );
+
+    }
+
+    @Test
+    @DisplayName( "Should return a list of MultiPrinter" )
+    void shouldReturnAListOfMultiPrinter() {
+
+        when( multiPrinterRepository.findAll() ).thenReturn( List.of( multiPrinter ) );
+        when( convertObjectToObjectDTOService.convertToMultiPrinterDTO( multiPrinter ) ).thenReturn( multiPrinterDTO );
+
+        List< MultiPrinterDTO > multiPrinters = multiPrinterServiceImpl.findAllMultiPrinters();
+        assertAll( "MultiPrinter",
+                () -> assertNotNull( multiPrinters ),
+                () -> assertEquals( 1, multiPrinters.size() ),
+                () -> assertEquals( MultiPrinterDTO.class, multiPrinters.get( 0 ).getClass() ),
+                () -> assertEquals( multiPrinterDTO, multiPrinters.get( 0 ) ) );
 
     }
 
