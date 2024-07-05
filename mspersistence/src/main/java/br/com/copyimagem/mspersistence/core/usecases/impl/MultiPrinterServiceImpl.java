@@ -92,6 +92,16 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
         multiPrinterRepository.deleteById( id );
     }
 
+    @Override
+    public MultiPrinterDTO deleteCustomerFromMultiPrinter( Integer id ) {
+
+        MultiPrinterDTO multiPrinterDTO = findMultiPrinterById( id );
+        multiPrinterDTO.setCustomer_id( null );
+        multiPrinterDTO.setMachineStatus( MachineStatus.DISPONIVEL );
+        multiPrinterRepository.save( convertObjectToObjectDTOService.convertToMultiPrinter( multiPrinterDTO ) );
+        return multiPrinterDTO;
+    }
+
     private void checkSerialNumber( String serialNumber ) {
 
         if( multiPrinterRepository.existsBySerialNumber( serialNumber ) ) {

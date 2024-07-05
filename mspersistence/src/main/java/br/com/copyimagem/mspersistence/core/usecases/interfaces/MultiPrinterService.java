@@ -20,4 +20,6 @@ public interface MultiPrinterService {
 
     void deleteMultiPrinter( Integer id );
 
+    MultiPrinterDTO deleteCustomerFromMultiPrinter( Integer id );
+
 }
