@@ -204,6 +204,18 @@ class MultiPrinterServiceImplTest {
         assertNull(resultDTO.getCustomer_id());
     }
 
+    @Test
+    @DisplayName("Must SET Machine Status")
+    void mustSetMAchineStatus(){
+        multiPrinterDTO.setMachineStatus(MachineStatus.MANUTENCAO);
+        when(multiPrinterRepository.updateMachineStatusById(1, MachineStatus.MANUTENCAO)).thenReturn(1);
+        when(multiPrinterRepository.findById(1)).thenReturn(Optional.ofNullable(multiPrinter));
+        when(convertObjectToObjectDTOService.convertToMultiPrinterDTO(multiPrinter)).thenReturn(multiPrinterDTO);
+        MultiPrinterDTO multiPrinterDto = multiPrinterServiceImpl.setMachineStatus(1,"MANUTENCAO");
+        assertEquals(multiPrinterDTO, multiPrinterDto);
+        assertEquals(MachineStatus.MANUTENCAO, multiPrinterDto.getMachineStatus());
+    }
+
     private void startEntities() {
 
         multiPrinter = oneMultiPrinter().now();
