@@ -86,6 +86,22 @@ class MultiPrinterServiceImplTest {
 
     }
 
+    @Test
+    @DisplayName( "Should return a list of MultiPrinter by Customer" )
+    void shouldReturnAListOfMultiPrinterByCustomer() {
+
+        when( multiPrinterRepository.findAllByCustomerId( 1L ) ).thenReturn( List.of( multiPrinter ) );
+        when( convertObjectToObjectDTOService.convertToMultiPrinterDTO( multiPrinter ) ).thenReturn( multiPrinterDTO );
+
+        List< MultiPrinterDTO > multiPrinters = multiPrinterServiceImpl.findAllMultiPrintersByCustomerId( 1L );
+        assertAll( "MultiPrinter",
+                () -> assertNotNull( multiPrinters ),
+                () -> assertEquals( 1, multiPrinters.size() ),
+                () -> assertEquals( MultiPrinterDTO.class, multiPrinters.get( 0 ).getClass() ),
+                () -> assertEquals( multiPrinterDTO, multiPrinters.get( 0 ) ) );
+
+    }
+
     private void startEntities() {
 
         multiPrinter = oneMultiPrinter().now();
