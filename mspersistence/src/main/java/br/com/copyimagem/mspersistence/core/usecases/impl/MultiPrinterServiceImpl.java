@@ -1,6 +1,7 @@
 package br.com.copyimagem.mspersistence.core.usecases.impl;
 
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.MultiPrinterRepository;
 
@@ -23,7 +24,9 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
     @Override
     public MultiPrinterDTO findMultiPrinterById( Integer id ) {
 
-        return null;
+        return multiPrinterRepository.findById( id )
+                .map( convertObjectToObjectDTOService::convertToMultiPrinterDTO )
+                .orElseThrow(() -> new NoSuchElementException("MultiPrint not found"));
     }
 
     @Override
