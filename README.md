@@ -4,13 +4,13 @@
 
 O objetivo principal do Projeto COPY IMAGEM é solucionar os desafios enfrentados no controle de
 informações nas locações de impressoras pela empresa Copyimagem, visando uma gestão mais eficaz e transparente.
- Iremos desenvolver e implementar uma arquitetura de software robusta e escalável para a aplicação CopyImagem. Faremos uso de
+ Iremos desenvolver e implementar uma APIRest para o backend com uma arquitetura de software robusta e escalável para a aplicação CopyImagem. Faremos uso de
 tecnologias avançadas como Java, Spring Boot e PostgreSQL para garantir um sistema eficiente e seguro. Adotaremos a
 prática de Desenvolvimento Orientado a Testes (TDD) para garantir a qualidade do código e a robustez das funcionalidades
 implementadas.
 Nosso foco primário é garantir a eficiência, segurança e manutenibilidade do sistema, proporcionando uma experiência
 excepcional aos usuários finais. Estamos concentrados especialmente na gestão de
-clientes, máquinas e mensalidades.
+clientes, máquinas, mensalidades e controle de chamados para manutenção das máquinas.
 
 ### 1. Visão Geral da Arquitetura
 
