@@ -4,6 +4,7 @@ package br.com.copyimagem.mspersistence.core.usecases.impl;
 import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
+import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.MultiPrinterRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.List;
 import java.util.Optional;
 
+import static br.com.copyimagem.mspersistence.core.domain.builders.LegalPersonalCustomerBuilder.oneLegalPersonalCustomer;
 import static br.com.copyimagem.mspersistence.core.domain.builders.MultiPrinterBuilder.oneMultiPrinter;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -31,6 +33,9 @@ class MultiPrinterServiceImplTest {
 
     @Mock
     private ConvertObjectToObjectDTOService convertObjectToObjectDTOService;
+
+    @Mock
+    private CustomerRepository customerRepository;
 
     @InjectMocks
     private MultiPrinterServiceImpl multiPrinterServiceImpl;
@@ -121,6 +126,21 @@ class MultiPrinterServiceImplTest {
                                                             .existsBySerialNumber( multiPrinterDTO.getSerialNumber() );
 
     }
+
+    @Test
+    @DisplayName("You should not save a MultiPrint")
+    void shouldNotSaveAMultiPrinter(){
+        multiPrinter.setCustomer(oneLegalPersonalCustomer().nowCustomerPJ());
+        when(multiPrinterRepository.existsBySerialNumber(multiPrinterDTO.getSerialNumber())).thenReturn(true);
+        when(convertObjectToObjectDTOService.convertToMultiPrinterDTO(multiPrinter)).thenReturn(multiPrinterDTO);
+        when(convertObjectToObjectDTOService.convertToMultiPrinter(multiPrinterDTO)).thenReturn(multiPrinter);
+        when(multiPrinterRepository.save(multiPrinter)).thenReturn(multiPrinter);
+
+        String message = assertThrows(IllegalArgumentException.class,
+                () -> multiPrinterServiceImpl.saveMultiPrinter(multiPrinterDTO)).getMessage();
+        assertEquals("Serial number already exists", message);
+    }
+
 
     private void startEntities() {
 
