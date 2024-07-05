@@ -32,7 +32,9 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
     @Override
     public List< MultiPrinterDTO > findAllMultiPrinters() {
 
-        return List.of();
+        return multiPrinterRepository.findAll().stream()
+                .map( convertObjectToObjectDTOService::convertToMultiPrinterDTO )
+                .toList();
     }
 
 }
