@@ -14,4 +14,6 @@ public interface MultiPrinterService {
 
     List< MultiPrinterDTO > findAllMultiPrintersByCustomerId( Long customer_Id );
 
+    MultiPrinterDTO saveMultiPrinter( MultiPrinterDTO multiPrinterDTO );
+
 }

@@ -1,5 +1,6 @@
 package br.com.copyimagem.mspersistence.core.usecases.impl;
 
+import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
@@ -46,4 +47,21 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
                 .toList();
     }
 
+    @Override
+    public MultiPrinterDTO saveMultiPrinter( MultiPrinterDTO multiPrinterDTO ) {
+
+        checkSerialNumber( multiPrinterDTO.getSerialNumber() );
+        MultiPrinter multiPrinter = multiPrinterRepository.save( convertObjectToObjectDTOService
+                .convertToMultiPrinter( multiPrinterDTO ) );
+        return convertObjectToObjectDTOService.convertToMultiPrinterDTO( multiPrinter );
+    }
+
+
+
+    private void checkSerialNumber( String serialNumber ) {
+
+        if( multiPrinterRepository.existsBySerialNumber( serialNumber ) ) {
+            throw new IllegalArgumentException( "Serial number already exists" );
+        }
+    }
 }
