@@ -141,6 +141,23 @@ class MultiPrinterServiceImplTest {
         assertEquals("Serial number already exists", message);
     }
 
+    @Test
+    @DisplayName("Should set up a client on a MultiPrinter")
+    void shouldSetUpClientOnAMultiPrinter(){
+        multiPrinterDTO.setCustomer_id(null);
+        when(multiPrinterRepository.findById(1)).thenReturn(Optional.ofNullable(multiPrinter));
+        when(multiPrinterRepository.save(multiPrinter)).thenReturn(multiPrinter);
+        when(customerRepository.findById(1L))
+                                        .thenReturn(Optional.ofNullable(oneLegalPersonalCustomer().nowCustomerPJ()));
+        when(convertObjectToObjectDTOService.convertToMultiPrinterDTO(multiPrinter)).thenReturn(multiPrinterDTO);
+        when(convertObjectToObjectDTOService.convertToMultiPrinter(multiPrinterDTO)).thenReturn(multiPrinter);
+
+        MultiPrinterDTO multiPrinterDto = multiPrinterServiceImpl.setUpClientOnAMultiPrinter(1, 1L);
+        assertEquals(multiPrinterDTO, multiPrinterDto);
+        assertEquals(multiPrinterDTO.getId(), multiPrinterDto.getId());
+        assertEquals(MultiPrinterDTO.class, multiPrinterDto.getClass());
+        assertEquals(multiPrinterDTO.getCustomer_id(), multiPrinterDto.getCustomer_id());
+    }
 
     private void startEntities() {
 
