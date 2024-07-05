@@ -24,4 +24,6 @@ public interface MultiPrinterService {
 
     MultiPrinterDTO setMachineStatus( Integer id, String status );
 
+    MultiPrinterDTO setImpressionCounter( Integer id, Integer counter, String attribute);
+
 }

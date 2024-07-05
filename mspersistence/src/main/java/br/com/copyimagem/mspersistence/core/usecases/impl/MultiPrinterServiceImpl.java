@@ -120,6 +120,19 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
         return multiPrinterDTO;
     }
 
+    @Override
+    public MultiPrinterDTO setImpressionCounter( Integer id, Integer counter, String attribute) {
+
+        int row = multiPrinterRepository.updateImpressionCounterByAttribute( id, counter , attribute);
+        MultiPrinterDTO multiPrinterDTO;
+        if (row > 0) {
+            multiPrinterDTO = findMultiPrinterById(id);
+            return multiPrinterDTO;
+        } else {
+            throw new IllegalStateException("No rows updated. Check the conditions and input values.");
+        }
+    }
+
     private void checkSerialNumber( String serialNumber ) {
 
         if( multiPrinterRepository.existsBySerialNumber( serialNumber ) ) {
