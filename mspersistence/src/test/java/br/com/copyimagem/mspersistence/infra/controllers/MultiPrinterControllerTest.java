@@ -1,5 +1,6 @@
 package br.com.copyimagem.mspersistence.infra.controllers;
 
+import br.com.copyimagem.mspersistence.core.domain.enums.MachineStatus;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -132,7 +133,8 @@ class MultiPrinterControllerTest {
     void shouldSetUpClientOnAMultiPrinter() throws Exception {
         when( multiPrinterService.setUpClientOnAMultiPrinter( 1, 1L ) ).thenReturn( multiPrinterDTO );
 
-        ResponseEntity< MultiPrinterDTO > multiPrinterDTOResponse = multiPrinterController.setUpClientOnAMultiPrinter( 1, 1L );
+        ResponseEntity< MultiPrinterDTO > multiPrinterDTOResponse =
+                                              multiPrinterController.setUpClientOnAMultiPrinter( 1, 1L );
         assertNotNull( multiPrinterDTOResponse );
         assertEquals( multiPrinterDTO, multiPrinterDTOResponse.getBody() );
         mockMvc.perform( patch( "/api/v1/multi-printer/set-customer?id=1&customerId=1" ) )
@@ -150,6 +152,26 @@ class MultiPrinterControllerTest {
 
         mockMvc.perform( patch( "/api/v1/multi-printer/unset-customer/1" ) )
                 .andExpect( status().isNoContent() );
+    }
+
+    @Test
+    @DisplayName( "Should set the machine status" )
+    void shouldSetMachineStatus() throws Exception {
+        multiPrinterDTO.setMachineStatus( MachineStatus.LOCADA );
+        when( multiPrinterService.setMachineStatus( 1, MachineStatus.LOCADA.toString() ) )
+                                                                                        .thenReturn( multiPrinterDTO );
+        ResponseEntity< MultiPrinterDTO > multiPrinterDTOResponse =
+                multiPrinterController.setMachineStatus( 1, MachineStatus.LOCADA.toString() );
+        assertNotNull( multiPrinterDTOResponse );
+        assertEquals( multiPrinterDTO, multiPrinterDTOResponse.getBody() );
+        mockMvc.perform(patch("/api/v1/multi-printer/status")
+                        .param("id", "1")
+                        .param("status", "LOCADA")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.machineStatus").value("LOCADA"));
     }
 
     private void start() {
