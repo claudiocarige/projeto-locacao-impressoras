@@ -22,8 +22,7 @@ import java.util.Objects;
 import static br.com.copyimagem.mspersistence.core.domain.builders.MultiPrinterBuilder.oneMultiPrinter;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -123,6 +122,19 @@ class MultiPrinterControllerTest {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule( new JavaTimeModule() );
         return mapper.writeValueAsString( obj );
+    }
+
+    @Test
+    @DisplayName( "Should set up a client on a MultiPrinter" )
+    void shouldSetUpClientOnAMultiPrinter() throws Exception {
+        when( multiPrinterService.setUpClientOnAMultiPrinter( 1, 1L ) ).thenReturn( multiPrinterDTO );
+
+        ResponseEntity< MultiPrinterDTO > multiPrinterDTOResponse = multiPrinterController.setUpClientOnAMultiPrinter( 1, 1L );
+        assertNotNull( multiPrinterDTOResponse );
+        assertEquals( multiPrinterDTO, multiPrinterDTOResponse.getBody() );
+        mockMvc.perform( patch( "/api/v1/multi-printer/set-customer?id=1&customerId=1" ) )
+                .andExpect( status().isOk() )
+                .andExpect( content().contentType( MediaType.APPLICATION_JSON ) );
     }
 
     private void start() {
