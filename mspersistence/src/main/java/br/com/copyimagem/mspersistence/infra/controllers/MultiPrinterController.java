@@ -52,4 +52,11 @@ public class MultiPrinterController {
         return ResponseEntity.created( uri ).build();
     }
 
+    @PatchMapping( "/set-customer" )
+    public ResponseEntity< MultiPrinterDTO > setUpClientOnAMultiPrinter( @RequestParam Integer id,
+                                                                         @RequestParam Long customerId ) {
+
+        return ResponseEntity.ok( multiPrinterService.setUpClientOnAMultiPrinter( id, customerId ) );
+    }
+
 }
