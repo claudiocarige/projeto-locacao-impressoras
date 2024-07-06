@@ -64,6 +64,23 @@ class MultiPrinterControllerTest {
                 .andExpect( jsonPath( "$[0].serialNumber").value( "x1x2x3" ) );
     }
 
+    @Test
+    @DisplayName( "Should return a MultiPrinter by id" )
+    void shouldReturnAMultiPrinterById() throws Exception {
+
+        when( multiPrinterService.findMultiPrinterById( 1 ) ).thenReturn( multiPrinterDTO );
+        ResponseEntity< MultiPrinterDTO > resultDTO = multiprinterController.findMultiPrinterById( 1 );
+        assertNotNull( resultDTO );
+        assertEquals( multiPrinterDTO, resultDTO.getBody() );
+
+        mockMvc.perform( get( "/api/v1/multi-printer/1" ) )
+                .andExpect( status().isOk() )
+                .andExpect( content().contentType( MediaType.APPLICATION_JSON ) )
+                .andExpect( jsonPath( "$.id" ).value( 1 ) )
+                .andExpect( jsonPath( "$.brand" ).value( "Epson" ) )
+                .andExpect( jsonPath( "$.serialNumber" ).value( "x1x2x3" ) );
+    }
+
     private void start() {
 
         multiPrinter = oneMultiPrinter().now();
