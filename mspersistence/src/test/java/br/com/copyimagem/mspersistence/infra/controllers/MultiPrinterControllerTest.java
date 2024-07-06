@@ -1,8 +1,10 @@
 package br.com.copyimagem.mspersistence.infra.controllers;
 
-import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,12 +23,12 @@ import static br.com.copyimagem.mspersistence.core.domain.builders.MultiPrinterB
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 class MultiPrinterControllerTest {
 
-    private MultiPrinter multiPrinter;
 
     private MultiPrinterDTO multiPrinterDTO;
 
@@ -36,12 +38,12 @@ class MultiPrinterControllerTest {
     private MultiPrinterService multiPrinterService;
 
     @InjectMocks
-    private MultiPrinterController multiprinterController;
+    private MultiPrinterController multiPrinterController;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks( this );
-        mockMvc = MockMvcBuilders.standaloneSetup( multiprinterController ).build();
+        mockMvc = MockMvcBuilders.standaloneSetup( multiPrinterController ).build();
         start();
 
     }
@@ -51,7 +53,7 @@ class MultiPrinterControllerTest {
     void shouldReturnAListOfMultiPrinters() throws Exception {
 
         when( multiPrinterService.findAllMultiPrinters() ).thenReturn( List.of( multiPrinterDTO ) );
-        ResponseEntity< List< MultiPrinterDTO > > multiPrinterDTOList = multiprinterController.findAllMultiPrinters();
+        ResponseEntity< List< MultiPrinterDTO > > multiPrinterDTOList = multiPrinterController.findAllMultiPrinters();
         assertNotNull( multiPrinterDTOList );
         assertEquals( 1, Objects.requireNonNull( multiPrinterDTOList.getBody() ).size() );
         assertEquals( multiPrinterDTO, multiPrinterDTOList.getBody().get( 0 ) );
@@ -69,7 +71,7 @@ class MultiPrinterControllerTest {
     void shouldReturnAMultiPrinterById() throws Exception {
 
         when( multiPrinterService.findMultiPrinterById( 1 ) ).thenReturn( multiPrinterDTO );
-        ResponseEntity< MultiPrinterDTO > resultDTO = multiprinterController.findMultiPrinterById( 1 );
+        ResponseEntity< MultiPrinterDTO > resultDTO = multiPrinterController.findMultiPrinterById( 1 );
         assertNotNull( resultDTO );
         assertEquals( multiPrinterDTO, resultDTO.getBody() );
 
@@ -87,7 +89,7 @@ class MultiPrinterControllerTest {
 
         when( multiPrinterService.findAllMultiPrintersByCustomerId( 1L ) )
                                                                             .thenReturn( List.of( multiPrinterDTO ) );
-        ResponseEntity< List< MultiPrinterDTO > > resultDTO = multiprinterController
+        ResponseEntity< List< MultiPrinterDTO > > resultDTO = multiPrinterController
                                                                               .findAllMultiPrintersByCustomerId( 1L );
         assertNotNull( resultDTO );
         assertEquals( 1, Objects.requireNonNull( resultDTO.getBody() ).size() );
@@ -103,10 +105,28 @@ class MultiPrinterControllerTest {
                 .andExpect( jsonPath( "$[0].serialNumber" ).value( "x1x2x3" ) );
     }
 
+    @Test
+    @DisplayName( "Should save a MultiPrinter" )
+    void shouldSaveMultiPrinter() throws Exception {
+
+        when(multiPrinterService.saveMultiPrinter(multiPrinterDTO)).thenReturn(multiPrinterDTO);
+
+        mockMvc.perform(post("/api/v1/multi-printer/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(multiPrinterDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "http://localhost/api/v1/multi-printer/save/1"));
+    }
+
+    private static String asJsonString( MultiPrinterDTO obj ) throws JsonProcessingException {
+
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule( new JavaTimeModule() );
+        return mapper.writeValueAsString( obj );
+    }
 
     private void start() {
 
-        multiPrinter = oneMultiPrinter().now();
         multiPrinterDTO = oneMultiPrinter().nowDTO();
     }
 
