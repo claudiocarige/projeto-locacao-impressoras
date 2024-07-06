@@ -2,12 +2,12 @@ package br.com.copyimagem.mspersistence.infra.controllers;
 
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 
@@ -41,5 +41,15 @@ public class MultiPrinterController {
         return ResponseEntity.ok( multiPrinterService.findAllMultiPrintersByCustomerId( customerId ) );
     }
 
+    @PostMapping( value = "/save")
+    public ResponseEntity< HttpStatus > saveMultiPrinter( @RequestBody MultiPrinterDTO multiPrinterDTO ) {
+
+        multiPrinterDTO = multiPrinterService.saveMultiPrinter( multiPrinterDTO );
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path( "/{id}" )
+                .buildAndExpand( multiPrinterDTO.getId() )
+                .toUri();
+
+        return ResponseEntity.created( uri ).build();
+    }
 
 }
