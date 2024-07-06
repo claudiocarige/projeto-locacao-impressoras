@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-class MultiprinterControllerTest {
+class MultiPrinterControllerTest {
 
     private MultiPrinter multiPrinter;
 
@@ -36,7 +36,7 @@ class MultiprinterControllerTest {
     private MultiPrinterService multiPrinterService;
 
     @InjectMocks
-    private MultiprinterController multiprinterController;
+    private MultiPrinterController multiprinterController;
 
     @BeforeEach
     void setUp() {
