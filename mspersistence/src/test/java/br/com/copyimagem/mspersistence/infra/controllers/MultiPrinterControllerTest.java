@@ -81,6 +81,29 @@ class MultiPrinterControllerTest {
                 .andExpect( jsonPath( "$.serialNumber" ).value( "x1x2x3" ) );
     }
 
+    @Test
+    @DisplayName( "Should return a list of MultiPrinter by customer id" )
+    void shouldReturnAListOfMultiPrintersByCustomerId() throws Exception {
+
+        when( multiPrinterService.findAllMultiPrintersByCustomerId( 1L ) )
+                                                                            .thenReturn( List.of( multiPrinterDTO ) );
+        ResponseEntity< List< MultiPrinterDTO > > resultDTO = multiprinterController
+                                                                              .findAllMultiPrintersByCustomerId( 1L );
+        assertNotNull( resultDTO );
+        assertEquals( 1, Objects.requireNonNull( resultDTO.getBody() ).size() );
+        assertEquals( multiPrinterDTO, resultDTO.getBody().get( 0 ) );
+
+        mockMvc.perform( get( "/api/v1/multi-printer/customer/{customerId}", 1 )
+                .contentType( MediaType.APPLICATION_JSON )
+                .accept( MediaType.APPLICATION_JSON ) )
+                .andExpect( status().isOk() )
+                .andExpect( content().contentType( MediaType.APPLICATION_JSON ) )
+                .andExpect( jsonPath( "$[0].id" ).value( 1 ) )
+                .andExpect( jsonPath( "$[0].brand" ).value( "Epson" ) )
+                .andExpect( jsonPath( "$[0].serialNumber" ).value( "x1x2x3" ) );
+    }
+
+
     private void start() {
 
         multiPrinter = oneMultiPrinter().now();
