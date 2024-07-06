@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,7 +21,9 @@ import java.util.List;
 import java.util.Objects;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.MultiPrinterBuilder.oneMultiPrinter;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -135,6 +138,18 @@ class MultiPrinterControllerTest {
         mockMvc.perform( patch( "/api/v1/multi-printer/set-customer?id=1&customerId=1" ) )
                 .andExpect( status().isOk() )
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON ) );
+    }
+
+    @Test
+    @DisplayName( "Should un set up a customer from a MultiPrinter by id" )
+    void shouldUnSetUpACustomerFromAMultiPrinterById() throws Exception {
+
+        ResponseEntity<Void> response = multiPrinterController.unSetUpCustomerFromMultiPrinterById(1);
+        verify(multiPrinterService).unSetUpCustomerFromMultiPrinterById(1);
+        assertThat(response.getStatusCode()).isEqualTo( HttpStatus.NO_CONTENT);
+
+        mockMvc.perform( patch( "/api/v1/multi-printer/unset-customer/1" ) )
+                .andExpect( status().isNoContent() );
     }
 
     private void start() {
