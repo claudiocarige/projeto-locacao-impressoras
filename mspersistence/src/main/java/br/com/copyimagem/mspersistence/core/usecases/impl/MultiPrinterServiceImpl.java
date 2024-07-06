@@ -8,10 +8,11 @@ import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.MultiPrinterRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
+@Service
 public class MultiPrinterServiceImpl implements MultiPrinterService {
 
     private final MultiPrinterRepository multiPrinterRepository;
@@ -109,7 +110,7 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
         int row;
         switch( status ) {
             case "DISPONIVEL", "MANUTENCAO", "LOCADA", "INATIVA" ->
-                    row = multiPrinterRepository.updateMachineStatusById( id, MachineStatus.valueOf( status ) );
+                          row = multiPrinterRepository.updateMachineStatusById( id, MachineStatus.valueOf( status ) );
             default -> throw new IllegalArgumentException( "Invalid Status: " + status );
         }
         if( row > 0 ) {
