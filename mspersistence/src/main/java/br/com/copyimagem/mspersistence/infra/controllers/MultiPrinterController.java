@@ -59,4 +59,10 @@ public class MultiPrinterController {
         return ResponseEntity.ok( multiPrinterService.setUpClientOnAMultiPrinter( id, customerId ) );
     }
 
+    @PatchMapping( "/unset-customer/{id}" )
+    public ResponseEntity< Void > unSetUpCustomerFromMultiPrinterById( @PathVariable Integer id ) {
+        multiPrinterService.unSetUpCustomerFromMultiPrinterById( id );
+        return ResponseEntity.noContent().build();
+    }
+
 }
