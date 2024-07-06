@@ -94,7 +94,7 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
     }
 
     @Override
-    public MultiPrinterDTO deleteCustomerFromMultiPrinter( Integer id ) {
+    public MultiPrinterDTO unSetUpCustomerFromMultiPrinterById( Integer id ) {
 
         MultiPrinterDTO multiPrinterDTO = findMultiPrinterById( id );
         multiPrinterDTO.setCustomer_id( null );

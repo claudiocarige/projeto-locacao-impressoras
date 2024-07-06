@@ -20,7 +20,7 @@ public interface MultiPrinterService {
 
     void deleteMultiPrinter( Integer id );
 
-    MultiPrinterDTO deleteCustomerFromMultiPrinter( Integer id );
+    MultiPrinterDTO unSetUpCustomerFromMultiPrinterById( Integer id );
 
     MultiPrinterDTO setMachineStatus( Integer id, String status );
 

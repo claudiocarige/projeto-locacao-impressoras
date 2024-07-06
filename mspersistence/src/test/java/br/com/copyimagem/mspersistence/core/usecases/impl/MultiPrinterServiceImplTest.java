@@ -193,10 +193,10 @@ class MultiPrinterServiceImplTest {
 
     @Test
     @DisplayName("Should delete Customer From Multiprinter")
-    void shouldDeleteCustomerFromMultiPrinter(){
+    void shouldUnSetUpCustomerFromMultiPrinterById(){
         when(multiPrinterRepository.findById(1)).thenReturn(Optional.ofNullable(multiPrinter));
         when(convertObjectToObjectDTOService.convertToMultiPrinterDTO(multiPrinter)).thenReturn(multiPrinterDTO);
-        MultiPrinterDTO resultDTO = multiPrinterServiceImpl.deleteCustomerFromMultiPrinter(1);
+        MultiPrinterDTO resultDTO = multiPrinterServiceImpl.unSetUpCustomerFromMultiPrinterById(1);
         assertEquals(multiPrinterDTO, resultDTO);
         assertEquals(multiPrinterDTO.getId(), resultDTO.getId());
         assertEquals(MultiPrinterDTO.class, resultDTO.getClass());
