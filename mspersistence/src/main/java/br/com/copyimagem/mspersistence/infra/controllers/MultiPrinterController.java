@@ -35,4 +35,11 @@ public class MultiPrinterController {
         return ResponseEntity.ok( multiPrinterService.findMultiPrinterById( id ) );
     }
 
+    @GetMapping( "/customer/{customerId}" )
+    public ResponseEntity< List< MultiPrinterDTO > > findAllMultiPrintersByCustomerId( @PathVariable Long customerId ) {
+
+        return ResponseEntity.ok( multiPrinterService.findAllMultiPrintersByCustomerId( customerId ) );
+    }
+
+
 }
