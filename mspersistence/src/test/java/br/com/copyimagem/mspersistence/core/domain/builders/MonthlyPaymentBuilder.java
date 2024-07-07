@@ -4,6 +4,7 @@ import br.com.copyimagem.mspersistence.core.domain.entities.Customer;
 import br.com.copyimagem.mspersistence.core.domain.entities.MonthlyPayment;
 import br.com.copyimagem.mspersistence.core.domain.enums.PaymentStatus;
 import br.com.copyimagem.mspersistence.core.domain.enums.PrinterType;
+import br.com.copyimagem.mspersistence.core.dtos.MonthlyPaymentDTO;
 
 import java.time.LocalDate;
 
@@ -165,6 +166,18 @@ public class MonthlyPaymentBuilder {
                 rateExcessColorPrinting, rateExcessBlackAndWhitePrinting,
                 expirationDate, paymentDate, paymentStatus, customer
                 );
+    }
+
+
+    public MonthlyPaymentDTO nowDTO(){
+        return new MonthlyPaymentDTO(
+                id, monthPayment, yearPayment, quantityPrintsPB,
+                quantityPrintsColor, printingFranchisePB, printingFranchiseColor,
+                invoiceNumber, ticketNumber, amountPrinter,
+                monthlyAmount, excessValuePrintsPB, excessValuePrintsColor,
+                rateExcessColorPrinting, rateExcessBlackAndWhitePrinting,
+                expirationDate, paymentDate, paymentStatus.toString(), 1L
+        );
     }
 
 }
