@@ -198,6 +198,17 @@ class MultiPrinterControllerTest {
 
     }
 
+    @Test
+    @DisplayName( "Should delete a MultiPrinter" )
+    void shouldDeleteAMultiPrinter() throws Exception {
+
+        ResponseEntity<Void> response = multiPrinterController.deleteMultiPrinter(1);
+        verify(multiPrinterService).deleteMultiPrinter(1);
+        assertThat(response.getStatusCode()).isEqualTo( HttpStatus.NO_CONTENT);
+        mockMvc.perform( delete( "/api/v1/multi-printer/{id}", 1 ) )
+                .andExpect( status().isNoContent() );
+    }
+
     private void start() {
 
         multiPrinterDTO = oneMultiPrinter().nowDTO();
