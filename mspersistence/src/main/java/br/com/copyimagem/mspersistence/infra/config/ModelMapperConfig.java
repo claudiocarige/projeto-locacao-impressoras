@@ -10,7 +10,6 @@ import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,12 +17,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ModelMapperConfig {
 
-
     @Bean
     public ModelMapper modelMapper() {
 
         ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setMatchingStrategy( MatchingStrategies.STRICT );
+        modelMapper.getConfiguration()
+                .setFieldMatchingEnabled(true)
+                .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
+
 
         modelMapper.addMappings( new PropertyMap< LegalPersonalCustomer, CustomerResponseDTO >() {
             @Override
@@ -59,12 +60,10 @@ public class ModelMapperConfig {
             protected void configure() { map().setCustomer_id( source.getCustomer().getId().toString() ); }
         } );
 
-        modelMapper.addMappings(new PropertyMap< MonthlyPayment, MonthlyPaymentDTO > () {
+        modelMapper.addMappings(new PropertyMap<MonthlyPayment, MonthlyPaymentDTO>() {
             @Override
             protected void configure() {
-
-                map().setCustomerId( source.getCustomer().getId() );
-                map().setPaymentStatus( source.getPaymentStatus().name() );
+                map().setCustomerId(source.getCustomer().getId());
             }
         });
 

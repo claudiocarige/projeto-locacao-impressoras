@@ -176,7 +176,7 @@ public class MonthlyPaymentBuilder {
                 invoiceNumber, ticketNumber, amountPrinter,
                 monthlyAmount, excessValuePrintsPB, excessValuePrintsColor,
                 rateExcessColorPrinting, rateExcessBlackAndWhitePrinting,
-                expirationDate, paymentDate, paymentStatus.toString(), 1L
+                expirationDate, paymentDate, paymentStatus, 1L
         );
     }
 

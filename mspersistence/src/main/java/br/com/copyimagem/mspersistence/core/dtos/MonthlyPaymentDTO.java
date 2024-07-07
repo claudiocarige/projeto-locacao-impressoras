@@ -1,5 +1,6 @@
 package br.com.copyimagem.mspersistence.core.dtos;
 
+import br.com.copyimagem.mspersistence.core.domain.enums.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -54,7 +55,7 @@ public class MonthlyPaymentDTO implements Serializable {
     @JsonFormat( pattern = "dd-MM-yyyy" )
     private LocalDate paymentDate;
 
-    private String paymentStatus;
+    private PaymentStatus paymentStatus;
 
     private Long customerId;
 
