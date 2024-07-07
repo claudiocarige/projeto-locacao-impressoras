@@ -79,4 +79,11 @@ public class MultiPrinterController {
 
         return ResponseEntity.ok( multiPrinterService.setImpressionCounter( id, counter, attribute ) );
     }
+
+    @DeleteMapping( "/{id}" )
+    public ResponseEntity< Void > deleteMultiPrinter( @PathVariable Integer id ) {
+
+        multiPrinterService.deleteMultiPrinter( id );
+        return ResponseEntity.noContent().build();
+    }
 }
