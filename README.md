@@ -161,9 +161,6 @@ class Customer {
     MonthlyPayment --> Customer
 ```
 
-
-- Diagrama de Componentes:
-
 - Diagrama de Sequência:
 ```mermaid
 sequenceDiagram
