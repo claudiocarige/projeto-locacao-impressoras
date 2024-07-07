@@ -163,7 +163,130 @@ class Customer {
 
 
 - Diagrama de Componentes:
-  - Diagrama de Sequência:
+
+- Diagrama de Sequência:
+```mermaid
+sequenceDiagram
+    participant Controller
+    participant Service
+    participant Repository
+
+    Controller ->> Service: Requisição HTTP GET /api/v1/customers/search-client?typeParam={type}&valueParam={value}
+    alt Pesquisa por parâmetros
+        Service ->> Repository: Chamada para buscar cliente por parâmetros
+        Repository -->> Service: Dados recuperados
+        Service -->> Controller: Resposta com dados
+    else Requisição GET /api/v1/customers/search-client-all
+        Service ->> Repository: Chamada para buscar todos os clientes
+        Repository -->> Service: Dados recuperados
+        Service -->> Controller: Resposta com lista de clientes
+    end
+
+    Controller ->> Service: Requisição HTTP GET /api/v1/customers/search-financial-situation?situation={situation}
+    alt Pesquisa situação financeira
+        Service ->> Repository: Chamada para buscar clientes pela situação financeira
+        Repository -->> Service: Dados recuperados
+        Service -->> Controller: Resposta com lista de clientes
+    end
+
+    Controller ->> Service: Requisição HTTP PATCH /api/v1/customers/{id}?attribute={attribute}&value={value}
+    Service ->> Repository: Chamada para atualizar atributo do cliente
+    Repository -->> Service: Confirmação de atualização
+    Service -->> Controller: Resposta com resultado da atualização
+
+Controller ->> Service: Requisição HTTP GET /api/v1/customers/pj/all
+    Service ->> Repository: Chamada para buscar todos os clientes pessoa jurídica
+    Repository -->> Service: Dados recuperados
+    Service -->> Controller: Resposta com lista de clientes pessoa jurídica
+
+    Controller ->> Service: Requisição HTTP GET /api/v1/customers/pj/{id}
+    Service ->> Repository: Chamada para buscar cliente pessoa jurídica por ID
+    Repository -->> Service: Dados recuperados
+    Service -->> Controller: Resposta com cliente pessoa jurídica encontrado
+
+    Controller ->> Service: Requisição HTTP POST /api/v1/customers/pj/save
+    alt Salvar cliente pessoa jurídica
+        Service ->> Repository: Chamada para salvar cliente pessoa jurídica
+        alt Validações de dados
+            Service -> Service: Verifica existência de CNPJ ou e-mail
+            Service -> Repository: Salva endereço do cliente
+            Service ->> Repository: Gera contrato de cliente se não existir
+        end
+        Repository -->> Service: Cliente pessoa jurídica salvo com sucesso
+        Service -->> Controller: Resposta com status HTTP 201 e localização do novo recurso
+    else Exceção de violação de integridade de dados
+        Service -->> Controller: Resposta com erro HTTP 400 ou 409
+    end
+
+    Controller ->> Service: Requisição HTTP GET /api/v1/customers/pf/all
+    Service ->> Repository: Chamada para buscar todos os clientes pessoa física
+    Repository -->> Service: Dados recuperados
+    Service -->> Controller: Resposta com lista de clientes pessoa física
+
+    Controller ->> Service: Requisição HTTP GET /api/v1/customers/pf/{id}
+    Service ->> Repository: Chamada para buscar cliente pessoa física por ID
+    Repository -->> Service: Dados recuperados
+    Service -->> Controller: Resposta com cliente pessoa física encontrado
+
+    Controller ->> Service: Requisição HTTP POST /api/v1/customers/pf/save
+    alt Salvar cliente pessoa física
+        Service ->> Repository: Chamada para salvar cliente pessoa física
+        alt Validações de dados
+            Service -> Service: Verifica existência de CPF ou e-mail
+            Service -> Repository: Salva endereço do cliente
+            Service ->> Repository: Gera contrato de cliente se não existir
+        end
+        Repository -->> Service: Cliente pessoa física salvo com sucesso
+        Service -->> Controller: Resposta com status HTTP 201 e localização do novo recurso
+    else Exceção de violação de integridade de dados
+        Service -->> Controller: Resposta com erro HTTP 400 ou 409
+    end
+    
+    Controller ->> Service: Requisição HTTP GET /api/v1/multi-printer
+    Service ->> Repository: Chamada para buscar todos os multi-printers
+    Repository -->> Service: Dados recuperados
+    Service -->> Controller: Resposta com lista de multi-printers
+
+    Controller ->> Service: Requisição HTTP GET /api/v1/multi-printer/{id}
+    Service ->> Repository: Chamada para buscar multi-printer por ID
+    Repository -->> Service: Dados recuperados
+    Service -->> Controller: Resposta com multi-printer encontrado
+
+    Controller ->> Service: Requisição HTTP GET /api/v1/multi-printer/customer/{customerId}
+    Service ->> Repository: Chamada para buscar multi-printers por ID de cliente
+    Repository -->> Service: Dados recuperados
+    Service -->> Controller: Resposta com lista de multi-printers encontrados
+
+    Controller ->> Service: Requisição HTTP POST /api/v1/multi-printer/save
+    Service ->> Repository: Chamada para salvar multi-printer
+    Repository -->> Service: Multi-printer salvo com sucesso
+    Service -->> Controller: Resposta com status HTTP 201 e localização do novo recurso
+
+    Controller ->> Service: Requisição HTTP PATCH /api/v1/multi-printer/set-customer?id={id}&customerId={customerId}
+    Service ->> Repository: Chamada para configurar cliente em um multi-printer
+    Repository -->> Service: Multi-printer atualizado com cliente configurado
+    Service -->> Controller: Resposta com multi-printer atualizado
+
+    Controller ->> Service: Requisição HTTP PATCH /api/v1/multi-printer/unset-customer/{id}
+    Service ->> Repository: Chamada para remover cliente de um multi-printer por ID
+    Repository -->> Service: Multi-printer atualizado com cliente removido
+    Service -->> Controller: Resposta com status HTTP 204 (sem conteúdo)
+
+    Controller ->> Service: Requisição HTTP PATCH /api/v1/multi-printer/status?id={id}&status={status}
+    Service ->> Repository: Chamada para atualizar status de um multi-printer por ID
+    Repository -->> Service: Status do multi-printer atualizado
+    Service -->> Controller: Resposta com multi-printer atualizado
+
+    Controller ->> Service: Requisição HTTP PATCH /api/v1/multi-printer/impression-counter?id={id}&counter={counter}&attribute={attribute}
+    Service ->> Repository: Chamada para atualizar contador de impressões de um multi-printer por ID
+    Repository -->> Service: Contador de impressões do multi-printer atualizado
+    Service -->> Controller: Resposta com multi-printer atualizado
+
+    Controller ->> Service: Requisição HTTP DELETE /api/v1/multi-printer/{id}
+    Service ->> Repository: Chamada para deletar multi-printer por ID
+    Repository -->> Service: Multi-printer deletado com sucesso
+    Service -->> Controller: Resposta com status HTTP 204 (sem conteúdo)
+```
 
 ### 3. Tecnologias Utilizadas:
 
