@@ -1,9 +1,6 @@
 package br.com.copyimagem.mspersistence.core.usecases.impl;
 
-import br.com.copyimagem.mspersistence.core.domain.entities.Customer;
-import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
-import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
-import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
+import br.com.copyimagem.mspersistence.core.domain.entities.*;
 import br.com.copyimagem.mspersistence.core.dtos.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,5 +61,10 @@ public class ConvertObjectToObjectDTOService {
     public MultiPrinter convertToMultiPrinter( MultiPrinterDTO multiPrinterDTO ) {
 
         return modelMapper.map( multiPrinterDTO, MultiPrinter.class );
+    }
+
+    public MonthlyPaymentDTO convertToMonthlyPaymentDTO( MonthlyPayment monthlyPayment ) {
+
+        return modelMapper.map( monthlyPayment, MonthlyPaymentDTO.class );
     }
 }
