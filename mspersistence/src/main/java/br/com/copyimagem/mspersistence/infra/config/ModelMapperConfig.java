@@ -1,9 +1,11 @@
 package br.com.copyimagem.mspersistence.infra.config;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
+import br.com.copyimagem.mspersistence.core.domain.entities.MonthlyPayment;
 import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
+import br.com.copyimagem.mspersistence.core.dtos.MonthlyPaymentDTO;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
 import org.modelmapper.ModelMapper;
@@ -56,6 +58,15 @@ public class ModelMapperConfig {
             @Override
             protected void configure() { map().setCustomer_id( source.getCustomer().getId().toString() ); }
         } );
+
+        modelMapper.addMappings(new PropertyMap< MonthlyPayment, MonthlyPaymentDTO > () {
+            @Override
+            protected void configure() {
+
+                map().setCustomerId( source.getCustomer().getId() );
+                map().setPaymentStatus( source.getPaymentStatus().name() );
+            }
+        });
 
         return modelMapper;
     }
