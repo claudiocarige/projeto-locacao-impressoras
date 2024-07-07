@@ -174,6 +174,30 @@ class MultiPrinterControllerTest {
                 .andExpect(jsonPath("$.machineStatus").value("LOCADA"));
     }
 
+    @Test
+    @DisplayName( "Should set the impression counter")
+    void shouldSetImpressionCounter() throws Exception {
+
+        when( multiPrinterService.setImpressionCounter( 1, 1000, "impressionCounterInitial" ) )
+                                                                                        .thenReturn( multiPrinterDTO );
+        ResponseEntity< MultiPrinterDTO > multiPrinterDTOResponse =
+                multiPrinterController.setImpressionCounter( 1, 1000, "impressionCounterInitial" );
+        assertNotNull( multiPrinterDTOResponse );
+        assertEquals( multiPrinterDTO, multiPrinterDTOResponse.getBody() );
+
+        mockMvc.perform( patch(
+          "/api/v1/multi-printer/impression-counter" )
+                .contentType( MediaType.APPLICATION_JSON )
+                .param( "id", "1" )
+                .param( "counter", "1000" )
+                .param( "attribute", "impressionCounterInitial" ) )
+                .andExpect( status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.impressionCounterInitial").value(1000));
+
+    }
+
     private void start() {
 
         multiPrinterDTO = oneMultiPrinter().nowDTO();
