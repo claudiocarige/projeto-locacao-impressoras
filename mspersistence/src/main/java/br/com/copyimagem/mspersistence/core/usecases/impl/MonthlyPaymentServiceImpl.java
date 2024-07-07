@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 
+
 @Service
 public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
 
@@ -58,7 +59,7 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
                 .getCustomerContract().getPrintingFranchisePB() );
         monthlyPayment.setPrintingFranchiseColor( monthlyPayment.getCustomer()
                 .getCustomerContract().getPrintingFranchiseColor() );
-        monthlyPayment.setPaymentDate( LocalDate.now().plusDays( 9 ));
+        monthlyPayment.setPaymentDate( LocalDate.now().plusDays( 9 ) );
         monthlyPayment.setPaymentStatus( PaymentStatus.PENDENTE );
         getInformationFromMultiPrinter( monthlyPayment );
     }
@@ -78,15 +79,18 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
             var excessValue = ( multiPrinterDTO.sumQuantityPrints()
                     - multiPrinterDTO.getPrintingFranchise() ) * multiPrinterDTO.getPrintType().getRate();
             if( multiPrinterDTO.getPrintType().getType().contains( "color" ) ) {
-                quantColor += (monthlyPayment.getQuantityPrintsColor() == null)? 0 : monthlyPayment.getQuantityPrintsColor()
-                        + multiPrinterDTO.sumQuantityPrints() ;
+                quantColor += (
+                  monthlyPayment.getQuantityPrintsColor() == null ) ? 0 : monthlyPayment.getQuantityPrintsColor()
+                                                                                 + multiPrinterDTO.sumQuantityPrints();
                 excessAmountPrinterColor += excessValue;
             } else {
-                quantColor += (monthlyPayment.getQuantityPrintsPB() == null)? 0 : monthlyPayment.getQuantityPrintsPB()
-                        + multiPrinterDTO.sumQuantityPrints();
+                quantColor += (
+                  monthlyPayment.getQuantityPrintsPB() == null ) ? 0 : monthlyPayment.getQuantityPrintsPB()
+                                                                                 + multiPrinterDTO.sumQuantityPrints();
                 excessAmountPrinterPB += excessValue;
             }
-            valueOfPrinters += multiPrinterDTO.getMonthlyPrinterAmount() == null ? 0 : multiPrinterDTO.getMonthlyPrinterAmount();
+            valueOfPrinters += multiPrinterDTO
+                                    .getMonthlyPrinterAmount() == null ? 0 : multiPrinterDTO.getMonthlyPrinterAmount();
         }
         monthlyPayment.setExcessValuePrintsPB( excessAmountPrinterPB );
         monthlyPayment.setExcessValuePrintsColor( excessAmountPrinterColor );
@@ -94,4 +98,5 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
         monthlyPayment.setQuantityPrintsPB( quantPB );
         monthlyPayment.setQuantityPrintsColor( quantColor );
     }
+
 }
