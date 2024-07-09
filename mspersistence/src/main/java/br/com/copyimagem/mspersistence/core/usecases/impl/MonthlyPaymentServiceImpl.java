@@ -5,6 +5,7 @@ import br.com.copyimagem.mspersistence.core.domain.enums.PaymentStatus;
 import br.com.copyimagem.mspersistence.core.dtos.MonthlyPaymentDTO;
 import br.com.copyimagem.mspersistence.core.dtos.MonthlyPaymentRequest;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MonthlyPaymentService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
@@ -43,7 +44,7 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
         MonthlyPayment monthlyPayment = new MonthlyPayment();
         insertDataInMonthlyPayment( monthlyPaymentRequest, monthlyPayment );
         return convertObjectToObjectDTOService
-                .convertToMonthlyPaymentDTO( monthlyPaymentRepository.save( monthlyPayment ) );
+                                    .convertToMonthlyPaymentDTO( monthlyPaymentRepository.save( monthlyPayment ) );
     }
 
     private void insertDataInMonthlyPayment(
@@ -64,7 +65,6 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
         getInformationFromMultiPrinter( monthlyPayment );
     }
 
-
     private void getInformationFromMultiPrinter( MonthlyPayment monthlyPayment ) {
 
         var excessAmountPrinterColor = 0.0;
@@ -77,7 +77,7 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
 
         for( MultiPrinterDTO multiPrinterDTO : multiPrinterDTOList ) {
             var excessValue = ( multiPrinterDTO.sumQuantityPrints()
-                    - multiPrinterDTO.getPrintingFranchise() ) * multiPrinterDTO.getPrintType().getRate();
+                               - multiPrinterDTO.getPrintingFranchise() ) * multiPrinterDTO.getPrintType().getRate();
             if( multiPrinterDTO.getPrintType().getType().contains( "color" ) ) {
                 quantColor += (
                   monthlyPayment.getQuantityPrintsColor() == null ) ? 0 : monthlyPayment.getQuantityPrintsColor()
@@ -98,5 +98,15 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
         monthlyPayment.setQuantityPrintsPB( quantPB );
         monthlyPayment.setQuantityPrintsColor( quantColor );
     }
+
+    @Override
+    public MonthlyPaymentDTO findMonthlyPaymentById( Long id ) {
+
+        MonthlyPayment monthlyPayment = monthlyPaymentRepository.
+                        findById( id ).orElseThrow( () -> new NoSuchElementException( "Monthly Payment not found" ) );
+        return convertObjectToObjectDTOService.convertToMonthlyPaymentDTO( monthlyPayment );
+    }
+
+
 
 }
