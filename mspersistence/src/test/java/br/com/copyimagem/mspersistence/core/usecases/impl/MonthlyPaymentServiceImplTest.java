@@ -86,6 +86,22 @@ class MonthlyPaymentServiceImplTest {
         verify( monthlyPaymentRepository ).save( any( MonthlyPayment.class ) );
     }
 
+    @Test
+    @DisplayName("Should return a MonthlyPayment By Id")
+    void shouldReturnAMonthlyPaymentById() {
+        when(monthlyPaymentRepository.findById(anyLong())).thenReturn(java.util.Optional.ofNullable(monthlyPayment));
+        when(convertObjectToObjectDTOService.convertToMonthlyPaymentDTO(any(MonthlyPayment.class))).thenReturn(monthlyPaymentDTO);
+        MonthlyPaymentDTO result = monthlyPaymentServiceImpl.findMonthlyPaymentById(1L);
+        assertNotNull(result);
+        assertEquals(result.getCustomerId(), monthlyPaymentDTO.getCustomerId());
+        assertEquals(result.getInvoiceNumber(), monthlyPaymentDTO.getInvoiceNumber());
+        assertEquals(result.getTicketNumber(), monthlyPaymentDTO.getTicketNumber());
+        assertEquals(result.getQuantityPrintsColor(), monthlyPaymentDTO.getQuantityPrintsColor());
+        assertEquals(result.getExcessValuePrintsPB(), monthlyPaymentDTO.getExcessValuePrintsPB());
+        assertEquals(result.getClass(), MonthlyPaymentDTO.class);
+        verify(monthlyPaymentRepository).findById(anyLong());
+    }
+
     void startEntities() {
 
         monthlyPayment = oneMonthlyPayment().now();
