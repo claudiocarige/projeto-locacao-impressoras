@@ -107,6 +107,10 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
         return convertObjectToObjectDTOService.convertToMonthlyPaymentDTO( monthlyPayment );
     }
 
-
+    public List<MonthlyPaymentDTO> findAllMonthlyPaymentsByCustomerId(Long customerId) {
+        return monthlyPaymentRepository.findAllMonthlyPaymentsByCustomerId(customerId).stream()
+                .map( convertObjectToObjectDTOService::convertToMonthlyPaymentDTO )
+                        .toList();
+    }
 
 }
