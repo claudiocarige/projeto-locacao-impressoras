@@ -36,8 +36,6 @@ public class MultiPrinterDTO {
 
     private Integer printingFranchise;
 
-    private Double amountPrinter;
-
     private Double monthlyPrinterAmount;
 
     private String customer_id;

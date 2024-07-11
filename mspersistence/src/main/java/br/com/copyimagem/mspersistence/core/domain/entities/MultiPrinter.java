@@ -50,8 +50,6 @@ public class MultiPrinter implements Serializable {
 
     private Integer printingFranchise;
 
-    private Double amountPrinter;
-
     private Double monthlyPrinterAmount;
 
     @ManyToOne

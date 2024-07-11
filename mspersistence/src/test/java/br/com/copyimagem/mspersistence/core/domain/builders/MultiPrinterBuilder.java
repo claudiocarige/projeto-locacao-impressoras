@@ -19,7 +19,6 @@ public class MultiPrinterBuilder {
     private Integer impressionCounterBefore;
     private Integer impressionCounterNow;
     private Integer printingFranchise;
-    private Double amountPrinter;
     private Double monthlyPrinterAmount;
     private Customer customer;
 
@@ -43,7 +42,6 @@ public class MultiPrinterBuilder {
         builder.impressionCounterBefore = 1000;
         builder.impressionCounterNow = 10000;
         builder.printingFranchise = 2000;
-        builder.amountPrinter = 3525.20;
     }
 
 
@@ -102,11 +100,6 @@ public class MultiPrinterBuilder {
         return this;
     }
 
-    public MultiPrinterBuilder withAmountPrinter(Double amountPrinter) {
-        this.amountPrinter = amountPrinter;
-        return this;
-    }
-
     public MultiPrinterBuilder withMonthlyPrinterAmount(Double monthlyPrinterAmount) {
         this.monthlyPrinterAmount = monthlyPrinterAmount;
         return this;
@@ -120,12 +113,12 @@ public class MultiPrinterBuilder {
     public MultiPrinter now() {
         return new MultiPrinter(id, brand, model, serialNumber, machineValue, machineStatus,
                                 printType, impressionCounterInitial, impressionCounterBefore, impressionCounterNow,
-                                printingFranchise, amountPrinter, monthlyPrinterAmount, customer);
+                                printingFranchise, monthlyPrinterAmount, customer);
     }
 
     public MultiPrinterDTO nowDTO() {
         return new MultiPrinterDTO(id, brand, model, serialNumber, machineValue, machineStatus,
                                    printType, impressionCounterInitial, impressionCounterBefore, impressionCounterNow,
-                                   printingFranchise, amountPrinter, monthlyPrinterAmount, "1");
+                                   printingFranchise, monthlyPrinterAmount, "1");
     }
 }
