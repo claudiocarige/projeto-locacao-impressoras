@@ -44,12 +44,18 @@ public class MultiPrinterDTO {
 
     public int sumQuantityPrints() {
 
-        if( this.impressionCounterBefore != null ) {
-            var sum = this.impressionCounterNow - this.impressionCounterBefore;
-            this.impressionCounterBefore = this.impressionCounterNow;
-            return sum;
-        } else if( this.impressionCounterNow != null ) {
-            return this.impressionCounterNow - this.impressionCounterInitial;
+        if (this.impressionCounterNow != null) {
+            if (this.impressionCounterBefore != null) {
+                int sum = 0;
+                if (this.impressionCounterNow > this.impressionCounterBefore) {
+                    sum = this.impressionCounterNow - this.impressionCounterBefore;
+                    this.impressionCounterBefore = this.impressionCounterNow;
+                }
+                return sum;
+            } else {
+                this.impressionCounterBefore = this.impressionCounterNow;
+                return this.impressionCounterNow - this.impressionCounterInitial;
+            }
         }
         return 0;
     }
