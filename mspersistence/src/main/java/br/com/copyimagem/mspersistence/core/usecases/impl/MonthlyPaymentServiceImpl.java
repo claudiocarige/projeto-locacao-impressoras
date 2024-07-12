@@ -10,6 +10,7 @@ import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MonthlyPaymentService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.MonthlyPaymentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
 
     private final ConvertObjectToObjectDTOService convertObjectToObjectDTOService;
 
+    @Autowired
     public MonthlyPaymentServiceImpl( MultiPrinterService multiPrinterService, CustomerService customerService,
                                       MonthlyPaymentRepository monthlyPaymentRepository,
                                       ConvertObjectToObjectDTOService convertObjectToObjectDTOService ) {
@@ -44,7 +46,7 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
         MonthlyPayment monthlyPayment = new MonthlyPayment();
         insertDataInMonthlyPayment( monthlyPaymentRequest, monthlyPayment );
         return convertObjectToObjectDTOService
-                                    .convertToMonthlyPaymentDTO( monthlyPaymentRepository.save( monthlyPayment ) );
+                                       .convertToMonthlyPaymentDTO( monthlyPaymentRepository.save( monthlyPayment ) );
     }
 
     private void insertDataInMonthlyPayment(
@@ -52,51 +54,63 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
 
         monthlyPayment.setMonthPayment( LocalDate.now().getMonthValue() );
         monthlyPayment.setYearPayment( LocalDate.now().getYear() );
-        monthlyPayment.setExpirationDate( LocalDate.now().plusDays( 5 ) );
+        monthlyPayment.setPaymentDate( LocalDate.now().plusDays( 9 ) );
+        monthlyPayment.setExpirationDate( monthlyPayment.getPaymentDate().plusDays( 5 ) );
         monthlyPayment.setInvoiceNumber( monthlyPaymentRequest.invoiceNumber() );
         monthlyPayment.setTicketNumber( monthlyPaymentRequest.ticketNumber() );
         monthlyPayment.setCustomer( customerService.returnCustomer( monthlyPaymentRequest.customerId() ) );
         monthlyPayment.setPrintingFranchisePB( monthlyPayment.getCustomer()
-                .getCustomerContract().getPrintingFranchisePB() );
+                                                                    .getCustomerContract().getPrintingFranchisePB() );
         monthlyPayment.setPrintingFranchiseColor( monthlyPayment.getCustomer()
-                .getCustomerContract().getPrintingFranchiseColor() );
-        monthlyPayment.setPaymentDate( LocalDate.now().plusDays( 9 ) );
+                                                                 .getCustomerContract().getPrintingFranchiseColor() );
+        monthlyPayment.setRateExcessBlackAndWhitePrinting(
+                                     monthlyPayment.getCustomer().getCustomerContract().getPrinterTypePB().getRate());
+        monthlyPayment.setRateExcessColorPrinting(
+                                 monthlyPayment.getCustomer().getCustomerContract().getPrinterTypeColor().getRate() );
         monthlyPayment.setPaymentStatus( PaymentStatus.PENDENTE );
         getInformationFromMultiPrinter( monthlyPayment );
     }
 
     private void getInformationFromMultiPrinter( MonthlyPayment monthlyPayment ) {
 
-        var excessAmountPrinterColor = 0.0;
-        var excessAmountPrinterPB = 0.0;
-        var valueOfPrinters = 0.0;
-        var quantPB = 0;
-        var quantColor = 0;
+        var excessValuePrintsPB = 0.0;
+        var excessValuePrintsColor = 0.0;
+        var amountPrinterPB = 0.0;
+        var amountPrinterColor = 0.0;
+        var quantityPrintsPB = 0;
+        var quantityPrintsColor = 0;
         List< MultiPrinterDTO > multiPrinterDTOList = multiPrinterService
-                .findAllMultiPrintersByCustomerId( monthlyPayment.getCustomer().getId() );
+                                            .findAllMultiPrintersByCustomerId( monthlyPayment.getCustomer().getId() );
 
         for( MultiPrinterDTO multiPrinterDTO : multiPrinterDTOList ) {
-            var excessValue = ( multiPrinterDTO.sumQuantityPrints()
-                               - multiPrinterDTO.getPrintingFranchise() ) * multiPrinterDTO.getPrintType().getRate();
-            if( multiPrinterDTO.getPrintType().getType().contains( "color" ) ) {
-                quantColor += (
-                  monthlyPayment.getQuantityPrintsColor() == null ) ? 0 : monthlyPayment.getQuantityPrintsColor()
-                                                                                 + multiPrinterDTO.sumQuantityPrints();
-                excessAmountPrinterColor += excessValue;
+            var sumPrinter = multiPrinterDTO.sumQuantityPrints();
+            var excessValue = ( sumPrinter < multiPrinterDTO.getPrintingFranchise() ? 0
+                                                             : sumPrinter - multiPrinterDTO.getPrintingFranchise() );
+            if( multiPrinterDTO.getPrintType().getType().startsWith( "Color" ) ) {
+                quantityPrintsColor += sumPrinter;
+                excessValuePrintsColor += excessValue * monthlyPayment.getRateExcessColorPrinting();
+                amountPrinterColor += multiPrinterDTO.getMonthlyPrinterAmount() + excessValuePrintsColor;
+
+//                amountPrinterColor += (multiPrinterDTO.getMonthlyPrinterAmount() != null
+//                        ? multiPrinterDTO.getMonthlyPrinterAmount()
+//                        : 0.0) + excessValuePrintsColor;
             } else {
-                quantColor += (
-                  monthlyPayment.getQuantityPrintsPB() == null ) ? 0 : monthlyPayment.getQuantityPrintsPB()
-                                                                                 + multiPrinterDTO.sumQuantityPrints();
-                excessAmountPrinterPB += excessValue;
+                quantityPrintsPB += sumPrinter;
+                excessValuePrintsPB += excessValue * monthlyPayment.getRateExcessBlackAndWhitePrinting();
+                amountPrinterPB += multiPrinterDTO.getMonthlyPrinterAmount() + excessValuePrintsPB;
+
+//                amountPrinterPB += (multiPrinterDTO.getMonthlyPrinterAmount() != null
+//                        ? multiPrinterDTO.getMonthlyPrinterAmount()
+//                        : 0.0) + excessValuePrintsPB;
             }
-            valueOfPrinters += multiPrinterDTO
-                                    .getMonthlyPrinterAmount() == null ? 0 : multiPrinterDTO.getMonthlyPrinterAmount();
+            monthlyPayment.setMonthlyAmount( multiPrinterDTO.getMonthlyPrinterAmount() );
         }
-        monthlyPayment.setExcessValuePrintsPB( excessAmountPrinterPB );
-        monthlyPayment.setExcessValuePrintsColor( excessAmountPrinterColor );
-        monthlyPayment.setMonthlyAmount( valueOfPrinters + excessAmountPrinterColor + excessAmountPrinterPB );
-        monthlyPayment.setQuantityPrintsPB( quantPB );
-        monthlyPayment.setQuantityPrintsColor( quantColor );
+
+        monthlyPayment.setExcessValuePrintsPB( excessValuePrintsPB );
+        monthlyPayment.setExcessValuePrintsColor( excessValuePrintsColor );
+        monthlyPayment.setQuantityPrintsPB( quantityPrintsPB );
+        monthlyPayment.setQuantityPrintsColor( quantityPrintsColor );
+        monthlyPayment.setAmountPrinter( amountPrinterPB + amountPrinterColor );
     }
 
     @Override
@@ -107,6 +121,7 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
         return convertObjectToObjectDTOService.convertToMonthlyPaymentDTO( monthlyPayment );
     }
 
+    @Override
     public List<MonthlyPaymentDTO> findAllMonthlyPaymentsByCustomerId(Long customerId) {
         return monthlyPaymentRepository.findAllMonthlyPaymentsByCustomerId(customerId).stream()
                 .map( convertObjectToObjectDTOService::convertToMonthlyPaymentDTO )
