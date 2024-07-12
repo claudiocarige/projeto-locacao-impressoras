@@ -13,4 +13,6 @@ public interface MonthlyPaymentService {
 
     List<MonthlyPaymentDTO> findAllMonthlyPaymentsByCustomerId( Long customerId );
 
+    List<MonthlyPaymentDTO> findMonthlyPaymentByAttributeAndValue( String attribute, String valueAttribute );
+
 }

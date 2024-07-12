@@ -128,4 +128,24 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
                         .toList();
     }
 
+    @Override
+    public List<MonthlyPaymentDTO> findMonthlyPaymentByAttributeAndValue (String attribute, String valueAttribute) {
+        return ifAttributeAndValue(attribute, valueAttribute).stream()
+                                         .map( convertObjectToObjectDTOService::convertToMonthlyPaymentDTO ).toList();
+    }
+    private List< MonthlyPayment> ifAttributeAndValue( String attribute, String valueAttribute ) {
+
+        if( attribute.equals( "monthPayment" ) || attribute.equals( "yearPayment" ) ) {
+            return monthlyPaymentRepository
+                               .findMonthlyPaymentByAttributeAndValue( attribute, Integer.valueOf( valueAttribute ) );
+        } else if( attribute.equals( "paymentStatus" ) ) {
+            return monthlyPaymentRepository
+                         .findMonthlyPaymentByAttributeAndValue( attribute, PaymentStatus.valueOf( valueAttribute ) );
+        } else if( attribute.equals( "excessValuePrintsPB" ) ) {
+            return monthlyPaymentRepository
+                                .findMonthlyPaymentByAttributeAndValue( attribute, Double.valueOf( valueAttribute ) );
+        } else {
+            throw new IllegalArgumentException( "Invalid attribute: " + attribute );
+        }
+    }
 }
