@@ -40,7 +40,9 @@ public class CustomerContract implements Serializable {
     @JsonFormat( pattern = "dd-MM-yyyy" )
     private LocalDate startContract;
 
-    private PrinterType printerType;
+    private PrinterType printerTypePB;
+
+    private PrinterType printerTypeColor;
 
     public CustomerContract() {
 
@@ -54,7 +56,8 @@ public class CustomerContract implements Serializable {
         this.monthlyAmount = 300.0;
         this.contractTime = 6;
         this.startContract = LocalDate.now();
-        this.printerType = PrinterType.LASER_BLACK_AND_WHITE_MEDIUM;
+        this.printerTypePB = PrinterType.LASER_BLACK_AND_WHITE_MEDIUM;
+        this.printerTypeColor = PrinterType.INKJET_COLOR_MEDIUM;
     }
 
 }
