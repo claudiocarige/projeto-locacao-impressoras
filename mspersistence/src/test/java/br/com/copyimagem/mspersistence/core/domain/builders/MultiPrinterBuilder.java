@@ -42,6 +42,7 @@ public class MultiPrinterBuilder {
         builder.impressionCounterBefore = 1000;
         builder.impressionCounterNow = 10000;
         builder.printingFranchise = 2000;
+        builder.monthlyPrinterAmount = 300.0;
     }
 
 
