@@ -10,10 +10,12 @@ import br.com.copyimagem.mspersistence.infra.persistence.repositories.MonthlyPay
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
@@ -24,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-
+@ExtendWith( MockitoExtension.class )
 class MonthlyPaymentServiceImplTest {
 
 
@@ -51,15 +53,13 @@ class MonthlyPaymentServiceImplTest {
     @Mock
     private ConvertObjectToObjectDTOService convertObjectToObjectDTOService;
 
-    @Spy
     @InjectMocks
+    @Spy
     private MonthlyPaymentServiceImpl monthlyPaymentServiceImpl;
 
 
     @BeforeEach
     void setUp() {
-
-        MockitoAnnotations.openMocks( this );
         startEntities();
     }
 
@@ -82,6 +82,7 @@ class MonthlyPaymentServiceImplTest {
         assertEquals( result.getTicketNumber(), monthlyPaymentRequest.ticketNumber() );
         assertEquals( result.getQuantityPrintsColor(), monthlyPaymentDTO.getQuantityPrintsColor() );
         assertEquals( result.getExcessValuePrintsPB(), monthlyPaymentDTO.getExcessValuePrintsPB() );
+        assertEquals( 3525.20, result.getAmountPrinter() );
         assertEquals( result.getClass(), MonthlyPaymentDTO.class );
         verify( monthlyPaymentRepository ).save( any( MonthlyPayment.class ) );
     }
@@ -109,10 +110,23 @@ class MonthlyPaymentServiceImplTest {
         when(convertObjectToObjectDTOService.convertToMonthlyPaymentDTO(any(MonthlyPayment.class))).thenReturn(monthlyPaymentDTO);
         List<MonthlyPaymentDTO> result = monthlyPaymentServiceImpl.findAllMonthlyPaymentsByCustomerId(1L);
         assertNotNull(result);
-        assertEquals( result.size(), 1);
-        assertEquals(result.get(0).getInvoiceNumber(), monthlyPaymentDTO.getInvoiceNumber());
-        assertEquals(result.get(0).getClass(), MonthlyPaymentDTO.class);
+        assertEquals(1, result.size());
+        assertEquals( monthlyPaymentDTO.getInvoiceNumber(), result.get(0).getInvoiceNumber());
+        assertEquals( MonthlyPaymentDTO.class, result.get(0).getClass());
         verify(monthlyPaymentRepository).findAllMonthlyPaymentsByCustomerId(1L);
+    }
+
+    @Test
+    @DisplayName("Should return a List of MonthlyPayment By Attribute and Value")
+    void shouldReturnAListOfMonthlyPaymentByAttributeAndValue() {
+        when(monthlyPaymentRepository.findMonthlyPaymentByAttributeAndValue("monthPayment", 1)).thenReturn(List.of(monthlyPayment));
+        when(convertObjectToObjectDTOService.convertToMonthlyPaymentDTO(any(MonthlyPayment.class))).thenReturn(monthlyPaymentDTO);
+        List<MonthlyPaymentDTO> result = monthlyPaymentServiceImpl.findMonthlyPaymentByAttributeAndValue("monthPayment", "1");
+        assertNotNull(result);
+        assertEquals( 1, result.size());
+        assertEquals(monthlyPaymentDTO.getInvoiceNumber(), result.get(0).getInvoiceNumber());
+        assertEquals( MonthlyPaymentDTO.class, result.get(0).getClass());
+        verify(monthlyPaymentRepository).findMonthlyPaymentByAttributeAndValue("monthPayment", 1);
     }
 
     void startEntities() {
