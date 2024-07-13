@@ -79,6 +79,7 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
         var amountPrinterColor = 0.0;
         var quantityPrintsPB = 0;
         var quantityPrintsColor = 0;
+        var monthlyAmount = 0.0;
         List< MultiPrinterDTO > multiPrinterDTOList = multiPrinterService
                                             .findAllMultiPrintersByCustomerId( monthlyPayment.getCustomer().getId() );
 
@@ -88,24 +89,19 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
                                                              : sumPrinter - multiPrinterDTO.getPrintingFranchise() );
             if( multiPrinterDTO.getPrintType().getType().startsWith( "Color" ) ) {
                 quantityPrintsColor += sumPrinter;
-                excessValuePrintsColor += excessValue * monthlyPayment.getRateExcessColorPrinting();
-                amountPrinterColor += multiPrinterDTO.getMonthlyPrinterAmount() + excessValuePrintsColor;
+                excessValuePrintsColor += excessValue * multiPrinterDTO.getPrintType().getRate();
+                amountPrinterColor += multiPrinterDTO.getMonthlyPrinterAmount() + excessValuePrintsColor ;
 
-//                amountPrinterColor += (multiPrinterDTO.getMonthlyPrinterAmount() != null
-//                        ? multiPrinterDTO.getMonthlyPrinterAmount()
-//                        : 0.0) + excessValuePrintsColor;
             } else {
                 quantityPrintsPB += sumPrinter;
-                excessValuePrintsPB += excessValue * monthlyPayment.getRateExcessBlackAndWhitePrinting();
+                excessValuePrintsPB += excessValue * multiPrinterDTO.getPrintType().getRate();
                 amountPrinterPB += multiPrinterDTO.getMonthlyPrinterAmount() + excessValuePrintsPB;
 
-//                amountPrinterPB += (multiPrinterDTO.getMonthlyPrinterAmount() != null
-//                        ? multiPrinterDTO.getMonthlyPrinterAmount()
-//                        : 0.0) + excessValuePrintsPB;
             }
-            monthlyPayment.setMonthlyAmount( multiPrinterDTO.getMonthlyPrinterAmount() );
+            monthlyAmount += multiPrinterDTO.getMonthlyPrinterAmount();
         }
 
+        monthlyPayment.setMonthlyAmount( monthlyAmount );
         monthlyPayment.setExcessValuePrintsPB( excessValuePrintsPB );
         monthlyPayment.setExcessValuePrintsColor( excessValuePrintsColor );
         monthlyPayment.setQuantityPrintsPB( quantityPrintsPB );
