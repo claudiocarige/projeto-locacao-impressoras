@@ -4,6 +4,8 @@ package br.com.copyimagem.mspersistence.core.usecases.impl;
 import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
 import br.com.copyimagem.mspersistence.core.domain.enums.MachineStatus;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.IllegalArgumentException;
+import br.com.copyimagem.mspersistence.core.exceptions.IllegalStateException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.MultiPrinterRepository;
@@ -219,7 +221,7 @@ class MultiPrinterServiceImplTest {
     @Test
     @DisplayName("Should throw an exception with invalid status")
     void shouldThrowAnExceptionWithInvalidStatus(){
-        String message = assertThrows(IllegalArgumentException.class,
+        String message = assertThrows( IllegalArgumentException.class,
                                 () -> multiPrinterServiceImpl.setMachineStatus(1, "INVALIDO")).getMessage();
         assertEquals("Invalid Status: INVALIDO", message);
     }
@@ -227,13 +229,16 @@ class MultiPrinterServiceImplTest {
     @Test
     @DisplayName("Should SET Impression Counter")
     void shouldSetImpressionCounter(){
-        when(multiPrinterRepository.updateImpressionCounterByAttribute(1, 10000,
-                                                                "impressionCounterInitial")).thenReturn(1);
+        when(multiPrinterRepository
+        .updateImpressionCounterByAttribute(1, 10000, "impressionCounterInitial")).thenReturn(1);
         when(multiPrinterRepository.findById(1)).thenReturn(Optional.ofNullable(multiPrinter));
+        when(multiPrinterRepository.save(multiPrinter)).thenReturn(multiPrinter);
         when(convertObjectToObjectDTOService.convertToMultiPrinterDTO(multiPrinter)).thenReturn(multiPrinterDTO);
-        multiPrinterDTO.setImpressionCounterInitial(10000);
+        when(convertObjectToObjectDTOService.convertToMultiPrinter(multiPrinterDTO)).thenReturn(multiPrinter);
+
         MultiPrinterDTO multiPrinterDto = multiPrinterServiceImpl
-                                        .setImpressionCounter(1, 10000,"impressionCounterInitial");
+                                        .setImpressionCounter(1, 10000, "impressionCounterInitial");
+
         assertEquals(multiPrinterDTO, multiPrinterDto);
         assertEquals(10000, multiPrinterDto.getImpressionCounterInitial());
     }
