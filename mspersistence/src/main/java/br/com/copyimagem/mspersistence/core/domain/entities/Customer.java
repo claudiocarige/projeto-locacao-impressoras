@@ -34,7 +34,7 @@ public abstract class Customer implements Serializable {
     @Column( unique = true )
     private String primaryEmail;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List< String > emailList = new ArrayList<>();
 
     private String phoneNumber;
