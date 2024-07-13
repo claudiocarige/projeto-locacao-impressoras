@@ -258,6 +258,36 @@ class MultiPrinterServiceImplTest {
         assertEquals("No rows updated. Check the conditions and input values.", exception.getMessage());
     }
 
+    @Test
+    @DisplayName("Should throw an IllegalArgumentException exception for smaller impressionCounterNow")
+    void shouldThrowAnExceptionForSmallerImpressionCounterNow(){
+        when(multiPrinterRepository.
+                updateImpressionCounterByAttribute(1, 1000, "impressionCounterNow")).thenReturn(0);
+        when(multiPrinterRepository.findById(1)).thenReturn(Optional.of(multiPrinter));
+        when(convertObjectToObjectDTOService.convertToMultiPrinterDTO(multiPrinter)).thenReturn(multiPrinterDTO);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> multiPrinterServiceImpl.setImpressionCounter(1, 1000, "impressionCounterNow")
+        );
+
+        assertEquals("The COUNTER value must be greater than the current value.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Should throw an IllegalArgumentException exception for invalid attribute")
+    void shouldThrowAnExceptionForInvalidAttribute(){
+        when(multiPrinterRepository.
+                updateImpressionCounterByAttribute(1, 1000, "invalidAttribute")).thenReturn(0);
+        when(multiPrinterRepository.findById(1)).thenReturn(Optional.of(multiPrinter));
+        when(convertObjectToObjectDTOService.convertToMultiPrinterDTO(multiPrinter)).thenReturn(multiPrinterDTO);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> multiPrinterServiceImpl.setImpressionCounter(1, 1000, "invalidAttribute")
+        );
+
+        assertEquals("Invalid attribute: invalidAttribute", exception.getMessage());
+    }
+
     private void startEntities() {
 
         multiPrinter = oneMultiPrinter().now();
