@@ -118,6 +118,9 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
         MultiPrinterDTO multiPrinterDTO;
         int row;
         switch( status ) {
+            //TODO inserir condição para LOCADA separada para verificar se está com cliente
+            //TODO inserir condição para INATIVA separada para unset cliente
+            //TODO onserir condição DISPOVIVEL para verificar para unset cliente
             case "DISPONIVEL", "MANUTENCAO", "LOCADA", "INATIVA" ->
                           row = multiPrinterRepository.updateMachineStatusById( id, MachineStatus.valueOf( status ) );
             default -> throw new IllegalArgumentException( "Invalid Status: " + status );
