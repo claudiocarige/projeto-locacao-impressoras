@@ -42,16 +42,15 @@ public class MultiPrinterDTO {
 
     public int sumQuantityPrints() {
 
-        if (this.impressionCounterNow != null) {
-            if (this.impressionCounterBefore != null) {
+        if( this.impressionCounterNow != null ) {
+            if( this.impressionCounterBefore != null ) {
                 int sum = 0;
-                if (this.impressionCounterNow > this.impressionCounterBefore) {
+                if( this.impressionCounterNow > this.impressionCounterBefore ) {
                     sum = this.impressionCounterNow - this.impressionCounterBefore;
                     this.impressionCounterBefore = this.impressionCounterNow;
                 }
                 return sum;
             } else {
-                this.impressionCounterBefore = this.impressionCounterNow;
                 return this.impressionCounterNow - this.impressionCounterInitial;
             }
         }
