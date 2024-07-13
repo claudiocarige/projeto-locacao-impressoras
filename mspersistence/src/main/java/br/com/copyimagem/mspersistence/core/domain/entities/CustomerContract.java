@@ -52,7 +52,7 @@ public class CustomerContract implements Serializable {
     private void basicContract() {
 
         this.printingFranchisePB = 2000;
-        this.printingFranchiseColor = 0;
+        this.printingFranchiseColor = 1000;
         this.monthlyAmount = 300.0;
         this.contractTime = 6;
         this.startContract = LocalDate.now();
