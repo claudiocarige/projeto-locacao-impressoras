@@ -4,6 +4,8 @@ import br.com.copyimagem.mspersistence.core.domain.entities.Customer;
 import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
 import br.com.copyimagem.mspersistence.core.domain.enums.MachineStatus;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
+import br.com.copyimagem.mspersistence.core.exceptions.IllegalArgumentException;
+import br.com.copyimagem.mspersistence.core.exceptions.IllegalStateException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
@@ -131,13 +133,37 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
     @Override
     public MultiPrinterDTO setImpressionCounter( Integer id, Integer counter, String attribute) {
 
-        int row = multiPrinterRepository.updateImpressionCounterByAttribute( id, counter , attribute);
-        MultiPrinterDTO multiPrinterDTO;
-        if (row > 0) {
-            multiPrinterDTO = findMultiPrinterById(id);
-            return multiPrinterDTO;
+        if ( !attribute.equals("impressionCounterInitial") && !attribute.equals("impressionCounterBefore") &&
+             !attribute.equals("impressionCounterNow") ) {
+            throw new IllegalArgumentException( "Invalid attribute: " + attribute );
+        }
+        MultiPrinterDTO multiPrinterDTO = findMultiPrinterById(id);
+
+        int row = 0;
+
+        if( attribute.equals("impressionCounterNow") ){
+            if ( counter <= multiPrinterDTO.getImpressionCounterNow()) {
+                throw new IllegalArgumentException( "The COUNTER value must be greater than the current value." );
+            }
+            multiPrinterDTO.setImpressionCounterBefore( multiPrinterDTO.getImpressionCounterNow() );
+            multiPrinterRepository.updateImpressionCounterByAttribute(
+                                     id, multiPrinterDTO.getImpressionCounterNow(), "impressionCounterBefore");
+            row = multiPrinterRepository.updateImpressionCounterByAttribute( id, counter , attribute);
+        }else if(attribute.equals("impressionCounterInitial")) {
+            multiPrinterDTO.setImpressionCounterInitial( counter );
+            multiPrinterDTO.setImpressionCounterBefore( 0 );
+            multiPrinterDTO.setImpressionCounterNow( 0 );
+            var multiPrinter = multiPrinterRepository.save( convertObjectToObjectDTOService
+                                                                           .convertToMultiPrinter( multiPrinterDTO ) );
+            return convertObjectToObjectDTOService.convertToMultiPrinterDTO( multiPrinter );
+        }else{
+            row = multiPrinterRepository.updateImpressionCounterByAttribute( id, counter , attribute);
+        }
+
+        if ( row > 0) {
+            return findMultiPrinterById(id);
         } else {
-            throw new IllegalStateException("No rows updated. Check the conditions and input values.");
+            throw new IllegalStateException ( "No rows updated. Check the conditions and input values." );
         }
     }
 
