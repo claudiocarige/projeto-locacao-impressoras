@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -77,14 +76,17 @@ class MonthlyPaymentServiceImplTest {
         MonthlyPaymentDTO result = monthlyPaymentServiceImpl.createMonthlyPayment( monthlyPaymentRequest );
 
         assertNotNull( result );
-        assertEquals( result.getCustomerId(), monthlyPaymentDTO.getCustomerId() );
-        assertEquals( result.getInvoiceNumber(), monthlyPaymentRequest.invoiceNumber() );
-        assertEquals( result.getTicketNumber(), monthlyPaymentRequest.ticketNumber() );
-        assertEquals( result.getQuantityPrintsColor(), monthlyPaymentDTO.getQuantityPrintsColor() );
-        assertEquals( result.getExcessValuePrintsPB(), monthlyPaymentDTO.getExcessValuePrintsPB() );
-        assertEquals( 3525.20, result.getAmountPrinter() );
-        assertEquals( result.getClass(), MonthlyPaymentDTO.class );
+        assertEquals( monthlyPaymentDTO.getCustomerId(), result.getCustomerId());
+        assertEquals( monthlyPaymentRequest.invoiceNumber(), result.getInvoiceNumber() );
+        assertEquals( monthlyPaymentRequest.ticketNumber(), result.getTicketNumber() );
+        assertEquals( 1000, result.getQuantityPrintsColor() );
+        assertEquals( monthlyPaymentDTO.getExcessValuePrintsPB(), result.getExcessValuePrintsPB() );
+        assertEquals( 3525.20,  result.getAmountPrinter() );
+        assertEquals( MonthlyPaymentDTO.class, result.getClass() );
         verify( monthlyPaymentRepository ).save( any( MonthlyPayment.class ) );
+        verify( convertObjectToObjectDTOService ).convertToMonthlyPaymentDTO( any( MonthlyPayment.class ) );
+        verify( customerService ).returnCustomer( monthlyPaymentRequest.customerId() );
+        verify( multiPrinterService ).findAllMultiPrintersByCustomerId( monthlyPaymentRequest.customerId() );
     }
 
     @Test
@@ -94,12 +96,12 @@ class MonthlyPaymentServiceImplTest {
         when(convertObjectToObjectDTOService.convertToMonthlyPaymentDTO(any(MonthlyPayment.class))).thenReturn(monthlyPaymentDTO);
         MonthlyPaymentDTO result = monthlyPaymentServiceImpl.findMonthlyPaymentById(1L);
         assertNotNull(result);
-        assertEquals(result.getCustomerId(), monthlyPaymentDTO.getCustomerId());
-        assertEquals(result.getInvoiceNumber(), monthlyPaymentDTO.getInvoiceNumber());
-        assertEquals(result.getTicketNumber(), monthlyPaymentDTO.getTicketNumber());
-        assertEquals(result.getQuantityPrintsColor(), monthlyPaymentDTO.getQuantityPrintsColor());
-        assertEquals(result.getExcessValuePrintsPB(), monthlyPaymentDTO.getExcessValuePrintsPB());
-        assertEquals(result.getClass(), MonthlyPaymentDTO.class);
+        assertEquals( monthlyPaymentDTO.getCustomerId(), result.getCustomerId() );
+        assertEquals( monthlyPaymentDTO.getInvoiceNumber(), result.getInvoiceNumber() );
+        assertEquals( monthlyPaymentDTO.getTicketNumber(), result.getTicketNumber() );
+        assertEquals( monthlyPaymentDTO.getQuantityPrintsColor(), result.getQuantityPrintsColor() );
+        assertEquals( monthlyPaymentDTO.getExcessValuePrintsPB(), result.getExcessValuePrintsPB() );
+        assertEquals( MonthlyPaymentDTO.class, result.getClass() );
         verify(monthlyPaymentRepository).findById(anyLong());
     }
 
