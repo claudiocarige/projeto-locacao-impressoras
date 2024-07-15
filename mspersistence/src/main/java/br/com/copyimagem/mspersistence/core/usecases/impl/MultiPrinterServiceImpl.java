@@ -115,14 +115,22 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
     @Override
     public MultiPrinterDTO setMachineStatus( Integer id, String status ) {
 
-        MultiPrinterDTO multiPrinterDTO;
+        MultiPrinterDTO multiPrinterDTO = findMultiPrinterById( id );
         int row;
         switch( status ) {
-            //TODO inserir condição para LOCADA separada para verificar se está com cliente
-            //TODO inserir condição para INATIVA separada para unset cliente
-            //TODO onserir condição DISPOVIVEL para verificar para unset cliente
-            case "DISPONIVEL", "MANUTENCAO", "LOCADA", "INATIVA" ->
-                          row = multiPrinterRepository.updateMachineStatusById( id, MachineStatus.valueOf( status ) );
+            case "LOCADA" -> {
+                if( multiPrinterDTO.getCustomer_id() != null ) {
+                    throw new IllegalStateException ( "The printer already has a customer. " +
+                                                        "You need to deselect customer" );
+                }
+                row = multiPrinterRepository.updateMachineStatusById( id, MachineStatus.valueOf( status ) );
+            }
+            case "INATIVA", "DISPONIVEL" -> {
+                row = multiPrinterRepository.updateMachineStatusById( id, MachineStatus.valueOf( status ) );
+                unSetUpCustomerFromMultiPrinterById( multiPrinterDTO.getId() );
+            }
+            case "MANUTENCAO" -> row = multiPrinterRepository
+                                                      .updateMachineStatusById( id, MachineStatus.valueOf( status ) );
             default -> throw new IllegalArgumentException( "Invalid Status: " + status );
         }
         if( row > 0 ) {
