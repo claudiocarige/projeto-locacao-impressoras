@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -221,9 +222,12 @@ class MultiPrinterServiceImplTest {
     @Test
     @DisplayName("Should throw an exception with invalid status")
     void shouldThrowAnExceptionWithInvalidStatus(){
-        String message = assertThrows( IllegalArgumentException.class,
-                                () -> multiPrinterServiceImpl.setMachineStatus(1, "INVALIDO")).getMessage();
-        assertEquals("Invalid Status: INVALIDO", message);
+        when(multiPrinterRepository.updateMachineStatusById(1, MachineStatus.MANUTENCAO)).thenReturn(0);
+        when(multiPrinterRepository.findById(1)).thenReturn(Optional.ofNullable(multiPrinter));
+        when(convertObjectToObjectDTOService.convertToMultiPrinterDTO(multiPrinter)).thenReturn(multiPrinterDTO);
+        IllegalArgumentException message = assertThrows( IllegalArgumentException.class,
+                                () -> multiPrinterServiceImpl.setMachineStatus(1, "INVALIDO"));
+        assertEquals("Invalid Status: INVALIDO", message.getMessage());
     }
 
     @Test
