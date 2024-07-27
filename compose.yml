@@ -44,6 +44,7 @@ services:
     depends_on:
       - eurekaserver
       - mspersistence
+      - msmonthlypayment
     ports:
       - "8080:8080"
     environment:
