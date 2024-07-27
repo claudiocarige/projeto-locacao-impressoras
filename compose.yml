@@ -23,6 +23,19 @@ services:
     networks:
       - network-ms-copyimagem
 
+  msmonthlypayment:
+    build:
+      context: ./msmonthlypayment
+    image: ms-monthlypayment-image
+    container_name: ms-monthlypayment-container
+    depends_on:
+      - eurekaserver
+      - mspersistence
+    environment:
+      - EUREKA_SERVER_HOST=ms-eurekaserver-container
+    networks:
+      - network-ms-copyimagem
+
   mscloudgateway:
     build:
       context: ./mscloudgateway
