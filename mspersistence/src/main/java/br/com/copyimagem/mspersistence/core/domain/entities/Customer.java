@@ -44,7 +44,7 @@ public abstract class Customer implements Serializable {
     private String bankCode;
 
     @OneToOne
-    @JoinColumn( name = "adress_id" )
+    @JoinColumn( name = "address_id" )
     private Address address;
 
     @Enumerated( EnumType.STRING )
