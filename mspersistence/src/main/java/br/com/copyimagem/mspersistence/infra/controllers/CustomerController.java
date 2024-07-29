@@ -1,5 +1,6 @@
 package br.com.copyimagem.mspersistence.infra.controllers;
 
+import br.com.copyimagem.mspersistence.core.dtos.CustomerContractDTO;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
@@ -34,6 +35,13 @@ public class CustomerController {
                 typeParam.toUpperCase(), valueParam ) );
         CustomerResponseDTO response = customerService.searchCustomer( typeParam, valueParam );
         return ResponseEntity.ok().body( response );
+    }
+
+    @GetMapping( value = "/search-contract/{customerId}" )
+    public ResponseEntity< CustomerContractDTO > searchCustomerContract( @PathVariable Long customerId ) {
+
+        log.info( String.format( "[ INFO ] Search for contract customer by customer id : %s.", customerId ) );
+        return ResponseEntity.ok().body( customerService.findCustomerContractByCustomerId( customerId ) );
     }
 
     @GetMapping( value = "/search-client-all" )

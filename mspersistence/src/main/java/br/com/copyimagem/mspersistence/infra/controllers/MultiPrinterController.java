@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping( "/api/v1/multi-printer" )
+    @RequestMapping( "/api/v1/multi-printer" )
 public class MultiPrinterController {
 
 

@@ -1,7 +1,6 @@
 package br.com.copyimagem.mspersistence.core.usecases.impl;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
-import br.com.copyimagem.mspersistence.core.domain.entities.MonthlyPayment;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
@@ -46,9 +45,6 @@ class LegalPersonalCustomerServiceImplTest {
 
     @Mock
     private CustomerRepository customerRepository;
-
-    @Mock
-    private CustomerContractRepository customerContractRepository;
 
     @Mock
     private ConvertObjectToObjectDTOService convertObjectToObjectDTOService;
@@ -123,14 +119,6 @@ class LegalPersonalCustomerServiceImplTest {
                             () -> assertEquals( 1, legalPersonalCustomerList.get( 0 )
                                     .getMultiPrinterList().size() )
                     );
-                },
-                () -> {
-                    assertAll( "MonthlyPayment",
-                            () -> assertEquals( 1, legalPersonalCustomerList.get( 0 )
-                                    .getMonthlyPaymentList().size() ),
-                            () -> assertEquals( MonthlyPayment.class, legalPersonalCustomerList.get( 0 )
-                                    .getMonthlyPaymentList().get( 0 ).getClass() )
-                    );
                 }
         );
 
@@ -164,13 +152,6 @@ class LegalPersonalCustomerServiceImplTest {
                             () -> assertEquals( MultiPrinterDTO.class, legalPersonalCustomerDTO
                                                                          .getMultiPrinterList().get( 0 ).getClass() ),
                             () -> assertEquals( 1, legalPersonalCustomerDTO.getMultiPrinterList().size() )
-                    );
-                },
-                () -> {
-                    assertAll( "MonthlyPayment",
-                            () -> assertEquals( 1, legalPersonalCustomerDTO.getMonthlyPaymentList().size() ),
-                            () -> assertEquals( MonthlyPayment.class, legalPersonalCustomerDTO
-                                                                        .getMonthlyPaymentList().get( 0 ).getClass() )
                     );
                 }
         );

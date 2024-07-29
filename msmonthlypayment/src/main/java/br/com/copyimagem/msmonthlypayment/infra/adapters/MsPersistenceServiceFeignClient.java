@@ -1,19 +1,26 @@
 package br.com.copyimagem.msmonthlypayment.infra.adapters;
 
 
-import br.com.copyimagem.msmonthlypayment.core.domain.representations.MonthlyPaymentDTO;
-import br.com.copyimagem.msmonthlypayment.core.domain.representations.MonthlyPaymentRequest;
+import br.com.copyimagem.msmonthlypayment.core.domain.representations.CustomerContractDTO;
+import br.com.copyimagem.msmonthlypayment.core.domain.representations.MultiPrinterDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.List;
 
 
 @FeignClient(
-            value = "ms-persistence-service",
-            path = "/api/v1/monthlypayment"
+            value = "mspersistence",
+            path = "/api/v1"
         )
 public interface MsPersistenceServiceFeignClient {
 
-    @PostMapping
-    MonthlyPaymentDTO createMonthlyPayment( @RequestBody MonthlyPaymentRequest monthlyPaymentRequest );
+    @GetMapping( value = "/customers/search-contract/{customerId}" )
+    CustomerContractDTO searchCustomerContract( @PathVariable Long customerId );
+
+    @GetMapping( "/multi-printer/customer/{customerId}" )
+    List< MultiPrinterDTO > findAllMultiPrintersByCustomerId( @PathVariable Long customerId );
+
+
 }

@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.AddressBuilder.oneAddress;
-import static br.com.copyimagem.mspersistence.core.domain.builders.MonthlyPaymentBuilder.oneMonthlyPayment;
 import static br.com.copyimagem.mspersistence.core.domain.builders.MultiPrinterBuilder.oneMultiPrinter;
 
 
@@ -31,7 +30,6 @@ public class NaturalPersonCustomerBuilder implements Serializable {
     private byte payDay;
     private CustomerContract customerContract;
     private List< MultiPrinter > multiPrinterList = new ArrayList<>();
-    private List< MonthlyPayment > monthlyPaymentList = new ArrayList<>();
     private String cpf;
 
     private NaturalPersonCustomerBuilder(){}
@@ -55,7 +53,6 @@ public class NaturalPersonCustomerBuilder implements Serializable {
         builder.payDay = 5;
         builder.customerContract = new CustomerContract();
         builder.multiPrinterList = Arrays.asList(oneMultiPrinter().now());
-        builder.monthlyPaymentList = Arrays.asList(oneMonthlyPayment().now());
         builder.cpf = "156.258.240-29";
     }
 
@@ -119,11 +116,6 @@ public class NaturalPersonCustomerBuilder implements Serializable {
         return this;
     }
 
-    public NaturalPersonCustomerBuilder withMonthlyPayment(MonthlyPayment... monthlyPaymentList) {
-        this.monthlyPaymentList = Arrays.asList(monthlyPaymentList);
-        return this;
-    }
-
     public NaturalPersonCustomerBuilder withCpf(String cpf) {
         this.cpf = cpf;
         return this;
@@ -143,7 +135,6 @@ public class NaturalPersonCustomerBuilder implements Serializable {
         customer.setPayDay(payDay);
         customer.setCustomerContract(customerContract);
         customer.addMultiPrinter(oneMultiPrinter().now());
-        customer.addMonthlyPayment(oneMonthlyPayment().now());
         return customer;
     }
 
@@ -162,8 +153,7 @@ public class NaturalPersonCustomerBuilder implements Serializable {
                 financialSituation.name(),
                 payDay,
                 customerContract,
-                List.of( oneMultiPrinter().now() ),
-                monthlyPaymentList
+                List.of( oneMultiPrinter().now() )
         );
     }
 }

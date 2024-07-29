@@ -1,7 +1,8 @@
 spring:
   application:
     name: msmonthlypayment
-
+  profiles:
+    active: test
 server:
     port: 0
 

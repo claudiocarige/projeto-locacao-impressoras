@@ -1,33 +1,34 @@
-package br.com.copyimagem.mspersistence.core.usecases.impl;
+package br.com.copyimagem.msmonthlypayment.core.usecases.impl;
 
-import br.com.copyimagem.mspersistence.core.domain.entities.*;
-import br.com.copyimagem.mspersistence.core.dtos.MonthlyPaymentDTO;
-import br.com.copyimagem.mspersistence.core.dtos.MonthlyPaymentRequest;
-import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
-import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
-import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
-import br.com.copyimagem.mspersistence.infra.persistence.repositories.MonthlyPaymentRepository;
+import br.com.copyimagem.msmonthlypayment.core.domain.entities.MonthlyPayment;
+import br.com.copyimagem.msmonthlypayment.core.domain.enums.PrinterType;
+import br.com.copyimagem.msmonthlypayment.core.domain.representations.CustomerContractDTO;
+import br.com.copyimagem.msmonthlypayment.core.domain.representations.MonthlyPaymentDTO;
+import br.com.copyimagem.msmonthlypayment.core.domain.representations.MonthlyPaymentRequest;
+import br.com.copyimagem.msmonthlypayment.core.domain.representations.MultiPrinterDTO;
+import br.com.copyimagem.msmonthlypayment.infra.adapters.MsPersistenceServiceFeignClient;
+import br.com.copyimagem.msmonthlypayment.infra.persistence.repositories.MsMonthlyPaymentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static br.com.copyimagem.mspersistence.core.domain.builders.MonthlyPaymentBuilder.oneMonthlyPayment;
-import static br.com.copyimagem.mspersistence.core.domain.builders.MultiPrinterBuilder.oneMultiPrinter;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static br.com.copyimagem.msmonthlypayment.core.domain.builders.MonthlyPaymentBuilder.oneMonthlyPayment;
+import static br.com.copyimagem.msmonthlypayment.core.domain.builders.MultiPrinterBuilder.oneMultiPrinter;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@ExtendWith( MockitoExtension.class )
-class MonthlyPaymentServiceImplTest {
 
+@ExtendWith( MockitoExtension.class)
+class MsMonthlyPaymentServiceImplTest {
 
     private MonthlyPayment monthlyPayment;
 
@@ -37,28 +38,24 @@ class MonthlyPaymentServiceImplTest {
 
     private MultiPrinterDTO multiPrinterDTO;
 
-    private Customer customer;
-
-
-    @Mock
-    private MultiPrinterService multiPrinterService;
+    private CustomerContractDTO customerContractDTO;
 
     @Mock
-    private CustomerService customerService;
+    private MsPersistenceServiceFeignClient msPersistenceServiceFeignClient;
 
     @Mock
-    private MonthlyPaymentRepository monthlyPaymentRepository;
+    private MsMonthlyPaymentRepository monthlyPaymentRepository;
 
     @Mock
     private ConvertObjectToObjectDTOService convertObjectToObjectDTOService;
 
     @InjectMocks
-    @Spy
-    private MonthlyPaymentServiceImpl monthlyPaymentServiceImpl;
+    private MsMonthlyPaymentServiceImpl msMonthlyPaymentService;
 
 
     @BeforeEach
     void setUp() {
+
         startEntities();
     }
 
@@ -66,14 +63,15 @@ class MonthlyPaymentServiceImplTest {
     @DisplayName( "Should create a monthly payment" )
     void shouldCreateAMonthlyPayment() {
 
-        when( monthlyPaymentRepository.save( any( MonthlyPayment.class ) ) ).thenReturn( monthlyPayment );
+        when( monthlyPaymentRepository.save( any(MonthlyPayment.class)) ).thenReturn( monthlyPayment );
         when( convertObjectToObjectDTOService.convertToMonthlyPaymentDTO( any( MonthlyPayment.class ) ) )
-                                                                                      .thenReturn( monthlyPaymentDTO );
-        when( customerService.returnCustomer( monthlyPaymentRequest.customerId() ) ).thenReturn( customer );
-        when( multiPrinterService.findAllMultiPrintersByCustomerId( monthlyPaymentRequest.customerId() ) )
-                                                                             .thenReturn( List.of( multiPrinterDTO ) );
+                .thenReturn( monthlyPaymentDTO );
+        when( msPersistenceServiceFeignClient
+                .searchCustomerContract( monthlyPaymentRequest.customerId() ) ).thenReturn( customerContractDTO);
+        when( msPersistenceServiceFeignClient.findAllMultiPrintersByCustomerId( monthlyPaymentRequest.customerId() ) )
+                .thenReturn( List.of( multiPrinterDTO ) );
 
-        MonthlyPaymentDTO result = monthlyPaymentServiceImpl.createMonthlyPayment( monthlyPaymentRequest );
+        MonthlyPaymentDTO result = msMonthlyPaymentService.createMonthlyPayment( monthlyPaymentRequest );
 
         assertNotNull( result );
         assertEquals( monthlyPaymentDTO.getCustomerId(), result.getCustomerId());
@@ -85,16 +83,18 @@ class MonthlyPaymentServiceImplTest {
         assertEquals( MonthlyPaymentDTO.class, result.getClass() );
         verify( monthlyPaymentRepository ).save( any( MonthlyPayment.class ) );
         verify( convertObjectToObjectDTOService ).convertToMonthlyPaymentDTO( any( MonthlyPayment.class ) );
-        verify( customerService ).returnCustomer( monthlyPaymentRequest.customerId() );
-        verify( multiPrinterService ).findAllMultiPrintersByCustomerId( monthlyPaymentRequest.customerId() );
+        verify( msPersistenceServiceFeignClient ).searchCustomerContract( monthlyPaymentRequest.customerId() );
+        verify( msPersistenceServiceFeignClient )
+                .findAllMultiPrintersByCustomerId( monthlyPaymentRequest.customerId() );
     }
 
     @Test
     @DisplayName("Should return a MonthlyPayment By Id")
     void shouldReturnAMonthlyPaymentById() {
         when(monthlyPaymentRepository.findById(anyLong())).thenReturn(java.util.Optional.ofNullable(monthlyPayment));
-        when(convertObjectToObjectDTOService.convertToMonthlyPaymentDTO(any(MonthlyPayment.class))).thenReturn(monthlyPaymentDTO);
-        MonthlyPaymentDTO result = monthlyPaymentServiceImpl.findMonthlyPaymentById(1L);
+        when(convertObjectToObjectDTOService.convertToMonthlyPaymentDTO(any(MonthlyPayment.class)))
+                .thenReturn(monthlyPaymentDTO);
+        MonthlyPaymentDTO result = msMonthlyPaymentService.findMonthlyPaymentById(1L);
         assertNotNull(result);
         assertEquals( monthlyPaymentDTO.getCustomerId(), result.getCustomerId() );
         assertEquals( monthlyPaymentDTO.getInvoiceNumber(), result.getInvoiceNumber() );
@@ -109,8 +109,9 @@ class MonthlyPaymentServiceImplTest {
     @DisplayName("Should return a List of MonthlyPayment By CustomerId")
     void shouldReturnAListOfMonthlyPaymentByCustomerId() {
         when(monthlyPaymentRepository.findAllMonthlyPaymentsByCustomerId(1L)).thenReturn(List.of(monthlyPayment));
-        when(convertObjectToObjectDTOService.convertToMonthlyPaymentDTO(any(MonthlyPayment.class))).thenReturn(monthlyPaymentDTO);
-        List<MonthlyPaymentDTO> result = monthlyPaymentServiceImpl.findAllMonthlyPaymentsByCustomerId(1L);
+        when(convertObjectToObjectDTOService
+                .convertToMonthlyPaymentDTO(any(MonthlyPayment.class))).thenReturn(monthlyPaymentDTO);
+        List<MonthlyPaymentDTO> result = msMonthlyPaymentService.findAllMonthlyPaymentsByCustomerId(1L);
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals( monthlyPaymentDTO.getInvoiceNumber(), result.get(0).getInvoiceNumber());
@@ -121,9 +122,12 @@ class MonthlyPaymentServiceImplTest {
     @Test
     @DisplayName("Should return a List of MonthlyPayment By Attribute and Value")
     void shouldReturnAListOfMonthlyPaymentByAttributeAndValue() {
-        when(monthlyPaymentRepository.findMonthlyPaymentByAttributeAndValue("monthPayment", 1)).thenReturn(List.of(monthlyPayment));
-        when(convertObjectToObjectDTOService.convertToMonthlyPaymentDTO(any(MonthlyPayment.class))).thenReturn(monthlyPaymentDTO);
-        List<MonthlyPaymentDTO> result = monthlyPaymentServiceImpl.findMonthlyPaymentByAttributeAndValue("monthPayment", "1");
+        when(monthlyPaymentRepository
+                .findMonthlyPaymentByAttributeAndValue("monthPayment", 1)).thenReturn(List.of(monthlyPayment));
+        when(convertObjectToObjectDTOService
+                .convertToMonthlyPaymentDTO(any(MonthlyPayment.class))).thenReturn(monthlyPaymentDTO);
+        List<MonthlyPaymentDTO> result = msMonthlyPaymentService
+                .findMonthlyPaymentByAttributeAndValue("monthPayment", "1");
         assertNotNull(result);
         assertEquals( 1, result.size());
         assertEquals(monthlyPaymentDTO.getInvoiceNumber(), result.get(0).getInvoiceNumber());
@@ -133,14 +137,13 @@ class MonthlyPaymentServiceImplTest {
 
     void startEntities() {
 
-        monthlyPayment = oneMonthlyPayment().now();
+        monthlyPayment = oneMonthlyPayment().withId( 1L ).now();
+        System.out.println(monthlyPayment.toString());
         monthlyPaymentDTO = oneMonthlyPayment().nowDTO();
         monthlyPaymentRequest = new MonthlyPaymentRequest( 1L, "0001", "0002" );
         multiPrinterDTO = oneMultiPrinter().nowDTO();
-        customer = new LegalPersonalCustomer();
-        customer.setId( 1L );
-        CustomerContract customerContract = new CustomerContract();
-        customer.setCustomerContract( customerContract );
+        customerContractDTO = new CustomerContractDTO(1L, 2000, 2000, PrinterType.LASER_COLOR_EASY.getRate(),
+                PrinterType.LASER_BLACK_AND_WHITE_EASY.getRate());
     }
 
 }

@@ -2,7 +2,6 @@ package br.com.copyimagem.mspersistence.core.dtos;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.Address;
 import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
-import br.com.copyimagem.mspersistence.core.domain.entities.MonthlyPayment;
 import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -62,8 +61,6 @@ public class NaturalPersonCustomerDTO implements Serializable {
     private CustomerContract customerContract;
 
     private List< MultiPrinter > multiPrinterList = new ArrayList<>();
-
-    private List< MonthlyPayment > monthlyPaymentList = new ArrayList<>();
 
     @Override
     public boolean equals( Object o ) {

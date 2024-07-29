@@ -1,16 +1,16 @@
-package br.com.copyimagem.mspersistence.core.usecases.impl;
+package br.com.copyimagem.msmonthlypayment.core.usecases.impl;
 
-import br.com.copyimagem.mspersistence.core.domain.entities.MonthlyPayment;
-import br.com.copyimagem.mspersistence.core.domain.enums.PaymentStatus;
-import br.com.copyimagem.mspersistence.core.dtos.MonthlyPaymentDTO;
-import br.com.copyimagem.mspersistence.core.dtos.MonthlyPaymentRequest;
-import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
-import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
-import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
-import br.com.copyimagem.mspersistence.core.usecases.interfaces.MonthlyPaymentService;
-import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
-import br.com.copyimagem.mspersistence.infra.persistence.repositories.MonthlyPaymentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import br.com.copyimagem.msmonthlypayment.core.domain.entities.MonthlyPayment;
+import br.com.copyimagem.msmonthlypayment.core.domain.enums.PaymentStatus;
+import br.com.copyimagem.msmonthlypayment.core.domain.representations.CustomerContractDTO;
+import br.com.copyimagem.msmonthlypayment.core.domain.representations.MonthlyPaymentDTO;
+import br.com.copyimagem.msmonthlypayment.core.domain.representations.MonthlyPaymentRequest;
+import br.com.copyimagem.msmonthlypayment.core.domain.representations.MultiPrinterDTO;
+import br.com.copyimagem.msmonthlypayment.core.exceptions.NoSuchElementException;
+import br.com.copyimagem.msmonthlypayment.core.usecases.MsMonthlyPaymentService;
+import br.com.copyimagem.msmonthlypayment.infra.adapters.MsPersistenceServiceFeignClient;
+import br.com.copyimagem.msmonthlypayment.infra.persistence.repositories.MsMonthlyPaymentRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,27 +18,23 @@ import java.util.List;
 
 
 @Service
-public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
+public class MsMonthlyPaymentServiceImpl implements MsMonthlyPaymentService {
 
-    private final MultiPrinterService multiPrinterService;
 
-    private final CustomerService customerService;
-
-    private final MonthlyPaymentRepository monthlyPaymentRepository;
+    private final MsMonthlyPaymentRepository msMonthlyPaymentRepository;
 
     private final ConvertObjectToObjectDTOService convertObjectToObjectDTOService;
 
-    @Autowired
-    public MonthlyPaymentServiceImpl( MultiPrinterService multiPrinterService, CustomerService customerService,
-                                      MonthlyPaymentRepository monthlyPaymentRepository,
-                                      ConvertObjectToObjectDTOService convertObjectToObjectDTOService ) {
+    private final MsPersistenceServiceFeignClient msPersistenceServiceFeignClient;
 
-        this.multiPrinterService = multiPrinterService;
+    public MsMonthlyPaymentServiceImpl( MsMonthlyPaymentRepository msMonthlyPaymentRepository,
+                                        ConvertObjectToObjectDTOService convertObjectToObjectDTOService, MsPersistenceServiceFeignClient msPersistenceServiceFeignClient ) {
 
-        this.customerService = customerService;
-        this.monthlyPaymentRepository = monthlyPaymentRepository;
+        this.msMonthlyPaymentRepository = msMonthlyPaymentRepository;
         this.convertObjectToObjectDTOService = convertObjectToObjectDTOService;
+        this.msPersistenceServiceFeignClient = msPersistenceServiceFeignClient;
     }
+
 
     @Override
     public MonthlyPaymentDTO createMonthlyPayment( MonthlyPaymentRequest monthlyPaymentRequest ) {
@@ -46,11 +42,11 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
         MonthlyPayment monthlyPayment = new MonthlyPayment();
         insertDataInMonthlyPayment( monthlyPaymentRequest, monthlyPayment );
         return convertObjectToObjectDTOService
-                                       .convertToMonthlyPaymentDTO( monthlyPaymentRepository.save( monthlyPayment ) );
+                .convertToMonthlyPaymentDTO( msMonthlyPaymentRepository.save( monthlyPayment ) );
     }
 
     private void insertDataInMonthlyPayment(
-            MonthlyPaymentRequest monthlyPaymentRequest, MonthlyPayment monthlyPayment ) {
+        MonthlyPaymentRequest monthlyPaymentRequest, MonthlyPayment monthlyPayment ) {
 
         monthlyPayment.setMonthPayment( LocalDate.now().getMonthValue() );
         monthlyPayment.setYearPayment( LocalDate.now().getYear() );
@@ -58,15 +54,14 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
         monthlyPayment.setExpirationDate( monthlyPayment.getPaymentDate().plusDays( 5 ) );
         monthlyPayment.setInvoiceNumber( monthlyPaymentRequest.invoiceNumber() );
         monthlyPayment.setTicketNumber( monthlyPaymentRequest.ticketNumber() );
-        monthlyPayment.setCustomer( customerService.returnCustomer( monthlyPaymentRequest.customerId() ) );
-        monthlyPayment.setPrintingFranchisePB( monthlyPayment.getCustomer()
-                                                                    .getCustomerContract().getPrintingFranchisePB() );
-        monthlyPayment.setPrintingFranchiseColor( monthlyPayment.getCustomer()
-                                                                 .getCustomerContract().getPrintingFranchiseColor() );
+        monthlyPayment.setCustomerId( monthlyPaymentRequest.customerId() );
+        CustomerContractDTO contractDTO = msPersistenceServiceFeignClient.searchCustomerContract( monthlyPaymentRequest.customerId() );
+        monthlyPayment.setPrintingFranchisePB(contractDTO.printingFranchisePB() );
+        monthlyPayment.setPrintingFranchiseColor( contractDTO.printingFranchiseColor() );
         monthlyPayment.setRateExcessBlackAndWhitePrinting(
-                                     monthlyPayment.getCustomer().getCustomerContract().getPrinterTypePB().getRate());
+                contractDTO.printerTypePBRate());
         monthlyPayment.setRateExcessColorPrinting(
-                                 monthlyPayment.getCustomer().getCustomerContract().getPrinterTypeColor().getRate() );
+                contractDTO.printerTypeColorRate());
         monthlyPayment.setPaymentStatus( PaymentStatus.PENDENTE );
         getInformationFromMultiPrinter( monthlyPayment );
     }
@@ -80,13 +75,13 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
         var quantityPrintsPB = 0;
         var quantityPrintsColor = 0;
         var monthlyAmount = 0.0;
-        List< MultiPrinterDTO > multiPrinterDTOList = multiPrinterService
-                                            .findAllMultiPrintersByCustomerId( monthlyPayment.getCustomer().getId() );
+        List< MultiPrinterDTO > multiPrinterDTOList = msPersistenceServiceFeignClient.findAllMultiPrintersByCustomerId(
+                monthlyPayment.getCustomerId() );
 
         for( MultiPrinterDTO multiPrinterDTO : multiPrinterDTOList ) {
             var sumPrinter = multiPrinterDTO.sumQuantityPrints();
             var excessValue = ( sumPrinter < multiPrinterDTO.getPrintingFranchise() ? 0
-                                                             : sumPrinter - multiPrinterDTO.getPrintingFranchise() );
+                    : sumPrinter - multiPrinterDTO.getPrintingFranchise() );
             if( multiPrinterDTO.getPrintType().getType().startsWith( "Color" ) ) {
                 quantityPrintsColor += sumPrinter;
                 excessValuePrintsColor += excessValue * multiPrinterDTO.getPrintType().getRate();
@@ -112,36 +107,37 @@ public class MonthlyPaymentServiceImpl implements MonthlyPaymentService {
     @Override
     public MonthlyPaymentDTO findMonthlyPaymentById( Long id ) {
 
-        MonthlyPayment monthlyPayment = monthlyPaymentRepository.
-                        findById( id ).orElseThrow( () -> new NoSuchElementException( "Monthly Payment not found" ) );
+        MonthlyPayment monthlyPayment = msMonthlyPaymentRepository.
+                findById( id ).orElseThrow( () -> new NoSuchElementException( "Monthly Payment not found" ) );
         return convertObjectToObjectDTOService.convertToMonthlyPaymentDTO( monthlyPayment );
     }
 
     @Override
     public List<MonthlyPaymentDTO> findAllMonthlyPaymentsByCustomerId(Long customerId) {
-        return monthlyPaymentRepository.findAllMonthlyPaymentsByCustomerId(customerId).stream()
-                .map( convertObjectToObjectDTOService::convertToMonthlyPaymentDTO )
-                        .toList();
+        return msMonthlyPaymentRepository.findAllMonthlyPaymentsByCustomerId(customerId).stream()
+                .map( convertObjectToObjectDTOService::convertToMonthlyPaymentDTO ).toList();
     }
 
     @Override
     public List<MonthlyPaymentDTO> findMonthlyPaymentByAttributeAndValue (String attribute, String valueAttribute) {
         return ifAttributeAndValue(attribute, valueAttribute).stream()
-                                         .map( convertObjectToObjectDTOService::convertToMonthlyPaymentDTO ).toList();
+                .map( convertObjectToObjectDTOService::convertToMonthlyPaymentDTO ).toList();
     }
     private List< MonthlyPayment> ifAttributeAndValue( String attribute, String valueAttribute ) {
 
         if( attribute.equals( "monthPayment" ) || attribute.equals( "yearPayment" ) ) {
-            return monthlyPaymentRepository
-                               .findMonthlyPaymentByAttributeAndValue( attribute, Integer.valueOf( valueAttribute ) );
+            return msMonthlyPaymentRepository
+                    .findMonthlyPaymentByAttributeAndValue( attribute, Integer.valueOf( valueAttribute ) );
         } else if( attribute.equals( "paymentStatus" ) ) {
-            return monthlyPaymentRepository
-                         .findMonthlyPaymentByAttributeAndValue( attribute, PaymentStatus.valueOf( valueAttribute ) );
+            return msMonthlyPaymentRepository
+                    .findMonthlyPaymentByAttributeAndValue( attribute, PaymentStatus.valueOf( valueAttribute ) );
         } else if( attribute.equals( "excessValuePrintsPB" ) ) {
-            return monthlyPaymentRepository
-                                .findMonthlyPaymentByAttributeAndValue( attribute, Double.valueOf( valueAttribute ) );
+            return msMonthlyPaymentRepository
+                    .findMonthlyPaymentByAttributeAndValue( attribute, Double.valueOf( valueAttribute ) );
         } else {
             throw new IllegalArgumentException( "Invalid attribute: " + attribute );
         }
     }
+
+
 }

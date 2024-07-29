@@ -40,22 +40,6 @@ public class MultiPrinterDTO {
 
     private String customer_id;
 
-    public int sumQuantityPrints() {
-
-        if( this.impressionCounterNow != null ) {
-            if( this.impressionCounterBefore != null ) {
-                int sum = 0;
-                if( this.impressionCounterNow > this.impressionCounterBefore ) {
-                    sum = this.impressionCounterNow - this.impressionCounterBefore;
-                    this.impressionCounterBefore = this.impressionCounterNow;
-                }
-                return sum;
-            } else {
-                return this.impressionCounterNow - this.impressionCounterInitial;
-            }
-        }
-        return 0;
-    }
 
     @Override
     public boolean equals( Object o ) {

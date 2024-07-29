@@ -2,7 +2,6 @@ package br.com.copyimagem.mspersistence.core.domain.builders;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.Address;
 import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
-import br.com.copyimagem.mspersistence.core.domain.entities.MonthlyPayment;
 import br.com.copyimagem.mspersistence.core.domain.entities.MultiPrinter;
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
 import br.com.copyimagem.mspersistence.core.domain.enums.FinancialSituation;
@@ -15,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static br.com.copyimagem.mspersistence.core.domain.builders.AddressBuilder.oneAddress;
-import static br.com.copyimagem.mspersistence.core.domain.builders.MonthlyPaymentBuilder.oneMonthlyPayment;
 import static br.com.copyimagem.mspersistence.core.domain.builders.MultiPrinterBuilder.oneMultiPrinter;
 
 
@@ -35,7 +33,6 @@ public class LegalPersonalCustomerBuilder implements Serializable {
 
     private CustomerContract customerContract;
     private List< MultiPrinter > multiPrinterList = new ArrayList<>();
-    private List< MonthlyPayment > monthlyPaymentList = new ArrayList<>();
     private String cnpj;
 
     private LegalPersonalCustomerBuilder(){}
@@ -59,7 +56,6 @@ public class LegalPersonalCustomerBuilder implements Serializable {
         builder.payDay = 5;
         builder.customerContract = new CustomerContract();
         builder.multiPrinterList = Arrays.asList(oneMultiPrinter().now());
-        builder.monthlyPaymentList = Arrays.asList(oneMonthlyPayment().now());
         builder.cnpj = "14.124.420/0001-94";
     }
 
@@ -124,11 +120,6 @@ public class LegalPersonalCustomerBuilder implements Serializable {
         return this;
     }
 
-    public LegalPersonalCustomerBuilder withListaMonthlyPaymentList(List<MonthlyPayment> monthlyPaymentList) {
-        this.monthlyPaymentList = monthlyPaymentList;
-        return this;
-    }
-
     public LegalPersonalCustomerBuilder withCnpj(String cnpj) {
         this.cnpj = cnpj;
         return this;
@@ -148,7 +139,6 @@ public class LegalPersonalCustomerBuilder implements Serializable {
         customer.setPayDay(payDay);
         customer.setCustomerContract(customerContract);
         customer.addMultiPrinter(oneMultiPrinter().now());
-        customer.addMonthlyPayment(oneMonthlyPayment().now());
         return customer;
     }
 
@@ -167,8 +157,7 @@ public class LegalPersonalCustomerBuilder implements Serializable {
                 financialSituation.name(),
                 payDay,
                 customerContract,
-                List.of( oneMultiPrinter().nowDTO() ),
-                monthlyPaymentList
+                List.of( oneMultiPrinter().nowDTO() )
         );
     }
 }

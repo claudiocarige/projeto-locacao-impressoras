@@ -2,6 +2,7 @@ package br.com.copyimagem.mspersistence.core.usecases.interfaces;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.Customer;
 import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
+import br.com.copyimagem.mspersistence.core.dtos.CustomerContractDTO;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
 
@@ -23,4 +24,5 @@ public interface CustomerService {
 
     Customer returnCustomer( Long aLong );
 
+    CustomerContractDTO findCustomerContractByCustomerId( Long customerId );
 }

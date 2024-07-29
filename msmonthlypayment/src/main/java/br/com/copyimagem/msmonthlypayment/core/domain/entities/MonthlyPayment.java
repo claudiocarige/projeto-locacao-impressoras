@@ -1,6 +1,9 @@
-package br.com.copyimagem.msmonthlypayment.core.domain.representations;
+package br.com.copyimagem.msmonthlypayment.core.domain.entities;
 
+
+import br.com.copyimagem.msmonthlypayment.core.domain.enums.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serial;
@@ -13,11 +16,15 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class MonthlyPaymentDTO implements Serializable {
+@Entity
+public class MonthlyPayment implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Id
+    @Column( nullable = false )
+    @GeneratedValue( strategy = GenerationType.IDENTITY )
     private Long id;
 
     private Integer monthPayment;
@@ -54,7 +61,8 @@ public class MonthlyPaymentDTO implements Serializable {
     @JsonFormat( pattern = "dd-MM-yyyy" )
     private LocalDate paymentDate;
 
-    private String paymentStatus;
+    @Enumerated( EnumType.STRING )
+    private PaymentStatus paymentStatus;
 
     private Long customerId;
 

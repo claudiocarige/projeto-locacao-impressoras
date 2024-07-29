@@ -2,7 +2,6 @@ package br.com.copyimagem.mspersistence.core.dtos;
 
 import br.com.copyimagem.mspersistence.core.domain.entities.Address;
 import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
-import br.com.copyimagem.mspersistence.core.domain.entities.MonthlyPayment;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -58,8 +57,6 @@ public class LegalPersonalCustomerDTO implements Serializable {
     private CustomerContract customerContract;
 
     private List< MultiPrinterDTO > multiPrinterList = new ArrayList<>();
-
-    private List< MonthlyPayment > monthlyPaymentList = new ArrayList<>();
 
 
 }

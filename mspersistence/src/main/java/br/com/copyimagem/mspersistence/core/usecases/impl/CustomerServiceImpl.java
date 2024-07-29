@@ -5,10 +5,7 @@ import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.domain.enums.FinancialSituation;
-import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
-import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
-import br.com.copyimagem.mspersistence.core.dtos.NaturalPersonCustomerDTO;
-import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
+import br.com.copyimagem.mspersistence.core.dtos.*;
 import br.com.copyimagem.mspersistence.core.exceptions.IllegalArgumentException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
@@ -109,6 +106,16 @@ public class CustomerServiceImpl implements CustomerService {
 
         return customerRepository.findById( id )
                 .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+    }
+
+    @Override
+    public CustomerContractDTO findCustomerContractByCustomerId( Long customerId ) {
+
+        CustomerContract customerContract = customerRepository.findCustomerContractByCustomerId( customerId );
+        return new CustomerContractDTO(
+                customerContract.getId(),
+                customerContract.getPrintingFranchisePB(), customerContract.getPrintingFranchiseColor(),
+                customerContract.getPrinterTypePB().getRate(), customerContract.getPrinterTypeColor().getRate());
     }
 
     private CustomerResponseDTO findById( Long id ) {
