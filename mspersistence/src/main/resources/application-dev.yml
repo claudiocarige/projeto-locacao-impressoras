@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME_POSTGRESQL}
+    password: ${DB_PASSWORD_POSTGRESQL}
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    url: ${DATABASE_URL}
+    user: ${DB_USERNAME_POSTGRESQL}
+    password: ${DB_PASSWORD_POSTGRESQL}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: false
