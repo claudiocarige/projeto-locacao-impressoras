@@ -3,10 +3,7 @@ package br.com.copyimagem.mspersistence.core.domain.entities;
 
 import br.com.copyimagem.mspersistence.core.domain.enums.PrinterType;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,8 +26,10 @@ public class CustomerContract implements Serializable {
     @GeneratedValue( strategy = GenerationType.IDENTITY )
     private Long id;
 
+    @Column( name = "printing_franchise_pb" )
     private Integer printingFranchisePB;
 
+    @Column( name = "printing_franchise_color" )
     private Integer printingFranchiseColor;
 
     private Double monthlyAmount;
@@ -40,8 +39,12 @@ public class CustomerContract implements Serializable {
     @JsonFormat( pattern = "dd-MM-yyyy" )
     private LocalDate startContract;
 
+    @Enumerated( EnumType.STRING )
+    @Column( name = "printer_type_pb" )
     private PrinterType printerTypePB;
 
+    @Enumerated( EnumType.STRING )
+    @Column( name = "printer_type_color" )
     private PrinterType printerTypeColor;
 
     public CustomerContract() {
