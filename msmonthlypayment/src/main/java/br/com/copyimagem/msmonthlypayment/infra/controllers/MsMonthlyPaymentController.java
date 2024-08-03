@@ -24,7 +24,7 @@ public class MsMonthlyPaymentController {
     }
 
     @GetMapping
-    public ResponseEntity< List< MonthlyPaymentDTO > > getMonthlyPayment() {
+    public ResponseEntity< List< MonthlyPaymentDTO > > getAllMonthlyPaymentByCustomerId() {
 
         return ResponseEntity.ok().body(monthlyPaymentService.findAllMonthlyPaymentsByCustomerId( 1L ));
     }
