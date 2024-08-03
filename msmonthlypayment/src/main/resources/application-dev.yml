@@ -6,6 +6,10 @@ spring:
     password: ${DB_PASSWORD_POSTGRESQL}
 
   jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
     hibernate:
       ddl-auto: none
     show-sql: false
