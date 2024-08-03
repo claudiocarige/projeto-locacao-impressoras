@@ -83,7 +83,7 @@ public class MsMonthlyPaymentServiceImpl implements MsMonthlyPaymentService {
         }
 
         for( MultiPrinterDTO multiPrinterDTO : multiPrinterDTOList ) {
-            var sumPrinter = multiPrinterDTO.sumQuantityPrints();
+            var sumPrinter = sumQuantityPrints(multiPrinterDTO);
             var excessValue = ( sumPrinter < multiPrinterDTO.getPrintingFranchise() ? 0
                     : sumPrinter - multiPrinterDTO.getPrintingFranchise() );
             if( multiPrinterDTO.getPrintType().getType().startsWith( "Color" ) ) {
