@@ -78,6 +78,10 @@ public class MsMonthlyPaymentServiceImpl implements MsMonthlyPaymentService {
         List< MultiPrinterDTO > multiPrinterDTOList = msPersistenceServiceFeignClient.findAllMultiPrintersByCustomerId(
                 monthlyPayment.getCustomerId() );
 
+        if( multiPrinterDTOList.isEmpty() ) {
+            throw new NoSuchElementException( "There is no contracted printer." );
+        }
+
         for( MultiPrinterDTO multiPrinterDTO : multiPrinterDTOList ) {
             var sumPrinter = multiPrinterDTO.sumQuantityPrints();
             var excessValue = ( sumPrinter < multiPrinterDTO.getPrintingFranchise() ? 0
