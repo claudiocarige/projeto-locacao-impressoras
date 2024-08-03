@@ -1,8 +1,6 @@
 package br.com.copyimagem.msmonthlypayment.core.domain.builders;
 
 
-import br.com.copyimagem.msmonthlypayment.core.domain.entities.MultiPrinter;
-import br.com.copyimagem.msmonthlypayment.core.domain.enums.MachineStatus;
 import br.com.copyimagem.msmonthlypayment.core.domain.enums.PrinterType;
 import br.com.copyimagem.msmonthlypayment.core.domain.representations.MultiPrinterDTO;
 
@@ -110,12 +108,6 @@ public class MultiPrinterBuilder {
     public MultiPrinterBuilder withCustomer(Long customer_id) {
         this.customer_id = customer_id;
         return this;
-    }
-
-    public MultiPrinter now() {
-        return new MultiPrinter(id, brand, model, serialNumber, machineValue, machineStatus,
-                                printType, impressionCounterInitial, impressionCounterBefore, impressionCounterNow,
-                                printingFranchise, monthlyPrinterAmount, customer_id);
     }
 
     public MultiPrinterDTO nowDTO() {
