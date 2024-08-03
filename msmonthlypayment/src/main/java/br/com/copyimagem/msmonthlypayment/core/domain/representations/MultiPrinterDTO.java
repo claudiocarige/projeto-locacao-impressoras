@@ -1,6 +1,5 @@
 package br.com.copyimagem.msmonthlypayment.core.domain.representations;
 
-import br.com.copyimagem.msmonthlypayment.core.domain.enums.MachineStatus;
 import br.com.copyimagem.msmonthlypayment.core.domain.enums.PrinterType;
 import lombok.*;
 

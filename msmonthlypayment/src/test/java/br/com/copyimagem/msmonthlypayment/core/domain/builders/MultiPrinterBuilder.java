@@ -113,6 +113,6 @@ public class MultiPrinterBuilder {
     public MultiPrinterDTO nowDTO() {
         return new MultiPrinterDTO(id, brand, model, serialNumber, machineValue, machineStatus,
                                    printType, impressionCounterInitial, impressionCounterBefore, impressionCounterNow,
-                                   printingFranchise, monthlyPrinterAmount, 1L);
+                                   printingFranchise, monthlyPrinterAmount, customer_id);
     }
 }

@@ -2,7 +2,6 @@ package br.com.copyimagem.msmonthlypayment.core.domain.builders;
 
 import br.com.copyimagem.msmonthlypayment.core.domain.entities.MonthlyPayment;
 import br.com.copyimagem.msmonthlypayment.core.domain.enums.PaymentStatus;
-import br.com.copyimagem.msmonthlypayment.core.domain.enums.PrinterType;
 import br.com.copyimagem.msmonthlypayment.core.domain.representations.MonthlyPaymentDTO;
 
 import java.time.LocalDate;
