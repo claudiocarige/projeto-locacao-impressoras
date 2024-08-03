@@ -139,5 +139,21 @@ public class MsMonthlyPaymentServiceImpl implements MsMonthlyPaymentService {
         }
     }
 
+    public int sumQuantityPrints(MultiPrinterDTO multiPrinterDTO) {
+
+        if( multiPrinterDTO.getImpressionCounterNow() != null ) {
+            if( multiPrinterDTO.getImpressionCounterBefore() != null ) {
+                int sum = 0;
+                if( multiPrinterDTO.getImpressionCounterNow() > multiPrinterDTO.getImpressionCounterBefore() ) {
+                    sum = multiPrinterDTO.getImpressionCounterNow() - multiPrinterDTO.getImpressionCounterBefore();
+                    multiPrinterDTO.setImpressionCounterBefore(multiPrinterDTO.getImpressionCounterNow());
+                }
+                return sum;
+            } else {
+                return multiPrinterDTO.getImpressionCounterNow() - multiPrinterDTO.getImpressionCounterInitial();
+            }
+        }
+        return 0;
+    }
 
 }
