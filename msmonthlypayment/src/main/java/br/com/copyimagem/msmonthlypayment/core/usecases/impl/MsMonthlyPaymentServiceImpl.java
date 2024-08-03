@@ -9,7 +9,7 @@ import br.com.copyimagem.msmonthlypayment.core.domain.representations.MonthlyPay
 import br.com.copyimagem.msmonthlypayment.core.domain.representations.MultiPrinterDTO;
 import br.com.copyimagem.msmonthlypayment.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.msmonthlypayment.core.usecases.MsMonthlyPaymentService;
-import br.com.copyimagem.msmonthlypayment.infra.adapters.MsPersistenceServiceFeignClient;
+import br.com.copyimagem.msmonthlypayment.infra.adapters.feingservices.MsPersistenceServiceFeignClient;
 import br.com.copyimagem.msmonthlypayment.infra.persistence.repositories.MsMonthlyPaymentRepository;
 import org.springframework.stereotype.Service;
 

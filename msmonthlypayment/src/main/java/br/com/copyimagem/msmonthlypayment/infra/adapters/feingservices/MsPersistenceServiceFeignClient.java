@@ -1,4 +1,4 @@
-package br.com.copyimagem.msmonthlypayment.infra.adapters;
+package br.com.copyimagem.msmonthlypayment.infra.adapters.feingservices;
 
 
 import br.com.copyimagem.msmonthlypayment.core.domain.representations.CustomerContractDTO;

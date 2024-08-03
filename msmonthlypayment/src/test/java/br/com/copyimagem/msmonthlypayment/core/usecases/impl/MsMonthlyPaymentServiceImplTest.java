@@ -6,7 +6,7 @@ import br.com.copyimagem.msmonthlypayment.core.domain.representations.CustomerCo
 import br.com.copyimagem.msmonthlypayment.core.domain.representations.MonthlyPaymentDTO;
 import br.com.copyimagem.msmonthlypayment.core.domain.representations.MonthlyPaymentRequest;
 import br.com.copyimagem.msmonthlypayment.core.domain.representations.MultiPrinterDTO;
-import br.com.copyimagem.msmonthlypayment.infra.adapters.MsPersistenceServiceFeignClient;
+import br.com.copyimagem.msmonthlypayment.infra.adapters.feingservices.MsPersistenceServiceFeignClient;
 import br.com.copyimagem.msmonthlypayment.infra.persistence.repositories.MsMonthlyPaymentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
