@@ -22,7 +22,7 @@ public class MultiPrinterDTO {
 
     private Double machineValue;
 
-    private MachineStatus machineStatus;
+    private String machineStatus;
 
     private PrinterType printType;
 

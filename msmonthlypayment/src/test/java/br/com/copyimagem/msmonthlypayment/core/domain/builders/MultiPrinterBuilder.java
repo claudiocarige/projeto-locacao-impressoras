@@ -13,7 +13,7 @@ public class MultiPrinterBuilder {
     private String model;
     private String serialNumber;
     private Double machineValue;
-    private MachineStatus machineStatus;
+    private String machineStatus;
     private PrinterType printType;
     private Integer impressionCounterInitial;
     private Integer impressionCounterBefore;
@@ -36,7 +36,7 @@ public class MultiPrinterBuilder {
         builder.model = "L5290";
         builder.serialNumber = "x1x2x3";
         builder.machineValue = 1000.0;
-        builder.machineStatus = MachineStatus.DISPONIVEL;
+        builder.machineStatus = "DISPONIVEL";
         builder.printType = PrinterType.LASER_COLOR_EASY;
         builder.impressionCounterInitial = 1000;
         builder.impressionCounterBefore = 1000;
@@ -72,7 +72,7 @@ public class MultiPrinterBuilder {
         return this;
     }
 
-    public MultiPrinterBuilder withMachineStatus(MachineStatus machineStatus) {
+    public MultiPrinterBuilder withMachineStatus(String machineStatus) {
         this.machineStatus = machineStatus;
         return this;
     }

@@ -73,8 +73,8 @@ public class MonthlyPaymentBuilder {
         builder.monthlyAmount = 200.0;
         builder.excessValuePrintsPB = 0.0;
         builder.excessValuePrintsColor = 0.0;
-        builder.rateExcessColorPrinting = PrinterType.LASER_COLOR_EASY.getRate();
-        builder.rateExcessBlackAndWhitePrinting = PrinterType.LASER_BLACK_AND_WHITE_EASY.getRate();
+        builder.rateExcessColorPrinting = 0.15;
+        builder.rateExcessBlackAndWhitePrinting = 0.04;
         builder.expirationDate = LocalDate.of( 2023, 11, 30 );
         builder.paymentDate = LocalDate.of( 2022, 12, 10 );
         builder.paymentStatus = PaymentStatus.PENDENTE;
