@@ -13,14 +13,25 @@ import lombok.Setter;
 public class TicketDTO {
 
     private Long id;
+
     private String title;
+
     private String description;
+
     private String status;
+
     private String priority;
+
     private String type;
+
     private String createdAt;
+
     private String updatedAt;
+
     private String closedAt;
+
     private Long customer_id;
+
     private Long technician_id;
+
 }
