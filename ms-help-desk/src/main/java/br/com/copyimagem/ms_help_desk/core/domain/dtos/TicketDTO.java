@@ -30,8 +30,8 @@ public class TicketDTO {
 
     private String closedAt;
 
-    private Long customer_id;
+    private String clientName;
 
-    private Long technician_id;
+    private String technicalName;
 
 }
