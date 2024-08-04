@@ -27,13 +27,22 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketDTO getTicketById( Long id ) {
 
-        return ticketRepository.findById( id ).orElseThrow( () -> new NoSuchElementException( "Ticket not found" ) );
+        Ticket ticket = ticketRepository.findById( id ).orElseThrow(
+                () -> new NoSuchElementException( "Ticket not found" ) );
+        return convertEntityAndDTOService.convertEntityToDTO( ticket );
     }
 
     @Override
     public List< TicketDTO > getAllTickets() {
 
-        return ticketRepository.findAll();
+        return convertEntityAndDTOService.convertEntityListToDTOList( ticketRepository.findAll() );
+    }
+
+    @Override
+    public TicketDTO createTicket( TicketDTO ticket ) {
+
+        return convertEntityAndDTOService.convertEntityToDTO(
+                ticketRepository.save( convertEntityAndDTOService.convertDTOToEntity( ticket ) ) );
     }
 
     @Override
