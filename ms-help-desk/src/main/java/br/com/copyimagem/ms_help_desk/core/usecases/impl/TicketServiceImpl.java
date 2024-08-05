@@ -39,15 +39,39 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public TicketDTO createTicket( TicketDTO ticket ) {
+    public TicketDTO createTicket( TicketDTO ticketDTO ) {
 
-        return convertEntityAndDTOService.convertEntityToDTO(
-                ticketRepository.save( convertEntityAndDTOService.convertDTOToEntity( ticket ) ) );
+        ticketDTO.setId( null );
+        ResponseEntity< CustomerResponseDTO > customerResponseDTO =
+                msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getClientName() );
+        //TODO criar o serviço de Usuario para buscar o tecnico, por enquanto este customerResponseDTO02
+        ResponseEntity< CustomerResponseDTO > customerResponseDTO02 =
+                msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getClientName() );
+
+        if( customerResponseDTO.getBody() == null ) {
+            throw new IllegalArgumentException( "Client not found" );
+        }
+        if( customerResponseDTO02.getBody() == null ) {
+            throw new IllegalArgumentException( "Technical not found" );
+        }
+        Ticket ticket = convertEntityAndDTOService.convertDTOToEntity( ticketDTO );
+        ticket.setClient_id( customerResponseDTO.getBody().getId() );
+        ticket.setTechnical_id( customerResponseDTO02.getBody().getId() );
+        ticket.setStatus( TicketStatus.OPEN );
+        if( ticket.getPriority() == null ) {
+            ticket.setPriority( TicketPriority.LOW );
+        }
+        ticket.setCreatedAt( LocalDateTime.now() );
+        return convertEntityAndDTOService.convertEntityToDTO( ticketRepository.save( ticket ) );
     }
 
     @Override
     public void deleteTicket( Long id ) {
 
+        TicketDTO ticketDTO = getTicketById( id );
+        if( !ticketDTO.getStatus().equals( "ERROR" ) ) {
+            throw new IllegalArgumentException( "Unable to delete the Ticket" );
+        }
         ticketRepository.deleteById( id );
     }
 
