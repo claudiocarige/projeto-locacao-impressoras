@@ -26,6 +26,8 @@ public class MscloudgatewayApplication {
 										.uri("lb://mspersistence"))
 					.route( r -> r.path("/api/v1/monthlypayment-service/**")
 										.uri("lb://msmonthlypayment"))
+					.route( r -> r.path("/api/v1/help-desk/**")
+										.uri("lb://ms-help-desk"))
 				.build();
 	}
 }
