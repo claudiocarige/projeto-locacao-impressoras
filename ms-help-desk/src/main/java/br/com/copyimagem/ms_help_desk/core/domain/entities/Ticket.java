@@ -3,10 +3,8 @@ package br.com.copyimagem.ms_help_desk.core.domain.entities;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketPriority;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketStatus;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -24,12 +22,25 @@ public class Ticket {
     private Long id;
     private String title;
     private String description;
+
+    @Enumerated( EnumType.STRING )
     private TicketStatus status;
+
+    @Enumerated( EnumType.STRING )
     private TicketPriority priority;
+
+    @Enumerated( EnumType.STRING )
     private TicketType type;
+
+    @JsonFormat( pattern = "dd-MM-yyyy HH:mm:ss" )
     private LocalDateTime createdAt;
+
+    @JsonFormat( pattern = "dd-MM-yyyy HH:mm:ss" )
     private LocalDateTime updatedAt;
+
+    @JsonFormat( pattern = "dd-MM-yyyy HH:mm:ss" )
     private LocalDateTime closedAt;
+
     private String clientName;
     private String technicalName;
     private Long client_id;
