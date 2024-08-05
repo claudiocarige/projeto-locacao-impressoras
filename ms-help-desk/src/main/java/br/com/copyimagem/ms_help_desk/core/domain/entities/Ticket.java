@@ -30,7 +30,9 @@ public class Ticket {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime closedAt;
-    private Long user_id;
-    private Long technician_id;
+    private String clientName;
+    private String technicalName;
+    private Long client_id;
+    private Long technical_id;
 
 }
