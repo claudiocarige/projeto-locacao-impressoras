@@ -1,5 +1,6 @@
 package br.com.copyimagem.ms_help_desk.core.domain.dtos;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,8 +31,10 @@ public class TicketDTO {
 
     private String closedAt;
 
+    @NotNull( message = "Client name is required" )
     private String clientName;
 
+    @NotNull( message = "Technical name is required" )
     private String technicalName;
 
 }
