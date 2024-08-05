@@ -1,27 +1,34 @@
 package br.com.copyimagem.ms_help_desk.core.usecases.impl;
 
+import br.com.copyimagem.ms_help_desk.core.domain.dtos.CustomerResponseDTO;
 import br.com.copyimagem.ms_help_desk.core.domain.dtos.TicketDTO;
+import br.com.copyimagem.ms_help_desk.core.domain.entities.Ticket;
+import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketPriority;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketStatus;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketType;
 import br.com.copyimagem.ms_help_desk.core.usecases.TicketService;
+import br.com.copyimagem.ms_help_desk.infra.adapters.feignservices.MsPersistenceFeignClientService;
 import br.com.copyimagem.ms_help_desk.infra.repositories.TicketRepository;
+import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 
 public class TicketServiceImpl implements TicketService {
 
-    private TicketRepository ticketRepository;
+    private final TicketRepository ticketRepository;
 
-    public TicketServiceImpl(TicketRepository ticketRepository) {
+    private final ConvertEntityAndDTOService convertEntityAndDTOService;
+
+    private final MsPersistenceFeignClientService msPersistenceFeignClientService;
+
+    public TicketServiceImpl( TicketRepository ticketRepository, ConvertEntityAndDTOService convertEntityAndDTOService, MsPersistenceFeignClientService msPersistenceFeignClientService ) {
+
         this.ticketRepository = ticketRepository;
-    }
-
-    @Override
-    public TicketDTO createTicket( TicketDTO ticket ) {
-
-        return ticketRepository.save( ticket );
+        this.convertEntityAndDTOService = convertEntityAndDTOService;
+        this.msPersistenceFeignClientService = msPersistenceFeignClientService;
     }
 
     @Override
@@ -78,13 +85,13 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public List< TicketDTO > getTicketsByStatus( TicketStatus status ) {
 
-        return ticketRepository.findByStatus( status );
+        return convertEntityAndDTOService.convertEntityListToDTOList( ticketRepository.findByStatus( status ) );
     }
 
     @Override
     public List< TicketDTO > getTicketsByType( TicketType type ) {
 
-        return ticketRepository.findByType( type );
+        return convertEntityAndDTOService.convertEntityListToDTOList( ticketRepository.findByType( type ) );
     }
 
 }
