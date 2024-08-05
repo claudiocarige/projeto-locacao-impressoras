@@ -1,6 +1,6 @@
 package br.com.copyimagem.ms_help_desk.core.usecases.impl;
 
-import br.com.copyimagem.ms_help_desk.core.domain.dtos.CustomerResponseDTO;
+import br.com.copyimagem.ms_help_desk.core.domain.dtos.UserRequestDTO;
 import br.com.copyimagem.ms_help_desk.core.domain.dtos.TicketDTO;
 import br.com.copyimagem.ms_help_desk.core.domain.entities.Ticket;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketPriority;
@@ -10,12 +10,14 @@ import br.com.copyimagem.ms_help_desk.core.usecases.TicketService;
 import br.com.copyimagem.ms_help_desk.infra.adapters.feignservices.MsPersistenceFeignClientService;
 import br.com.copyimagem.ms_help_desk.infra.repositories.TicketRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 
+@Service
 public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
@@ -49,21 +51,23 @@ public class TicketServiceImpl implements TicketService {
     public TicketDTO createTicket( TicketDTO ticketDTO ) {
 
         ticketDTO.setId( null );
-        ResponseEntity< CustomerResponseDTO > customerResponseDTO =
+        ResponseEntity< UserRequestDTO > userRequestDTO =
                 msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getClientName() );
-        //TODO criar o serviço de Usuario para buscar o tecnico, por enquanto este customerResponseDTO02
-        ResponseEntity< CustomerResponseDTO > customerResponseDTO02 =
-                msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getClientName() );
+        //TODO criar o serviço de Usuario para buscar o tecnico, por enquanto este userRequestDTO02
+        ResponseEntity< UserRequestDTO > userRequestDTO02 =
+                msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getTechnicalName() );
 
-        if( customerResponseDTO.getBody() == null ) {
+        if( userRequestDTO.getBody() == null ) {
             throw new IllegalArgumentException( "Client not found" );
         }
-        if( customerResponseDTO02.getBody() == null ) {
+        if( userRequestDTO02.getBody() == null ) {
             throw new IllegalArgumentException( "Technical not found" );
         }
         Ticket ticket = convertEntityAndDTOService.convertDTOToEntity( ticketDTO );
-        ticket.setClient_id( customerResponseDTO.getBody().getId() );
-        ticket.setTechnical_id( customerResponseDTO02.getBody().getId() );
+        ticket.setClient_id( userRequestDTO.getBody().id() );
+        ticket.setTechnical_id( userRequestDTO02.getBody().id() );
+        ticket.setClientName( userRequestDTO.getBody().clientName() );
+        ticket.setTechnicalName( userRequestDTO02.getBody().clientName() );
         ticket.setStatus( TicketStatus.OPEN );
         if( ticket.getPriority() == null ) {
             ticket.setPriority( TicketPriority.LOW );
