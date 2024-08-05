@@ -8,7 +8,14 @@
         <option value="$PROJECT_DIR$/eurekaserver/pom.xml" />
         <option value="$PROJECT_DIR$/mscloudgateway/pom.xml" />
         <option value="$PROJECT_DIR$/msmonthlypayment/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-help-desk/pom.xml" />
+        <option value="$PROJECT_DIR$/lib-commons/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/lib-commons/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="zulu-17" project-jdk-type="JavaSDK">

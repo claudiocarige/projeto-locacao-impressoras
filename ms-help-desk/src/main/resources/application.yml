@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: ms-help-desk
+  profiles:
+    active: dev
+server:
+  port: 0
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_SERVER_HOST}:8761/eureka/
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}

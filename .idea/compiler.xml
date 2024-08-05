@@ -9,15 +9,20 @@
         <outputRelativeToContentRoot value="true" />
         <module name="eurekaserver" />
         <module name="mscloudgateway" />
+        <module name="ms-help-desk" />
         <module name="mspersistence" />
         <module name="msmonthlypayment" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="17" />
+    <bytecodeTargetLevel target="17">
+      <module name="lib-commons" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="eurekaserver" options="-parameters" />
+      <module name="lib-commons" options="-parameters" />
+      <module name="ms-help-desk" options="-parameters" />
       <module name="mscloudgateway" options="-parameters" />
       <module name="msmonthlypayment" options="-parameters" />
       <module name="mspersistence" options="-parameters" />
