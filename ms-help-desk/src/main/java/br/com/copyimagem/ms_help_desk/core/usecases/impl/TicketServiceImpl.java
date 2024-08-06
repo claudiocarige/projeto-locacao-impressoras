@@ -6,6 +6,8 @@ import br.com.copyimagem.ms_help_desk.core.domain.entities.Ticket;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketPriority;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketStatus;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketType;
+import br.com.copyimagem.ms_help_desk.core.exceptions.IllegalArgumentException;
+import br.com.copyimagem.ms_help_desk.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.ms_help_desk.core.usecases.TicketService;
 import br.com.copyimagem.ms_help_desk.infra.adapters.feignservices.MsPersistenceFeignClientService;
 import br.com.copyimagem.ms_help_desk.infra.repositories.TicketRepository;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
 @Service
@@ -58,10 +59,10 @@ public class TicketServiceImpl implements TicketService {
                 msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getTechnicalName() );
 
         if( userRequestDTO.getBody() == null ) {
-            throw new IllegalArgumentException( "Client not found" );
+            throw new IllegalArgumentException( "Client cannot be null or empty" );
         }
         if( userRequestDTO02.getBody() == null ) {
-            throw new IllegalArgumentException( "Technical not found" );
+            throw new IllegalArgumentException( "Technical cannot be null or empty" );
         }
         Ticket ticket = convertEntityAndDTOService.convertDTOToEntity( ticketDTO );
         ticket.setClient_id( userRequestDTO.getBody().id() );
