@@ -148,7 +148,7 @@ class Customer {
         - LocalDate expirationDate
         - LocalDate paymentDate
         - PaymentStatus paymentStatus
-        - Customer customer
+        - Long customerId
     }
 
     Customer <|-- LegalPersonalCustomer
