@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 
 @Getter
 @Setter
@@ -25,11 +27,11 @@ public class TicketDTO {
 
     private String type;
 
-    private String createdAt;
+    private LocalDateTime createdAt;
 
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 
-    private String closedAt;
+    private LocalDateTime closedAt;
 
     @NotNull( message = "Client name is required" )
     private String clientName;
