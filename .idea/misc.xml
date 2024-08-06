@@ -10,11 +10,13 @@
         <option value="$PROJECT_DIR$/msmonthlypayment/pom.xml" />
         <option value="$PROJECT_DIR$/ms-help-desk/pom.xml" />
         <option value="$PROJECT_DIR$/lib-commons/pom.xml" />
+        <option value="$PROJECT_DIR$/shared-lib-module/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/lib-commons/pom.xml" />
+        <option value="$PROJECT_DIR$/shared-lib-module/pom.xml" />
       </set>
     </option>
   </component>
