@@ -1,16 +1,19 @@
 package br.com.copyimagem.ms_help_desk.core.usecases.impl;
 
+import br.com.copyimagem.ms_help_desk.core.domain.dtos.ResultFeignClient;
 import br.com.copyimagem.ms_help_desk.core.domain.dtos.UserRequestDTO;
 import br.com.copyimagem.ms_help_desk.core.domain.dtos.TicketDTO;
 import br.com.copyimagem.ms_help_desk.core.domain.entities.Ticket;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketPriority;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketStatus;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketType;
+import br.com.copyimagem.ms_help_desk.core.exceptions.CustomFeignException;
 import br.com.copyimagem.ms_help_desk.core.exceptions.IllegalArgumentException;
 import br.com.copyimagem.ms_help_desk.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.ms_help_desk.core.usecases.TicketService;
 import br.com.copyimagem.ms_help_desk.infra.adapters.feignservices.MsPersistenceFeignClientService;
 import br.com.copyimagem.ms_help_desk.infra.repositories.TicketRepository;
+import feign.FeignException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -51,12 +54,42 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketDTO createTicket( TicketDTO ticketDTO ) {
 
-        ticketDTO.setId( null );
-        ResponseEntity< UserRequestDTO > userRequestDTO =
-                msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getClientName() );
+        final ResultFeignClient resultFeignClient = getResult( ticketDTO );
+        Ticket ticket = convertEntityAndDTOService.convertDTOToEntity( ticketDTO );
+        ticket.setClient_id( resultFeignClient.client().getBody().id() );
+        ticket.setTechnical_id( resultFeignClient.technical().getBody().id() );
+        ticket.setClientName( resultFeignClient.client().getBody().clientName() );
+        ticket.setTechnicalName( resultFeignClient.technical().getBody().clientName() );
+        ticket.setStatus( TicketStatus.OPEN );
+        if( ticket.getPriority() == null ) {
+            ticket.setPriority( TicketPriority.LOW );
+        }
+        ticket.setCreatedAt( LocalDateTime.now() );
+        return convertEntityAndDTOService.convertEntityToDTO( ticketRepository.save( ticket ) );
+    }
+
+    private ResultFeignClient getResult( TicketDTO ticketDTO ) {
+
+        ResponseEntity< UserRequestDTO > userRequestDTO02;
+        ResponseEntity< UserRequestDTO > userRequestDTO;
+        try {
+            userRequestDTO =
+                    msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getClientName() );
+        }catch ( FeignException.ServiceUnavailable ex){
+            throw new CustomFeignException( 503, "The service is currently unavailable. Please try again later." );
+        }catch ( FeignException.NotFound ex){
+            throw new CustomFeignException( 404, "Client not found: " + ticketDTO.getClientName() );
+        }
+
         //TODO criar o serviço de Usuario para buscar o tecnico, por enquanto este userRequestDTO02
-        ResponseEntity< UserRequestDTO > userRequestDTO02 =
+        try{
+        userRequestDTO02 =
                 msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getTechnicalName() );
+        }catch ( FeignException.ServiceUnavailable ex){
+            throw new CustomFeignException( 503, "The service is currently unavailable. Please try again later." );
+        }catch ( FeignException.NotFound ex){
+            throw new CustomFeignException( 404, "Technical not found: " + ticketDTO.getTechnicalName() );
+        }
 
         if( userRequestDTO.getBody() == null ) {
             throw new IllegalArgumentException( "Client cannot be null or empty" );
@@ -64,17 +97,7 @@ public class TicketServiceImpl implements TicketService {
         if( userRequestDTO02.getBody() == null ) {
             throw new IllegalArgumentException( "Technical cannot be null or empty" );
         }
-        Ticket ticket = convertEntityAndDTOService.convertDTOToEntity( ticketDTO );
-        ticket.setClient_id( userRequestDTO.getBody().id() );
-        ticket.setTechnical_id( userRequestDTO02.getBody().id() );
-        ticket.setClientName( userRequestDTO.getBody().clientName() );
-        ticket.setTechnicalName( userRequestDTO02.getBody().clientName() );
-        ticket.setStatus( TicketStatus.OPEN );
-        if( ticket.getPriority() == null ) {
-            ticket.setPriority( TicketPriority.LOW );
-        }
-        ticket.setCreatedAt( LocalDateTime.now() );
-        return convertEntityAndDTOService.convertEntityToDTO( ticketRepository.save( ticket ) );
+        return new ResultFeignClient( userRequestDTO, userRequestDTO02 );
     }
 
     @Override
