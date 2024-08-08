@@ -76,9 +76,9 @@ public class TicketServiceImpl implements TicketService {
             userRequestDTO =
                     msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getClientName() );
         }catch ( FeignException.ServiceUnavailable ex){
-            throw new CustomFeignException( 503, "The service is currently unavailable. Please try again later." );
+            throw new CustomFeignException( "The service is currently unavailable. Please try again later.", 503 );
         }catch ( FeignException.NotFound ex){
-            throw new CustomFeignException( 404, "Client not found: " + ticketDTO.getClientName() );
+            throw new CustomFeignException( "Customer not found: " + ticketDTO.getClientName().toUpperCase() + " does not exist in the database ", 404 );
         }
 
         //TODO criar o serviço de Usuario para buscar o tecnico, por enquanto este userRequestDTO02
@@ -86,9 +86,9 @@ public class TicketServiceImpl implements TicketService {
         userRequestDTO02 =
                 msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getTechnicalName() );
         }catch ( FeignException.ServiceUnavailable ex){
-            throw new CustomFeignException( 503, "The service is currently unavailable. Please try again later." );
+            throw new CustomFeignException( "The service is currently unavailable. Please try again later.", 503 );
         }catch ( FeignException.NotFound ex){
-            throw new CustomFeignException( 404, "Technical not found: " + ticketDTO.getTechnicalName() );
+            throw new CustomFeignException("Technical not found: " + ticketDTO.getTechnicalName().toUpperCase()  + " does not exist in the database ", 404 );
         }
 
         if( userRequestDTO.getBody() == null ) {
