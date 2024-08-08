@@ -1,6 +1,7 @@
 package br.com.copyimagem.ms_help_desk.core.usecases.impl;
 
 import br.com.copyimagem.ms_help_desk.core.domain.dtos.TicketDTO;
+import br.com.copyimagem.ms_help_desk.core.domain.dtos.UserRequestDTO;
 import br.com.copyimagem.ms_help_desk.core.domain.entities.Ticket;
 import br.com.copyimagem.ms_help_desk.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.ms_help_desk.infra.adapters.feignservices.MsPersistenceFeignClientService;
@@ -12,12 +13,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith( MockitoExtension.class)
@@ -68,12 +72,34 @@ class TicketServiceImplTest {
     }
 
     @Test
-    void getAllTickets() {
-
+    @DisplayName("Should return a list of ticketDTO.")
+    void shouldReturnAListOfTicketDTO() {
+        when(ticketRepository.findAll()).thenReturn( List.of(ticket));
+        when(convertEntityAndDTOService.convertEntityListToDTOList(List.of(ticket))).thenReturn(List.of(ticketDTO));
+        List<TicketDTO> result = ticketService.getAllTickets();
+        assertEquals( List.of(ticketDTO), result);
+        assertEquals( ticketDTO.getId(), result.get(0).getId());
     }
 
     @Test
-    void createTicket() {
+    @DisplayName( "Should create a ticket with success")
+    void shouldCreateATicketWithSuccess() {
+        ResponseEntity<UserRequestDTO> clientResponse = ResponseEntity.ok(new UserRequestDTO(1L, "Client Name"));
+        ResponseEntity<UserRequestDTO> technicalResponse = ResponseEntity.ok(new UserRequestDTO(2L, "Technical Name"));
+
+        when(msPersistenceFeignClientService.searchCustomerByParams("clientname", ticketDTO.getClientName())).thenReturn(clientResponse);
+        when(msPersistenceFeignClientService.searchCustomerByParams("clientname", ticketDTO.getTechnicalName())).thenReturn(technicalResponse);
+        when(convertEntityAndDTOService.convertDTOToEntity(ticketDTO)).thenReturn(ticket);
+        when(ticketRepository.save(ticket)).thenReturn(ticket);
+        when(convertEntityAndDTOService.convertEntityToDTO(ticket)).thenReturn(ticketDTO);
+        TicketDTO result = ticketService.createTicket(ticketDTO);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals("Client Name", result.getClientName());
+
+        verify(msPersistenceFeignClientService, times(1)).searchCustomerByParams("clientname", "Client Name");
+        verify(msPersistenceFeignClientService, times(1)).searchCustomerByParams("clientname", "Technical Name");
 
     }
 
