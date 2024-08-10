@@ -17,8 +17,8 @@ public interface TicketService {
 
     void deleteTicket( Long id );
 
-    List< TicketDTO > getTicketsByStatus( TicketStatus status );
+    void updateTicketsByStatus( Long id, TicketStatus status );
 
-    List< TicketDTO > getTicketsByType( TicketType type );
+    void updateTicketsByType( Long id, TicketType type );
 
 }
