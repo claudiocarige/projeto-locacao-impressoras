@@ -36,6 +36,19 @@ services:
     networks:
       - network-ms-copyimagem
 
+  ms-help-desk:
+    build:
+      context: ./ms-help-desk
+    image: ms-help-desk-image
+    container_name: ms-help-desk-container
+    depends_on:
+      - eurekaserver
+      - mspersistence
+    environment:
+      - EUREKA_SERVER_HOST=ms-eurekaserver-container
+    networks:
+      - network-ms-copyimagem
+
   mscloudgateway:
     build:
       context: ./mscloudgateway
@@ -45,6 +58,7 @@ services:
       - eurekaserver
       - mspersistence
       - msmonthlypayment
+      - ms-help-desk
     ports:
       - "8080:8080"
     environment:
