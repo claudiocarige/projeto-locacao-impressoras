@@ -111,13 +111,33 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public List< TicketDTO > getTicketsByStatus( TicketStatus status ) {
+    public void updateTicketsByStatus( Long id, TicketStatus status ) {
 
-        return convertEntityAndDTOService.convertEntityListToDTOList( ticketRepository.findByStatus( status ) );
+        String dataField = "";
+        if( status == null ) {
+            throw new IllegalArgumentException( "Status cannot be null or empty" );
+        }
+        if( status.equals( TicketStatus.IN_PROGRESS ) ) {
+            dataField = "updatedAt";
+        } else if( status.equals( TicketStatus.CLOSED ) ) {
+            dataField = "closedAt";
+        }
+
+        int row = ticketRepository.updateStatusById( id, status.toString(), dataField );
+        if( row == 0 ) {
+            throw new IllegalArgumentException( "Unable to update the Ticket" );
+        }
     }
 
     @Override
-    public List< TicketDTO > getTicketsByType( TicketType type ) {
+    public void updateTicketsByType( Long id, TicketType type ) {
+
+        LocalDateTime dataNow = LocalDateTime.now();
+        int row = ticketRepository.updateTypeById( id, type, dataNow );
+        if( row == 0 ) {
+            throw new IllegalArgumentException( "Unable to update the Ticket" );
+        }
+    }
 
         return convertEntityAndDTOService.convertEntityListToDTOList( ticketRepository.findByType( type ) );
     }
