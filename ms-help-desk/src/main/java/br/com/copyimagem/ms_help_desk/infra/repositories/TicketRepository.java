@@ -32,4 +32,10 @@ public interface TicketRepository extends JpaRepository< Ticket, Long > {
                         @Param( "dataField") String dataField);
 
 
+    @Transactional
+    @Modifying
+    @Query( "UPDATE Ticket t SET t.priority = :priority, t.updatedAt = :updatedAt WHERE t.id = :id" )
+    int updatePriorityById( @Param( "id" ) Long id,
+                          @Param( "priority" ) TicketPriority priority,
+                          @Param( "updatedAt" ) LocalDateTime updatedAt );
 }

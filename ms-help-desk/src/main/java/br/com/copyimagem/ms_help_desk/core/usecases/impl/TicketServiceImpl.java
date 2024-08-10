@@ -139,7 +139,13 @@ public class TicketServiceImpl implements TicketService {
         }
     }
 
-        return convertEntityAndDTOService.convertEntityListToDTOList( ticketRepository.findByType( type ) );
+    public void updateTicketsByPriority( Long id, TicketPriority priority ) {
+
+        LocalDateTime dataNow = LocalDateTime.now();
+        int row = ticketRepository.updatePriorityById( id, priority, dataNow );
+        if( row == 0 ) {
+            throw new IllegalArgumentException( "Unable to update the Ticket" );
+        }
     }
 
 }
