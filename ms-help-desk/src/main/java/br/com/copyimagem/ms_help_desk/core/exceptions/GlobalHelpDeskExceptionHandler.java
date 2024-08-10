@@ -1,6 +1,5 @@
 package br.com.copyimagem.ms_help_desk.core.exceptions;
 
-import feign.FeignException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
