@@ -41,7 +41,7 @@ public class TicketServiceImpl implements TicketService {
     public TicketDTO getTicketById( Long id ) {
 
         Ticket ticket = ticketRepository.findById( id ).orElseThrow(
-                () -> new NoSuchElementException( "Ticket not found" ) );
+                                                             () -> new NoSuchElementException( "Ticket not found" ) );
         return convertEntityAndDTOService.convertEntityToDTO( ticket );
     }
 
@@ -75,28 +75,24 @@ public class TicketServiceImpl implements TicketService {
         try {
             userRequestDTO =
                     msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getClientName() );
-        }catch ( FeignException.ServiceUnavailable ex){
+        } catch( FeignException.ServiceUnavailable ex ) {
             throw new CustomFeignException( "The service is currently unavailable. Please try again later.", 503 );
-        }catch ( FeignException.NotFound ex){
-            throw new CustomFeignException( "Customer not found: " + ticketDTO.getClientName().toUpperCase() + " does not exist in the database ", 404 );
+        } catch( FeignException.NotFound ex ) {
+            throw new CustomFeignException( "Customer not found: " + ticketDTO.getClientName().toUpperCase() +
+                                            " does not exist in the database ", 404 );
         }
 
         //TODO criar o serviço de Usuario para buscar o tecnico, por enquanto este userRequestDTO02
-        try{
-        userRequestDTO02 =
-                msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getTechnicalName() );
-        }catch ( FeignException.ServiceUnavailable ex){
+        try {
+            userRequestDTO02 =
+                   msPersistenceFeignClientService.searchCustomerByParams( "clientname", ticketDTO.getTechnicalName() );
+        } catch( FeignException.ServiceUnavailable ex ) {
             throw new CustomFeignException( "The service is currently unavailable. Please try again later.", 503 );
-        }catch ( FeignException.NotFound ex){
-            throw new CustomFeignException("Technical not found: " + ticketDTO.getTechnicalName().toUpperCase()  + " does not exist in the database ", 404 );
+        } catch( FeignException.NotFound ex ) {
+            throw new CustomFeignException( "Technical not found: " + ticketDTO.getTechnicalName().toUpperCase() +
+                                            " does not exist in the database ", 404 );
         }
 
-        if( userRequestDTO.getBody() == null ) {
-            throw new IllegalArgumentException( "Client cannot be null or empty" );
-        }
-        if( userRequestDTO02.getBody() == null ) {
-            throw new IllegalArgumentException( "Technical cannot be null or empty" );
-        }
         return new ResultFeignClient( userRequestDTO, userRequestDTO02 );
     }
 
@@ -104,7 +100,7 @@ public class TicketServiceImpl implements TicketService {
     public void deleteTicket( Long id ) {
 
         TicketDTO ticketDTO = getTicketById( id );
-        if( !ticketDTO.getStatus().equals( "ERROR" ) ) {
+        if( ! ticketDTO.getStatus().equals( "ERROR" ) ) {
             throw new IllegalArgumentException( "Unable to delete the Ticket" );
         }
         ticketRepository.deleteById( id );
