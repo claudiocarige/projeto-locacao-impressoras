@@ -19,7 +19,10 @@ services:
     depends_on:
       - eurekaserver
     environment:
-      - EUREKA_SERVER_HOST=ms-eurekaserver-container
+      - EUREKA_SERVER_HOST=${EUREKA_SERVER_HOST}
+      - DATABASE_URL=${DATABASE_URL}
+      - DB_PASSWORD_POSTGRESQL=${DB_PASSWORD_POSTGRESQL}
+      - DB_USERNAME_POSTGRESQL=${DB_USERNAME_POSTGRESQL}
     networks:
       - network-ms-copyimagem
 
@@ -32,7 +35,10 @@ services:
       - eurekaserver
       - mspersistence
     environment:
-      - EUREKA_SERVER_HOST=ms-eurekaserver-container
+      - EUREKA_SERVER_HOST=${EUREKA_SERVER_HOST}
+      - DATABASE_URL=${DATABASE_URL}
+      - DB_PASSWORD_POSTGRESQL=${DB_PASSWORD_POSTGRESQL}
+      - DB_USERNAME_POSTGRESQL=${DB_USERNAME_POSTGRESQL}
     networks:
       - network-ms-copyimagem
 
@@ -45,7 +51,10 @@ services:
       - eurekaserver
       - mspersistence
     environment:
-      - EUREKA_SERVER_HOST=ms-eurekaserver-container
+      - EUREKA_SERVER_HOST=${EUREKA_SERVER_HOST}
+      - DATABASE_URL=${DATABASE_URL}
+      - DB_PASSWORD_POSTGRESQL=${DB_PASSWORD_POSTGRESQL}
+      - DB_USERNAME_POSTGRESQL=${DB_USERNAME_POSTGRESQL}
     networks:
       - network-ms-copyimagem
 
@@ -62,7 +71,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - EUREKA_SERVER_HOST=ms-eurekaserver-container
+      - EUREKA_SERVER_HOST=${EUREKA_SERVER_HOST}
     networks:
       - network-ms-copyimagem
 
