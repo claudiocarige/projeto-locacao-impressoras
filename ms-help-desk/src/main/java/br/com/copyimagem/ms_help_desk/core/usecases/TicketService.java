@@ -1,6 +1,7 @@
 package br.com.copyimagem.ms_help_desk.core.usecases;
 
 import br.com.copyimagem.ms_help_desk.core.domain.dtos.TicketDTO;
+import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketPriority;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketStatus;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketType;
 
@@ -20,5 +21,7 @@ public interface TicketService {
     void updateTicketsByStatus( Long id, TicketStatus status );
 
     void updateTicketsByType( Long id, TicketType type );
+
+    void updateTicketsByPriority( Long id, TicketPriority priority );
 
 }

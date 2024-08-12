@@ -40,9 +40,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketDTO getTicketById( Long id ) {
 
-        Ticket ticket = ticketRepository.findById( id ).orElseThrow(
-                                                             () -> new NoSuchElementException( "Ticket not found" ) );
-        return convertEntityAndDTOService.convertEntityToDTO( ticket );
+        return convertEntityAndDTOService.convertEntityToDTO( findById( id ) );
     }
 
     @Override
@@ -79,7 +77,7 @@ public class TicketServiceImpl implements TicketService {
             throw new CustomFeignException( "The service is currently unavailable. Please try again later.", 503 );
         } catch( FeignException.NotFound ex ) {
             throw new CustomFeignException( "Customer not found: " + ticketDTO.getClientName().toUpperCase() +
-                                            " does not exist in the database ", 404 );
+                    " does not exist in the database ", 404 );
         }
 
         //TODO criar o serviço de Usuario para buscar o tecnico, por enquanto este userRequestDTO02
@@ -109,38 +107,87 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public void updateTicketsByStatus( Long id, TicketStatus status ) {
 
-        String dataField = "";
-        if( status == null ) {
-            throw new IllegalArgumentException( "Status cannot be null or empty" );
-        }
-        if( status.equals( TicketStatus.IN_PROGRESS ) ) {
-            dataField = "updatedAt";
-        } else if( status.equals( TicketStatus.CLOSED ) ) {
-            dataField = "closedAt";
-        }
+        validateStatus( status );
+        Ticket ticket = findById( id );
+        isTicketClosed( ticket );
+        updateTimeStamps( status, ticket );
+        ticket.setStatus( status );
+        ticketRepository.save( ticket );
 
-        int row = ticketRepository.updateStatusById( id, status.toString(), dataField );
-        if( row == 0 ) {
-            throw new IllegalArgumentException( "Unable to update the Ticket" );
-        }
     }
 
     @Override
     public void updateTicketsByType( Long id, TicketType type ) {
 
-        LocalDateTime dataNow = LocalDateTime.now();
-        int row = ticketRepository.updateTypeById( id, type, dataNow );
-        if( row == 0 ) {
-            throw new IllegalArgumentException( "Unable to update the Ticket" );
+        validateType( type );
+        Ticket ticket = findById( id );
+        isTicketClosed( ticket );
+        ticket.setType( type );
+        ticket.setUpdatedAt( LocalDateTime.now() );
+        ticketRepository.save( ticket );
+
+    }
+
+    @Override
+    public void updateTicketsByPriority( Long id, TicketPriority priority ) {
+
+        validatePriority( priority );
+        Ticket ticket = findById( id );
+        isTicketClosed( ticket );
+        ticket.setPriority( priority );
+        ticket.setUpdatedAt( LocalDateTime.now() );
+        ticketRepository.save(  ticket );
+    }
+
+    private Ticket findById( Long id ) {
+
+        return ticketRepository.findById( id ).orElseThrow(
+                () -> new NoSuchElementException( "Ticket not found" ) );
+    }
+
+    private static void updateTimeStamps( TicketStatus status, Ticket ticket ) {
+
+        if( status.equals( TicketStatus.IN_PROGRESS ) ) {
+            ticket.setUpdatedAt( LocalDateTime.now() );
+        } else if( status.equals( TicketStatus.CLOSED ) ) {
+            ticket.setClosedAt( LocalDateTime.now() );
+        }
+
+    }
+
+    private static void isTicketClosed( Ticket ticket ) {
+
+        if( ticket.getStatus().equals( TicketStatus.CLOSED ) ) {
+            throw new IllegalArgumentException( "Ticket is already closed" );
         }
     }
 
-    public void updateTicketsByPriority( Long id, TicketPriority priority ) {
+    private static void validateStatus( TicketStatus status ) {
 
-        LocalDateTime dataNow = LocalDateTime.now();
-        int row = ticketRepository.updatePriorityById( id, priority, dataNow );
-        if( row == 0 ) {
-            throw new IllegalArgumentException( "Unable to update the Ticket" );
+        if( status != TicketStatus.OPEN &&
+            status != TicketStatus.IN_PROGRESS &&
+            status != TicketStatus.CLOSED &&
+            status != TicketStatus.ERROR ) {
+            throw new IllegalArgumentException( "Invalid status: " + status );
+        }
+    }
+
+    private static void validateType( TicketType type ) {
+
+        if( type != TicketType.TECHNICAL_VISIT &&
+            type != TicketType.REFILL &&
+            type != TicketType.TONER ) {
+            throw new IllegalArgumentException( "Invalid type: " + type );
+        }
+    }
+
+    private static void validatePriority( TicketPriority priority ) {
+
+        if( priority != TicketPriority.LOW &&
+            priority != TicketPriority.MEDIUM &&
+            priority != TicketPriority.HIGH &&
+            priority != TicketPriority.URGENT ) {
+            throw new IllegalArgumentException( "Invalid priority: " + priority );
         }
     }
 
