@@ -54,7 +54,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketDTO createTicket( TicketDTO ticketDTO ) {
 
-        final ResultFeignClient resultFeignClient = getResult( ticketDTO );
+        final ResultFeignClient resultFeignClient = callToFeignClient( ticketDTO );
         Ticket ticket = convertEntityAndDTOService.convertDTOToEntity( ticketDTO );
         ticket.setClient_id( resultFeignClient.client().getBody().id() );
         ticket.setTechnical_id( resultFeignClient.technical().getBody().id() );
@@ -68,7 +68,7 @@ public class TicketServiceImpl implements TicketService {
         return convertEntityAndDTOService.convertEntityToDTO( ticketRepository.save( ticket ) );
     }
 
-    private ResultFeignClient getResult( TicketDTO ticketDTO ) {
+    private ResultFeignClient callToFeignClient( TicketDTO ticketDTO ) {
 
         ResponseEntity< UserRequestDTO > userRequestDTO02;
         ResponseEntity< UserRequestDTO > userRequestDTO;
