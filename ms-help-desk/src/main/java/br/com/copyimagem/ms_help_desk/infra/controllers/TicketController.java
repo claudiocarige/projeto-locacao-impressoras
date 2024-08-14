@@ -1,6 +1,7 @@
 package br.com.copyimagem.ms_help_desk.infra.controllers;
 
 import br.com.copyimagem.ms_help_desk.core.domain.dtos.TicketDTO;
+import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketPriority;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketStatus;
 import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketType;
 import br.com.copyimagem.ms_help_desk.core.usecases.TicketService;
@@ -45,6 +46,13 @@ public class TicketController {
     public ResponseEntity<Void> updateStatus( @PathVariable Long id,
                                               @RequestParam("ticketStatus") TicketStatus ticketStatus ) {
         ticketService.updateTicketsByStatus( id, ticketStatus );
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping( "/update-priority/{id}" )
+    public ResponseEntity<Void> updatePriority( @PathVariable Long id,
+                                                @RequestParam("ticketPriority") TicketPriority ticketPriority ) {
+        ticketService.updateTicketsByPriority( id, ticketPriority );
         return ResponseEntity.noContent().build();
     }
 
