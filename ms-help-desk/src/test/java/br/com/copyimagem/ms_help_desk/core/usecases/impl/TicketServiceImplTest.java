@@ -4,6 +4,7 @@ import br.com.copyimagem.ms_help_desk.core.domain.dtos.TicketDTO;
 import br.com.copyimagem.ms_help_desk.core.domain.dtos.UserRequestDTO;
 import br.com.copyimagem.ms_help_desk.core.domain.entities.Ticket;
 import br.com.copyimagem.ms_help_desk.core.exceptions.CustomFeignException;
+import br.com.copyimagem.ms_help_desk.core.exceptions.IllegalArgumentException;
 import br.com.copyimagem.ms_help_desk.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.ms_help_desk.infra.adapters.feignservices.MsPersistenceFeignClientService;
 import br.com.copyimagem.ms_help_desk.infra.repositories.TicketRepository;
@@ -124,8 +125,27 @@ class TicketServiceImplTest {
     }
 
     @Test
-    void deleteTicket() {
+    @DisplayName("Should delete a ticket with success")
+    void shouldDeleteATicketWithSucess() {
+        ticketDTO.setStatus("ERROR");
+        when(ticketRepository.findById(1L)).thenReturn( Optional.of(ticket));
+        when(ticketService.getTicketById(1L)).thenReturn(ticketDTO);
+        ticketService.deleteTicket(1L);
+        verify(ticketRepository, times(1)).deleteById(1L);
 
+    }
+
+    @Test
+    @DisplayName("Should return a exception when ticket is not in error status")
+    void shouldReturnAExceptionWhenTicketIsNotInErrorStatus() {
+        ticketDTO.setStatus("OPEN");
+        when(ticketRepository.findById(1L)).thenReturn( Optional.of(ticket));
+        when(ticketService.getTicketById(1L)).thenReturn(ticketDTO);
+        IllegalArgumentException exception = assertThrows( IllegalArgumentException.class, () -> {
+
+            ticketService.deleteTicket(1L);
+        });
+        assertEquals("Unable to delete the Ticket", exception.getMessage());
     }
 
     @Test
