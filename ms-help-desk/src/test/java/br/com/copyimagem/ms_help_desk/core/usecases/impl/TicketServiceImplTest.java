@@ -161,6 +161,19 @@ class TicketServiceImplTest {
     }
 
     @Test
+    @DisplayName( "Should return a exception when status is Closed" )
+    void shouldReturnAExceptionWhenStatusIsClosed() {
+
+        ticket.setStatus( TicketStatus.CLOSED );
+        when( ticketRepository.findById( 1L ) ).thenReturn( Optional.of( ticket ) );
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> ticketService.updateTicketsByStatus( 1L, TicketStatus.CLOSED )
+        );
+        assertEquals( "Ticket is already closed", exception.getMessage() );
+        verify( ticketRepository, never() ).save( any( Ticket.class ) );
+    }
     void getTicketsByType() {
 
     }
