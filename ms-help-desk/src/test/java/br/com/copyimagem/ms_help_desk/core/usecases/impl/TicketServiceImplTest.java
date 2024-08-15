@@ -149,8 +149,15 @@ class TicketServiceImplTest {
     }
 
     @Test
-    void getTicketsByStatus() {
+    @DisplayName( "Should Update a Ticket Status" )
+    void shouldUpdateTicketStatus() {
 
+        when( ticketRepository.findById( 1L ) ).thenReturn( Optional.of( ticket ) );
+        ticketService.updateTicketsByStatus( 1L, TicketStatus.IN_PROGRESS );
+
+        assert ( ticket.getStatus().equals( TicketStatus.IN_PROGRESS ) );
+        assert ( ticket.getUpdatedAt() != null );
+        verify( ticketRepository, times( 1 ) ).save( ticket );
     }
 
     @Test
