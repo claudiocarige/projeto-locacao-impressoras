@@ -186,6 +186,18 @@ class TicketServiceImplTest {
 
     }
 
+    @Test
+    @DisplayName( "Should update a Ticket Priority" )
+    void shouldUpdateATicketsPriority() {
+
+        when( ticketRepository.findById( 1L ) ).thenReturn( Optional.of( ticket ) );
+        ticketService.updateTicketsByPriority( 1L, TicketPriority.HIGH );
+
+        assertEquals ( ticket.getPriority(), TicketPriority.HIGH  );
+        assertNotNull( ticket.getUpdatedAt() );
+        verify( ticketRepository, times( 1 ) ).save( ticket );
+    }
+
     void startEntities(){
         ticket = new Ticket();
         ticket.setId(1L);
