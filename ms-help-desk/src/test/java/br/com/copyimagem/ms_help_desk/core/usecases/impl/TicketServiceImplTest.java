@@ -174,7 +174,15 @@ class TicketServiceImplTest {
         assertEquals( "Ticket is already closed", exception.getMessage() );
         verify( ticketRepository, never() ).save( any( Ticket.class ) );
     }
-    void getTicketsByType() {
+
+    @Test
+    @DisplayName( "Should Update a Ticket Type" )
+    void shouldUpdateATicketsType() {
+        when( ticketRepository.findById( 1L ) ).thenReturn( Optional.of( ticket ) );
+        ticketService.updateTicketsByType( 1L, TicketType.REFILL );
+
+        assertEquals ( ticket.getType(), TicketType.REFILL  );
+        assertNotNull( ticket.getUpdatedAt() );
 
     }
 
