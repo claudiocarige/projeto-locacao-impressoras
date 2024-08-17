@@ -3,6 +3,7 @@ package br.com.copyimagem.mspersistence.infra.controllers;
 import br.com.copyimagem.mspersistence.core.domain.enums.MachineStatus;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
+import br.com.copyimagem.mspersistence.infra.controllers.impl.MultiPrinterControllerImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -30,7 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-class MultiPrinterControllerTest {
+class MultiPrinterControllerImplTest {
 
 
     private MultiPrinterDTO multiPrinterDTO;
@@ -41,12 +42,12 @@ class MultiPrinterControllerTest {
     private MultiPrinterService multiPrinterService;
 
     @InjectMocks
-    private MultiPrinterController multiPrinterController;
+    private MultiPrinterControllerImpl multiPrinterControllerImpl;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks( this );
-        mockMvc = MockMvcBuilders.standaloneSetup( multiPrinterController ).build();
+        mockMvc = MockMvcBuilders.standaloneSetup( multiPrinterControllerImpl ).build();
         start();
 
     }
@@ -56,7 +57,7 @@ class MultiPrinterControllerTest {
     void shouldReturnAListOfMultiPrinters() throws Exception {
 
         when( multiPrinterService.findAllMultiPrinters() ).thenReturn( List.of( multiPrinterDTO ) );
-        ResponseEntity< List< MultiPrinterDTO > > multiPrinterDTOList = multiPrinterController.findAllMultiPrinters();
+        ResponseEntity< List< MultiPrinterDTO > > multiPrinterDTOList = multiPrinterControllerImpl.findAllMultiPrinters();
         assertNotNull( multiPrinterDTOList );
         assertEquals( 1, Objects.requireNonNull( multiPrinterDTOList.getBody() ).size() );
         assertEquals( multiPrinterDTO, multiPrinterDTOList.getBody().get( 0 ) );
@@ -74,7 +75,7 @@ class MultiPrinterControllerTest {
     void shouldReturnAMultiPrinterById() throws Exception {
 
         when( multiPrinterService.findMultiPrinterById( 1 ) ).thenReturn( multiPrinterDTO );
-        ResponseEntity< MultiPrinterDTO > resultDTO = multiPrinterController.findMultiPrinterById( 1 );
+        ResponseEntity< MultiPrinterDTO > resultDTO = multiPrinterControllerImpl.findMultiPrinterById( 1 );
         assertNotNull( resultDTO );
         assertEquals( multiPrinterDTO, resultDTO.getBody() );
 
@@ -92,7 +93,7 @@ class MultiPrinterControllerTest {
 
         when( multiPrinterService.findAllMultiPrintersByCustomerId( 1L ) )
                                                                             .thenReturn( List.of( multiPrinterDTO ) );
-        ResponseEntity< List< MultiPrinterDTO > > resultDTO = multiPrinterController
+        ResponseEntity< List< MultiPrinterDTO > > resultDTO = multiPrinterControllerImpl
                                                                               .findAllMultiPrintersByCustomerId( 1L );
         assertNotNull( resultDTO );
         assertEquals( 1, Objects.requireNonNull( resultDTO.getBody() ).size() );
@@ -134,7 +135,7 @@ class MultiPrinterControllerTest {
         when( multiPrinterService.setUpClientOnAMultiPrinter( 1, 1L ) ).thenReturn( multiPrinterDTO );
 
         ResponseEntity< MultiPrinterDTO > multiPrinterDTOResponse =
-                                              multiPrinterController.setUpClientOnAMultiPrinter( 1, 1L );
+                                              multiPrinterControllerImpl.setUpClientOnAMultiPrinter( 1, 1L );
         assertNotNull( multiPrinterDTOResponse );
         assertEquals( multiPrinterDTO, multiPrinterDTOResponse.getBody() );
         mockMvc.perform( patch( "/api/v1/multi-printer/set-customer?id=1&customerId=1" ) )
@@ -146,7 +147,7 @@ class MultiPrinterControllerTest {
     @DisplayName( "Should un set up a customer from a MultiPrinter by id" )
     void shouldUnSetUpACustomerFromAMultiPrinterById() throws Exception {
 
-        ResponseEntity<Void> response = multiPrinterController.unSetUpCustomerFromMultiPrinterById(1);
+        ResponseEntity<Void> response = multiPrinterControllerImpl.unSetUpCustomerFromMultiPrinterById(1);
         verify(multiPrinterService).unSetUpCustomerFromMultiPrinterById(1);
         assertThat(response.getStatusCode()).isEqualTo( HttpStatus.NO_CONTENT);
 
@@ -161,7 +162,7 @@ class MultiPrinterControllerTest {
         when( multiPrinterService.setMachineStatus( 1, MachineStatus.LOCADA.toString() ) )
                                                                                         .thenReturn( multiPrinterDTO );
         ResponseEntity< MultiPrinterDTO > multiPrinterDTOResponse =
-                multiPrinterController.setMachineStatus( 1, MachineStatus.LOCADA.toString() );
+                multiPrinterControllerImpl.setMachineStatus( 1, MachineStatus.LOCADA.toString() );
         assertNotNull( multiPrinterDTOResponse );
         assertEquals( multiPrinterDTO, multiPrinterDTOResponse.getBody() );
         mockMvc.perform(patch("/api/v1/multi-printer/status")
@@ -181,7 +182,7 @@ class MultiPrinterControllerTest {
         when( multiPrinterService.setImpressionCounter( 1, 1000, "impressionCounterInitial" ) )
                                                                                         .thenReturn( multiPrinterDTO );
         ResponseEntity< MultiPrinterDTO > multiPrinterDTOResponse =
-                multiPrinterController.setImpressionCounter( 1, 1000, "impressionCounterInitial" );
+                multiPrinterControllerImpl.setImpressionCounter( 1, 1000, "impressionCounterInitial" );
         assertNotNull( multiPrinterDTOResponse );
         assertEquals( multiPrinterDTO, multiPrinterDTOResponse.getBody() );
 
@@ -202,7 +203,7 @@ class MultiPrinterControllerTest {
     @DisplayName( "Should delete a MultiPrinter" )
     void shouldDeleteAMultiPrinter() throws Exception {
 
-        ResponseEntity<Void> response = multiPrinterController.deleteMultiPrinter(1);
+        ResponseEntity<Void> response = multiPrinterControllerImpl.deleteMultiPrinter(1);
         verify(multiPrinterService).deleteMultiPrinter(1);
         assertThat(response.getStatusCode()).isEqualTo( HttpStatus.NO_CONTENT);
         mockMvc.perform( delete( "/api/v1/multi-printer/{id}", 1 ) )
