@@ -129,18 +129,15 @@ public class MsMonthlyPaymentServiceImpl implements MsMonthlyPaymentService {
     }
     private List< MonthlyPayment> ifAttributeAndValue( String attribute, String valueAttribute ) {
 
-        if( attribute.equals( "monthPayment" ) || attribute.equals( "yearPayment" ) ) {
-            return msMonthlyPaymentRepository
+        return switch( attribute ) {
+            case "monthPayment", "yearPayment" -> msMonthlyPaymentRepository
                     .findMonthlyPaymentByAttributeAndValue( attribute, Integer.valueOf( valueAttribute ) );
-        } else if( attribute.equals( "paymentStatus" ) ) {
-            return msMonthlyPaymentRepository
+            case "paymentStatus" -> msMonthlyPaymentRepository
                     .findMonthlyPaymentByAttributeAndValue( attribute, PaymentStatus.valueOf( valueAttribute ) );
-        } else if( attribute.equals( "excessValuePrintsPB" ) ) {
-            return msMonthlyPaymentRepository
+            case "excessValuePrintsPB" -> msMonthlyPaymentRepository
                     .findMonthlyPaymentByAttributeAndValue( attribute, Double.valueOf( valueAttribute ) );
-        } else {
-            throw new IllegalArgumentException( "Invalid attribute: " + attribute );
-        }
+            default -> throw new IllegalArgumentException( "Invalid attribute: " + attribute );
+        };
     }
 
     public int sumQuantityPrints(MultiPrinterDTO multiPrinterDTO) {
