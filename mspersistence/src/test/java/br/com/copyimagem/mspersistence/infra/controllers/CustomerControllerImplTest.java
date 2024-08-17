@@ -4,6 +4,7 @@ import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
+import br.com.copyimagem.mspersistence.infra.controllers.impl.CustomerControllerImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,13 +57,13 @@ class CustomerControllerImplTest {
     private MockMvc mockMvc;
 
     @InjectMocks
-    private CustomerController customerController;
+    private CustomerControllerImpl customerControllerImpl;
 
     @BeforeEach
     void setUp() {
 
         MockitoAnnotations.openMocks( this );
-        mockMvc = MockMvcBuilders.standaloneSetup( customerController ).build();
+        mockMvc = MockMvcBuilders.standaloneSetup( customerControllerImpl ).build();
         start();
     }
 
@@ -98,7 +99,7 @@ class CustomerControllerImplTest {
 
         when( customerService.searchAllCustomers() ).thenReturn( List.of( customerResponseDTO ) );
 
-        ResponseEntity< List< CustomerResponseDTO > > responseEntity = customerController.searchAllCustomers();
+        ResponseEntity< List< CustomerResponseDTO > > responseEntity = customerControllerImpl.searchAllCustomers();
         assertEquals( HttpStatus.OK, responseEntity.getStatusCode() );
         assertEquals( CustomerResponseDTO.class, Objects.requireNonNull( responseEntity.getBody() )
                                                                                               .get( 0 ).getClass() );
@@ -120,7 +121,7 @@ class CustomerControllerImplTest {
         String situation = "PAGO";
         when( customerService.searchFinancialSituation( situation ) ).thenReturn( List.of( customerResponseDTO ) );
         ResponseEntity< List< CustomerResponseDTO > > responseEntity =
-                                                             customerController.searchFinancialSituation( situation );
+                                                             customerControllerImpl.searchFinancialSituation( situation );
         assertEquals( HttpStatus.OK, responseEntity.getStatusCode() );
         assertEquals( CustomerResponseDTO.class,
                                              Objects.requireNonNull( responseEntity.getBody() ).get( 0 ).getClass() );
@@ -139,7 +140,7 @@ class CustomerControllerImplTest {
 
         String situation = "INVALID";
         IllegalArgumentException exception = assertThrows( IllegalArgumentException.class,
-                                                     () -> customerController.searchFinancialSituation( situation ) );
+                                                     () -> customerControllerImpl.searchFinancialSituation( situation ) );
         assertEquals( "The argument is not correct", exception.getMessage() );
         verify( customerService, never() ).searchFinancialSituation( situation );
     }
@@ -150,7 +151,7 @@ class CustomerControllerImplTest {
 
         when( customerService.updateCustomerAttribute( CNPJ_PARAM, CPF_OR_CNPJ, 1L ) ).thenReturn( updateCustomerDTO );
         ResponseEntity< UpdateCustomerDTO > responseEntity =
-                customerController.updateCustomerAttribute( CNPJ_PARAM, CPF_OR_CNPJ, 1L );
+                customerControllerImpl.updateCustomerAttribute( CNPJ_PARAM, CPF_OR_CNPJ, 1L );
         assertEquals( HttpStatus.OK, responseEntity.getStatusCode() );
         assertEquals( UpdateCustomerDTO.class, Objects.requireNonNull( responseEntity.getBody() ).getClass() );
         assertEquals( customerResponseDTO.getId(), responseEntity.getBody().getId() );
