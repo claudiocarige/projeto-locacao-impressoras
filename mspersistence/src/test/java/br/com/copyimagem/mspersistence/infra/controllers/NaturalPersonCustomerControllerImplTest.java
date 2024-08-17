@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-class NaturalPersonCustomerControllerTest {
+class NaturalPersonCustomerControllerImplTest {
 
     public static final long ID1L = 1L;
 

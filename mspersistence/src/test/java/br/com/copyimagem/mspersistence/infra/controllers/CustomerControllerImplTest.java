@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 
-class CustomerControllerTest {
+class CustomerControllerImplTest {
 
     public static final String CUSTOMER_NOT_FOUND = "Customer not found";
 
