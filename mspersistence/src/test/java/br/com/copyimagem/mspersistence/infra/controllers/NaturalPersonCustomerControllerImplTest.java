@@ -4,6 +4,7 @@ import br.com.copyimagem.mspersistence.core.domain.builders.NaturalPersonCustome
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.NaturalPersonCustomerDTO;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.NaturalPersonCustomerService;
+import br.com.copyimagem.mspersistence.infra.controllers.impl.NaturalPersonCustomerControllerImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ class NaturalPersonCustomerControllerImplTest {
     private NaturalPersonCustomerService naturalPersonCustomerService;
 
     @InjectMocks
-    private NaturalPersonCustomerController naturalPersonCustomerController;
+    private NaturalPersonCustomerControllerImpl naturalPersonCustomerControllerImpl;
 
     private MockMvc mockMvc;
 
@@ -48,7 +49,7 @@ class NaturalPersonCustomerControllerImplTest {
     void setUp() {
 
         MockitoAnnotations.openMocks( this );
-        mockMvc = MockMvcBuilders.standaloneSetup( naturalPersonCustomerController ).build();
+        mockMvc = MockMvcBuilders.standaloneSetup( naturalPersonCustomerControllerImpl ).build();
         start();
     }
 
@@ -56,7 +57,7 @@ class NaturalPersonCustomerControllerImplTest {
     @DisplayName("Should return a list of NaturalPersonCustomers")
     void shouldReturnAListOfNaturalPersonCustomers() throws Exception {
         when(naturalPersonCustomerService.findAllNaturalPersonCustomer()).thenReturn( List.of(customerPfDTO));
-        ResponseEntity<List<NaturalPersonCustomerDTO>> allNaturalPersonCustomers = naturalPersonCustomerController
+        ResponseEntity<List<NaturalPersonCustomerDTO>> allNaturalPersonCustomers = naturalPersonCustomerControllerImpl
                 .getAllNaturalPersonCustomers();
         assertNotNull(allNaturalPersonCustomers);
         mockMvc.perform(get("/api/v1/customers/pf/all")
