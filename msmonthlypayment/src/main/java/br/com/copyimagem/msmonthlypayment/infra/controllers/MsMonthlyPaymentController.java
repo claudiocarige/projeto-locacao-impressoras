@@ -21,4 +21,7 @@ public interface MsMonthlyPaymentController {
     ResponseEntity< MonthlyPaymentDTO > createMonthlyPayment(
                                                           @RequestBody MonthlyPaymentRequest monthlyPaymentRequest );
 
+    @GetMapping( "/{id}" )
+    ResponseEntity< MonthlyPaymentDTO > getMonthlyPaymentById( @PathVariable Long id );
+
 }

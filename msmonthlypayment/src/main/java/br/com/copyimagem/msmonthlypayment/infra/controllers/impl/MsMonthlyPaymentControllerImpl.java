@@ -44,4 +44,9 @@ public class MsMonthlyPaymentControllerImpl implements MsMonthlyPaymentControlle
         return ResponseEntity.ok().body( monthlyPaymentService.createMonthlyPayment( monthlyPaymentRequest ) );
     }
 
+    @Override
+    public ResponseEntity< MonthlyPaymentDTO > getMonthlyPaymentById( @PathVariable Long id ) {
+        return ResponseEntity.ok().body( monthlyPaymentService.findMonthlyPaymentById( id ) );
+    }
+
 }
