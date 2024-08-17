@@ -4,6 +4,7 @@ import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustome
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.LegalPersonalCustomerService;
+import br.com.copyimagem.mspersistence.infra.controllers.impl.LegalPersonalCustomerControllerImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,7 @@ class LegalPersonalCustomerControllerImplTest {
     private LegalPersonalCustomerService legalPersonalCustomerService;
 
     @InjectMocks
-    private LegalPersonalCustomerController LegalPersonalCustomerController;
+    private LegalPersonalCustomerControllerImpl LegalPersonalCustomerControllerImpl;
 
     private MockMvc mockMvc;
 
@@ -49,7 +50,7 @@ class LegalPersonalCustomerControllerImplTest {
     void setUp() {
 
         MockitoAnnotations.openMocks( this );
-        mockMvc = MockMvcBuilders.standaloneSetup( LegalPersonalCustomerController ).build();
+        mockMvc = MockMvcBuilders.standaloneSetup( LegalPersonalCustomerControllerImpl ).build();
         start();
     }
 
@@ -57,7 +58,7 @@ class LegalPersonalCustomerControllerImplTest {
     @DisplayName("Should return a list of LegalPersonalCustomers")
     void shouldReturnAListOfLegalPersonalCustomers() throws Exception {
         when(legalPersonalCustomerService.findAllLegalPersonalCustomer()).thenReturn( List.of(customerPjDTO));
-        ResponseEntity<List<LegalPersonalCustomerDTO>> allLegalPersonalCustomerDTOs = LegalPersonalCustomerController
+        ResponseEntity<List<LegalPersonalCustomerDTO>> allLegalPersonalCustomerDTOs = LegalPersonalCustomerControllerImpl
                 .getAllLegalPersonalCustomers();
         assertNotNull(allLegalPersonalCustomerDTOs);
         mockMvc.perform(get("/api/v1/customers/pj/all")
@@ -91,9 +92,9 @@ class LegalPersonalCustomerControllerImplTest {
                 .thenThrow(new NoSuchElementException("Customer not found"));
 
         assertThrows(NoSuchElementException.class,
-                () ->  LegalPersonalCustomerController.getLegalPersonalCustomerById(ID1L));
+                () ->  LegalPersonalCustomerControllerImpl.getLegalPersonalCustomerById(ID1L));
         String legalPersonalCustomerById = assertThrows(NoSuchElementException.class,
-                () -> LegalPersonalCustomerController.getLegalPersonalCustomerById(ID1L)).getMessage();
+                () -> LegalPersonalCustomerControllerImpl.getLegalPersonalCustomerById(ID1L)).getMessage();
         assertEquals("Customer not found", legalPersonalCustomerById);
         verify(legalPersonalCustomerService, times(2)).findLegalPersonalCustomerById(ID1L);
     }
