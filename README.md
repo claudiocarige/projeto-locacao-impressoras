@@ -4,8 +4,11 @@
 
 O objetivo principal do Projeto COPY IMAGEM é solucionar os desafios enfrentados no controle de
 informações nas locações de impressoras pela empresa Copyimagem, visando uma gestão mais eficaz e transparente.
- Iremos desenvolver e implementar uma APIRest para o backend com uma arquitetura de software robusta e escalável para a aplicação CopyImagem. Faremos uso de
-tecnologias avançadas como Java, Spring Boot e PostgreSQL para garantir um sistema eficiente e seguro. Adotaremos a
+Iremos desenvolver e implementar uma APIRest para o backend com uma arquitetura de software robusta e escalável para a
+aplicação CopyImagem. Faremos uso de
+tecnologias avançadas como Java, Spring Boot e PostgreSQL para garantir um sistema eficiente e seguro. O Docker e o
+Docker Compose serão utilizados para containerização e orquestração dos serviços, facilitando o gerenciamento de
+dependências e a consistência dos ambientes de desenvolvimento e produção. Além disso, adotaremos a
 prática de Desenvolvimento Orientado a Testes (TDD) para garantir a qualidade do código e a robustez das funcionalidades
 implementadas.
 Nosso foco primário é garantir a eficiência, segurança e manutenibilidade do sistema, proporcionando uma experiência
@@ -14,11 +17,13 @@ clientes, máquinas, mensalidades e controle de chamados para manutenção das m
 
 ### 1. Visão Geral da Arquitetura
 
-A arquitetura da aplicação seguirá o padrão composto de camadas distintas para facilitar a manutenção e escalabilidade.
+A arquitetura da aplicação seguirá a arquitetura baseada em Microserviço para facilitar a manutenção e escalabilidade.
+Cada aplicação será dividida em duas camadas principais: CORE e INFRA.
 
 #### 1. Camada CORE da aplicação:
 
-- Utilizará o Spring MVC para lidar com as requisições HTTP.
+- Responsável por implementar a lógica de negócios da aplicação.
+- Utilizará o Spring Boot para criar serviços transacionais e MVC para lidar com as requisições HTTP.
 - Autenticação e autorização serão gerenciadas pelo Spring Security, utilizando JWT para token de autenticação.
 - A documentação da API será gerada automaticamente pelo Swagger/OpenAPI.
 
@@ -41,7 +46,8 @@ A arquitetura da aplicação seguirá o padrão composto de camadas distintas pa
 
 ##### d. Camada DTO (representationDTO):
 
-- Esta camada terá a responsabilidade de transferir os dados entre as camadas da aplicação, sobretudo quando são expostas para o externo.
+- Esta camada terá a responsabilidade de transferir os dados entre as camadas da aplicação, sobretudo quando são
+  expostas para o externo.
 
 #### 2. Camada INFRA da aplicação:
 
@@ -51,22 +57,33 @@ A arquitetura da aplicação seguirá o padrão composto de camadas distintas pa
 
 ##### b. Camada Adapter (adapter):
 
-
 ##### c. Camada de Controle (controllers):
 
-- Será responsável por receber as entradas dos usuários, coordenar as ações necessárias e chamar os casos de uso (use cases) apropriados.
+- Será responsável por receber as entradas dos usuários, coordenar as ações necessárias e chamar os casos de uso (use
+  cases) apropriados.
 
-- Terá a responsabilidade de traduzir os dados entre os casos de uso da aplicação e os detalhes da implementação externa, com frameworks, bibliotecas, APIs ou sistemas.
+- Terá a responsabilidade de traduzir os dados entre os casos de uso da aplicação e os detalhes da implementação
+  externa, com frameworks, bibliotecas, APIs ou sistemas.
 
 ##### c. Camada de Persistência (persistence):
 
 - Utilizará JPA (Java Persistence API) para interagir com o banco de dados.
 - Repositórios serão criados para realizar operações de persistências como: Create, Read, Update e Delete.
 
-### 2. Diagramas:
+### 2. Deployment e Orquestração
+
+A aplicação será containerizada usando Docker para garantir consistência entre os ambientes de desenvolvimento, teste e
+produção. Utilizaremos Docker Compose para orquestrar os múltiplos containers dos microserviços, facilitando a
+comunicação entre eles e permitindo o escalonamento conforme necessário.
+
+Cada microserviço será definido em seu próprio Dockerfile, encapsulando todas as dependências e variáveis de ambiente
+necessárias. O Docker Compose será configurado para gerenciar o ambiente de rede, volumes e outros aspectos de
+configuração dos containers.
+
+### 3. Diagramas:
 
 ## Diagrama de Classes:
-    
+
 ```mermaid
 classDiagram
 class Customer {
@@ -162,6 +179,7 @@ class Customer {
 ```
 
 - Diagrama de Sequência:
+
 ```mermaid
 sequenceDiagram
     participant Controller
@@ -285,14 +303,19 @@ Controller ->> Service: Requisição HTTP GET /api/v1/customers/pj/all
     Service -->> Controller: Resposta com status HTTP 204 (sem conteúdo)
 ```
 
-### 3. Tecnologias Utilizadas:
+### 4. Tecnologias Utilizadas:
 
 - **Java e Spring Boot**:
     - Versão do Java: 17
-    - Versão do Spring Boot: 3.1.0
+    - Versão do Spring Boot: 3.2.7
 
 - **Gerenciador de dependências**:
     - Maven
+
+- **Docker e Docker Compose**:
+    - Docker: Containerização dos microserviços para garantir consistência entre os ambientes de desenvolvimento, teste
+      e produção.
+    - Docker Compose: Orquestração dos contêineres para facilitar o gerenciamento e a configuração dos microserviços.
 
 - **Banco de Dados**:
     - PostgreSQL: Utilizado para armazenamento persistente.
@@ -314,7 +337,7 @@ Controller ->> Service: Requisição HTTP GET /api/v1/customers/pj/all
 - **Relatórios**:
     - Apache POI: Para geração de relatórios em Excel.
 
-### 4. Regras de Negócio
+### 5. Regras de Negócio
 
 - **Sistema de Login**:
     - O login deverá ser feito com nickname e senha.
@@ -333,96 +356,100 @@ Controller ->> Service: Requisição HTTP GET /api/v1/customers/pj/all
     - Não deverá possibilitar modificar valores de mensalidades num prazo maior de que 40 dias do seu lançamento.
     - Não devem ser deletadas nenhuma informação de clientes, de mensalidades e nem de máquinas.
 
-### 5. Padrões de Codificação e Convenções:
+### 6. Padrões de Codificação e Convenções:
 
 - **Padrões de Commits e Versionamento**:
     - (detalhado na seção)
-- Exemplo: 
-  - [ topico ] : "**descrição do commit**"
-  - <span style="color:green; font-weight: bold"> [ addition ] : First commit</span>
+- Exemplo:
+    - [ topico ] : "**descrição do commit**"
+    - <span style="color:green; font-weight: bold"> [ addition ] : First commit</span>
 
-  - **Tópicos de Commit:**
-    1. **addition / inclusion:** Usado especificamente para adicionar novos elementos ao código, como atributos, métodos, classes, etc.
-    2. **feature:** Usado para adicionar uma nova funcionalidade ao código.
-    3. **refactor:** Usado para fazer alterações no código para melhorar sua estrutura, legibilidade ou desempenho sem alterar seu comportamento externo.
-    4. **enhancement:** Usado para adicionar melhorias ou otimizações ao código existente.
-    5. **update:** Usado quando você está atualizando ou modificando partes existentes do código.
-    6. **docs:** Usado para fazer alterações na documentação do código, como adicionar ou corrigir comentários, atualizar documentação de API, etc.
-    7. **cleanup:** Usado para realizar tarefas de limpeza no código, como remover código morto, otimizar imports, etc.
-    8. **bugfix:** Usado para corrigir um bug existente no código.
-    9. **test:** Usado para adicionar, modificar ou corrigir testes de unidade, testes de integração, etc.
-    10. **test refactor:** Usado para informar alterações no código dos testes.
-    11. **build:** Usado para modificações nos arquivos de Build.
+    - **Tópicos de Commit:**
+        1. **addition / inclusion:** Usado especificamente para adicionar novos elementos ao código, como atributos,
+           métodos, classes, etc.
+        2. **feature:** Usado para adicionar uma nova funcionalidade ao código.
+        3. **refactor:** Usado para fazer alterações no código para melhorar sua estrutura, legibilidade ou desempenho
+           sem alterar seu comportamento externo.
+        4. **enhancement:** Usado para adicionar melhorias ou otimizações ao código existente.
+        5. **update:** Usado quando você está atualizando ou modificando partes existentes do código.
+        6. **docs:** Usado para fazer alterações na documentação do código, como adicionar ou corrigir comentários,
+           atualizar documentação de API, etc.
+        7. **cleanup:** Usado para realizar tarefas de limpeza no código, como remover código morto, otimizar imports,
+           etc.
+        8. **bugfix:** Usado para corrigir um bug existente no código.
+        9. **test:** Usado para adicionar, modificar ou corrigir testes de unidade, testes de integração, etc.
+        10. **test refactor:** Usado para informar alterações no código dos testes.
+        11. **build:** Usado para modificações nos arquivos de Build.
 
-### 6. Arquitetura do Projeto Backend:
-    
+### 7. Arquitetura do Projeto Backend:
+
 - **src**
     - main
-       - java
-          - <span style="color:yellow; font-weight: bold">core</span>
-              - <span style="color:blue; font-weight: bold">domain</span>
-                  - entities
-                    - Customer
-                    - CustomerContract
-                    - LegalPesonalCustomer
-                    - NaturalPersonCustomer
-                    - Address
-                    - MonthlyPayment
-                    - MultiPrinter
-                  - enums
-                      - FinancialSituation
-                      - MachineStatus
-                      - PaymentStatus
-                      - PrinterType
-              - <span style="color:blue; font-weight: bold">dto</span>
-                - CustomerResponseDTO
-                - LegalPersonalCustomerDTO
-                - MultiPrinterDTO
-                - NaturalPersonCustomrDTO
-                - UpdateCustometDTO
-              - <span style="color:red; font-weight: bold">exceptions</span>
-                - GlobalExceptionHandler
-                - DataIntegrityViolationException
-                - IllegalArgumentException
-                - NoSuchElementException
-                - StandardError
-              - <span style="color:blue; font-weight: bold">usecases</span>
-                  - interfaces
-                      - ConvertObjectToObjectDTOService
-                      - CustomerService
-                      - LegalPersonalCustomerService
-                      - MultiPrinterService
-                      - NaturalPersonCustomerService
-                  - impl
-                      - CustomerServiceImpl
-                      - LegalPersonalCustomerServiceImpl
-                      - MultiPrinterServiceImpl
-                      - NaturalPersonCustomerServiceImpl
-          - <span style="color:yellow; font-weight: bold">infra</span>
-              - <span style="color:blue; font-weight: bold">controllers</span>
-                  - CustomerController
-                  - LegalPersonalController
-                  - NaturalPersonController
-              - <span style="color:blue; font-weight: bold">adaptors
-                  - apiexterna
-                      - ApiExternaAdapter
-                      - ApiExternaAdapterInterface
-                  - emailapi
-                      - MensageriaAdapter
-                      - MensageriaAdapterInterface
-            - <span style="color:blue; font-weight: bold">config</span>
-                - ModelMapperConfig
-                - SecurityConfig
-                - security
-                    - JwtTokenProvider.java  // Provedor JWT
-            - <span style="color:blue; font-weight: bold">persistence
-                - repositories
-                    - AddressRepository
-                    - CustomerContractRepository
-                    - CustomerRepository
-                    - LegalPersonalCustomerRepository
-                    - MultiPrinterRepository
-                    - NaturalPersonCustomerRepository
+        - java
+            - <span style="color:yellow; font-weight: bold">core</span>
+                - <span style="color:blue; font-weight: bold">domain</span>
+                    - entities
+                        - Customer
+                        - CustomerContract
+                        - LegalPesonalCustomer
+                        - NaturalPersonCustomer
+                        - Address
+                        - MonthlyPayment
+                        - MultiPrinter
+                    - enums
+                        - FinancialSituation
+                        - MachineStatus
+                        - PaymentStatus
+                        - PrinterType
+                - <span style="color:blue; font-weight: bold">dto</span>
+                    - CustomerResponseDTO
+                    - LegalPersonalCustomerDTO
+                    - MultiPrinterDTO
+                    - NaturalPersonCustomrDTO
+                    - UpdateCustometDTO
+                - <span style="color:red; font-weight: bold">exceptions</span>
+                    - GlobalExceptionHandler
+                    - DataIntegrityViolationException
+                    - IllegalArgumentException
+                    - NoSuchElementException
+                    - StandardError
+                - <span style="color:blue; font-weight: bold">usecases</span>
+                    - interfaces
+                        - ConvertObjectToObjectDTOService
+                        - CustomerService
+                        - LegalPersonalCustomerService
+                        - MultiPrinterService
+                        - NaturalPersonCustomerService
+                    - impl
+                        - CustomerServiceImpl
+                        - LegalPersonalCustomerServiceImpl
+                        - MultiPrinterServiceImpl
+                        - NaturalPersonCustomerServiceImpl
+            - <span style="color:yellow; font-weight: bold">infra</span>
+                - <span style="color:blue; font-weight: bold">controllers</span>
+                    - CustomerController
+                    - LegalPersonalController
+                    - NaturalPersonController
+                - <span style="color:blue; font-weight: bold">adaptors
+                    - apiexterna
+                        - ApiExternaAdapter
+                        - ApiExternaAdapterInterface
+                    - emailapi
+                        - MensageriaAdapter
+                        - MensageriaAdapterInterface
+                - <span style="color:blue; font-weight: bold">config</span>
+                    - ModelMapperConfig
+                    - SecurityConfig
+                    - security
+                        - JwtTokenProvider.java // Provedor JWT
+                - <span style="color:blue; font-weight: bold">persistence
+                    - repositories
+                        - AddressRepository
+                        - CustomerContractRepository
+                        - CustomerRepository
+                        - LegalPersonalCustomerRepository
+                        - MultiPrinterRepository
+                        - NaturalPersonCustomerRepository
 
 - **Gerenciamento de Dependências**:
     - Utilizar uma ferramenta de gerenciamento de dependências, como Maven ou Gradle.
