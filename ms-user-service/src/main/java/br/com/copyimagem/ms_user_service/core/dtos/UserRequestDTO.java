@@ -1,6 +1,7 @@
 package br.com.copyimagem.ms_user_service.core.dtos;
 
 
+import br.com.copyimagem.ms_user_service.core.domain.enums.ProfileEnum;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 
 
 @Getter
@@ -38,6 +40,8 @@ public class UserRequestDTO implements Serializable {
     @Pattern( regexp = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}$", message = "Password format is invalid" )
     private String password;
 
+    Set< ProfileEnum > profiles;
+
     @Override
     public boolean equals( Object o ) {
 
@@ -45,8 +49,8 @@ public class UserRequestDTO implements Serializable {
         if( o == null || getClass() != o.getClass() ) return false;
         UserRequestDTO that = ( UserRequestDTO ) o;
         return Objects.equals( name, that.name )
-               && Objects.equals( email, that.email )
-               && Objects.equals( password, that.password );
+                && Objects.equals( email, that.email )
+                && Objects.equals( password, that.password );
     }
 
     @Override
