@@ -28,6 +28,8 @@ public class MscloudgatewayApplication {
 										.uri("lb://msmonthlypayment"))
 					.route( r -> r.path("/api/v1/help-desk/**")
 										.uri("lb://ms-help-desk"))
+					.route( r -> r.path("/api/v1/user/**")
+										.uri("lb://ms-user-service"	))
 				.build();
 	}
 }
