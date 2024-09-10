@@ -5,9 +5,9 @@ import br.com.copyimagem.ms_user_service.core.dtos.UserCreateResponse;
 import br.com.copyimagem.ms_user_service.core.dtos.UserLoginResponseDTO;
 import br.com.copyimagem.ms_user_service.core.dtos.UserRequestDTO;
 import br.com.copyimagem.ms_user_service.core.dtos.UserResponseDTO;
+import br.com.copyimagem.ms_user_service.core.usecases.ConvertEntitiesAndDTOs;
 import br.com.copyimagem.ms_user_service.core.usecases.UserService;
 import br.com.copyimagem.ms_user_service.infra.persistence.UserRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,17 +18,17 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final ModelMapper modelMapper;
+    private final ConvertEntitiesAndDTOs convertEntitiesAndDTOs;
 
     private final UserRepository userRepository;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserServiceImpl( ModelMapper modelMapper,
+    public UserServiceImpl( ConvertEntitiesAndDTOs convertEntitiesAndDTOs,
                             UserRepository userRepository,
                             BCryptPasswordEncoder bCryptPasswordEncoder ) {
 
-        this.modelMapper = modelMapper;
+        this.convertEntitiesAndDTOs = convertEntitiesAndDTOs;
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
@@ -37,10 +37,10 @@ public class UserServiceImpl implements UserService {
     public UserCreateResponse save( UserRequestDTO userRequestDTO ) {
 
         verifyIfEmailExists( userRequestDTO.getEmail(), null );
-        User user = modelMapper.map( userRequestDTO, User.class );
+        User user = convertEntitiesAndDTOs.convert( userRequestDTO, User.class );
         user.setPassword( bCryptPasswordEncoder.encode( userRequestDTO.getPassword() ) );
         user = userRepository.save( user );
-        return modelMapper.map( user, UserCreateResponse.class );
+        return convertEntitiesAndDTOs.convert( user, UserCreateResponse.class );
     }
 
     @Override

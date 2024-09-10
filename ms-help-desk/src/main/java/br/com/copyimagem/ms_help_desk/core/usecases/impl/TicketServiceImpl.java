@@ -10,6 +10,7 @@ import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketType;
 import br.com.copyimagem.ms_help_desk.core.exceptions.CustomFeignException;
 import br.com.copyimagem.ms_help_desk.core.exceptions.IllegalArgumentException;
 import br.com.copyimagem.ms_help_desk.core.exceptions.NoSuchElementException;
+import br.com.copyimagem.ms_help_desk.core.usecases.ConvertEntityAndDTO;
 import br.com.copyimagem.ms_help_desk.core.usecases.TicketService;
 import br.com.copyimagem.ms_help_desk.infra.adapters.feignservices.MsPersistenceFeignClientService;
 import br.com.copyimagem.ms_help_desk.infra.repositories.TicketRepository;
@@ -26,34 +27,34 @@ public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
 
-    private final ConvertEntityAndDTOService convertEntityAndDTOService;
+    private final ConvertEntityAndDTO convertEntityAndDTO;
 
     private final MsPersistenceFeignClientService msPersistenceFeignClientService;
 
-    public TicketServiceImpl( TicketRepository ticketRepository, ConvertEntityAndDTOService convertEntityAndDTOService, MsPersistenceFeignClientService msPersistenceFeignClientService ) {
+    public TicketServiceImpl( TicketRepository ticketRepository, ConvertEntityAndDTO convertEntityAndDTO, MsPersistenceFeignClientService msPersistenceFeignClientService ) {
 
         this.ticketRepository = ticketRepository;
-        this.convertEntityAndDTOService = convertEntityAndDTOService;
+        this.convertEntityAndDTO = convertEntityAndDTO;
         this.msPersistenceFeignClientService = msPersistenceFeignClientService;
     }
 
     @Override
     public TicketDTO getTicketById( Long id ) {
 
-        return convertEntityAndDTOService.convertEntityToDTO( findById( id ) );
+        return convertEntityAndDTO.convertDTOToEntity( findById( id ), TicketDTO.class );
     }
 
     @Override
     public List< TicketDTO > getAllTickets() {
 
-        return convertEntityAndDTOService.convertEntityListToDTOList( ticketRepository.findAll() );
+        return convertEntityAndDTO.convertEntityAndDTOList( ticketRepository.findAll() , TicketDTO.class );
     }
 
     @Override
     public TicketDTO createTicket( TicketDTO ticketDTO ) {
 
         final ResultFeignClient resultFeignClient = callToFeignClient( ticketDTO );
-        Ticket ticket = convertEntityAndDTOService.convertDTOToEntity( ticketDTO );
+        Ticket ticket = convertEntityAndDTO.convertDTOToEntity( ticketDTO, Ticket.class );
         ticket.setClient_id( resultFeignClient.client().getBody().id() );
         ticket.setTechnical_id( resultFeignClient.technical().getBody().id() );
         ticket.setClientName( resultFeignClient.client().getBody().clientName() );
@@ -63,7 +64,7 @@ public class TicketServiceImpl implements TicketService {
             ticket.setPriority( TicketPriority.LOW );
         }
         ticket.setCreatedAt( LocalDateTime.now() );
-        return convertEntityAndDTOService.convertEntityToDTO( ticketRepository.save( ticket ) );
+        return convertEntityAndDTO.convertDTOToEntity( ticketRepository.save( ticket ) , TicketDTO.class );
     }
 
     private ResultFeignClient callToFeignClient( TicketDTO ticketDTO ) {
