@@ -4,6 +4,7 @@ import br.com.copyimagem.ms_user_service.core.domain.entities.User;
 import br.com.copyimagem.ms_user_service.core.domain.enums.ProfileEnum;
 import br.com.copyimagem.ms_user_service.core.dtos.UserCreateResponse;
 import br.com.copyimagem.ms_user_service.core.dtos.UserRequestDTO;
+import br.com.copyimagem.ms_user_service.core.usecases.ConvertEntitiesAndDTOs;
 import br.com.copyimagem.ms_user_service.infra.persistence.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,7 +35,7 @@ class UserServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
-    private ModelMapper modelMapper;
+    private ConvertEntitiesAndDTOs convertEntitiesAndDTOs;
 
     @Mock
     private BCryptPasswordEncoder bcryptPasswordEncoder;
@@ -55,15 +56,15 @@ class UserServiceImplTest {
 
         when( userRepository.save( user ) ).thenReturn( user );
         when( userRepository.findByEmail( "ccarige@gmail.com" ) ).thenReturn( null );
-        when( modelMapper.map( userRequestDTO, User.class ) ).thenReturn( user );
-        when( modelMapper.map( user, UserCreateResponse.class ) ).thenReturn( userCreateResponse );
+        when( convertEntitiesAndDTOs.convert( userRequestDTO, User.class ) ).thenReturn( user );
+        when( convertEntitiesAndDTOs.convert( user, UserCreateResponse.class ) ).thenReturn( userCreateResponse );
         when( bcryptPasswordEncoder.encode( userRequestDTO.getPassword() ) ).thenReturn( "1A2B3C4D5E6F-encoded" );
 
         UserCreateResponse result = userServiceImpl.save( userRequestDTO );
 
         assertEquals( userCreateResponse, result );
-        assertEquals( userCreateResponse.email(), result.email() );
-        assertEquals( userCreateResponse.profiles(), result.profiles() );
+        assertEquals( userCreateResponse.getEmail(), result.getEmail() );
+        assertEquals( userCreateResponse.getProfiles(), result.getProfiles() );
 
         verify( userRepository, times( 1 ) ).save( user );
         verify( userRepository, times( 1 ) ).findByEmail( "ccarige@gmail.com" );
