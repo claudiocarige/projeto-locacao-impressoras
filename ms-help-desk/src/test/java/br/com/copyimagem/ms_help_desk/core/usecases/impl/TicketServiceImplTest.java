@@ -9,6 +9,7 @@ import br.com.copyimagem.ms_help_desk.core.domain.enums.TicketType;
 import br.com.copyimagem.ms_help_desk.core.exceptions.CustomFeignException;
 import br.com.copyimagem.ms_help_desk.core.exceptions.IllegalArgumentException;
 import br.com.copyimagem.ms_help_desk.core.exceptions.NoSuchElementException;
+import br.com.copyimagem.ms_help_desk.core.usecases.ConvertEntityAndDTO;
 import br.com.copyimagem.ms_help_desk.infra.adapters.feignservices.MsPersistenceFeignClientService;
 import br.com.copyimagem.ms_help_desk.infra.repositories.TicketRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ class TicketServiceImplTest {
     private TicketRepository ticketRepository;
 
     @Mock
-    private ConvertEntityAndDTOService convertEntityAndDTOService;
+    private ConvertEntityAndDTO convertEntityAndDTOService;
 
     @Mock
     private MsPersistenceFeignClientService msPersistenceFeignClientService;
@@ -60,7 +61,7 @@ class TicketServiceImplTest {
     void shouldReturnATicketDTOWithSuccess() {
 
         when( ticketRepository.findById( 1L ) ).thenReturn( Optional.of( ticket ) );
-        when( convertEntityAndDTOService.convertEntityToDTO( ticket ) ).thenReturn( ticketDTO );
+        when( convertEntityAndDTOService.convertDTOToEntity( ticket , TicketDTO.class) ).thenReturn( ticketDTO );
         TicketDTO result = ticketService.getTicketById( 1L );
         assertEquals( ticketDTO, result );
         assertEquals( ticketDTO.getId(), result.getId() );
@@ -84,7 +85,7 @@ class TicketServiceImplTest {
 
         when( ticketRepository.findAll() ).thenReturn( List.of( ticket ) );
         when( convertEntityAndDTOService
-                                .convertEntityListToDTOList( List.of( ticket ) ) ).thenReturn( List.of( ticketDTO ) );
+                   .convertEntityAndDTOList( List.of( ticket ), TicketDTO.class ) ).thenReturn( List.of( ticketDTO ) );
         List< TicketDTO > result = ticketService.getAllTickets();
         assertEquals( List.of( ticketDTO ), result );
         assertEquals( ticketDTO.getId(), result.get( 0 ).getId() );
@@ -102,9 +103,9 @@ class TicketServiceImplTest {
                       .searchCustomerByParams( "clientname", ticketDTO.getClientName() ) ).thenReturn( clientResponse );
         when( msPersistenceFeignClientService
                 .searchCustomerByParams( "clientname", ticketDTO.getTechnicalName() ) ).thenReturn( technicalResponse );
-        when( convertEntityAndDTOService.convertDTOToEntity( ticketDTO ) ).thenReturn( ticket );
+        when( convertEntityAndDTOService.convertDTOToEntity( ticketDTO, Ticket.class) ).thenReturn( ticket );
         when( ticketRepository.save( ticket ) ).thenReturn( ticket );
-        when( convertEntityAndDTOService.convertEntityToDTO( ticket ) ).thenReturn( ticketDTO );
+        when( convertEntityAndDTOService.convertDTOToEntity( ticket , TicketDTO.class) ).thenReturn( ticketDTO );
         TicketDTO result = ticketService.createTicket( ticketDTO );
 
         assertNotNull( result );
@@ -128,9 +129,9 @@ class TicketServiceImplTest {
                 .searchCustomerByParams( "clientname", ticketDTO.getClientName() ) ).thenReturn( clientResponse );
         when( msPersistenceFeignClientService
                 .searchCustomerByParams( "clientname", ticketDTO.getTechnicalName() ) ).thenReturn( technicalResponse );
-        when( convertEntityAndDTOService.convertDTOToEntity( ticketDTO ) ).thenReturn( ticket );
+        when( convertEntityAndDTOService.convertDTOToEntity( ticketDTO, Ticket.class ) ).thenReturn( ticket );
         when( ticketRepository.save( ticket ) ).thenReturn( ticket );
-        when( convertEntityAndDTOService.convertEntityToDTO( ticket ) ).thenReturn( ticketDTO );
+        when( convertEntityAndDTOService.convertDTOToEntity( ticket , TicketDTO.class) ).thenReturn( ticketDTO );
 
         try {
             ticketService.createTicket( ticketDTO );
