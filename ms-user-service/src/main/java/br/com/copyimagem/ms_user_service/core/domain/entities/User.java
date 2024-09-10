@@ -34,17 +34,18 @@ public class User implements Serializable {
     private String email;
 
     private String password;
-
+    @Column(name="last_password_reset")
     private String lastPasswordReset;
-
+    @Column(name="code_authenticator")
     private String codeAuthenticator;
-
+    @Column(name="login_attempts")
     private Integer loginAttempts;
 
     private Boolean locked;
 
     @ElementCollection
     @Enumerated( EnumType.STRING )
+    @CollectionTable( name = "user_profiles" )
     private Set< ProfileEnum > profiles;
 
     @Override
