@@ -58,6 +58,21 @@ services:
     networks:
       - network-ms-copyimagem
 
+  ms-user-service:
+    build:
+      context: ./ms-user-service
+    image: ms-user-service-image
+    container_name: ms-user-service-container
+    depends_on:
+      - eurekaserver
+    environment:
+      - EUREKA_SERVER_HOST=${EUREKA_SERVER_HOST}
+      - DATABASE_URL_USERS=${DATABASE_URL_USERS}
+      - DB_PASSWORD_POSTGRESQL=${DB_PASSWORD_POSTGRESQL}
+      - DB_USERNAME_POSTGRESQL=${DB_USERNAME_POSTGRESQL}
+    networks:
+      - network-ms-copyimagem
+
   mscloudgateway:
     build:
       context: ./mscloudgateway
@@ -68,6 +83,7 @@ services:
       - mspersistence
       - msmonthlypayment
       - ms-help-desk
+      - ms-user-service
     ports:
       - "8080:8080"
     environment:
