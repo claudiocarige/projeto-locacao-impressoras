@@ -4,8 +4,10 @@ import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
 import br.com.copyimagem.mspersistence.core.domain.entities.LegalPersonalCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
+import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.DataIntegrityViolationException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
+import br.com.copyimagem.mspersistence.core.usecases.interfaces.ConvertObjectToObjectDTOService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.LegalPersonalCustomerService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerContractRepository;
@@ -18,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @Log4j2
@@ -54,8 +55,7 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
 
         log.info( "[ INFO ] Finding all LegalPersonalCustomers." );
         List< LegalPersonalCustomer > legalPersonalCustumerList = legalPersonalCustomerRepository.findAll();
-        return legalPersonalCustumerList.stream()
-                .map( convertObjectToObjectDTOService::convertToLegalPersonalCustomerDTO ).toList();
+        return convertObjectToObjectDTOService.convertEntityAndDTOList( legalPersonalCustumerList, LegalPersonalCustomerDTO.class );
     }
 
     @Override
@@ -65,11 +65,9 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
         LegalPersonalCustomer legalPersonalCustomer = legalPersonalCustomerRepository.findById( id )
                 .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
         LegalPersonalCustomerDTO legalPersonalCustomerDTO =
-                convertObjectToObjectDTOService.convertToLegalPersonalCustomerDTO( legalPersonalCustomer );
-        legalPersonalCustomerDTO.setMultiPrinterList( legalPersonalCustomer
-                .getMultiPrinterList().stream()
-                .map( convertObjectToObjectDTOService::convertToMultiPrinterDTO )
-                .collect( Collectors.toList() ) );
+                convertObjectToObjectDTOService.convertToEntityOrDTO( legalPersonalCustomer, LegalPersonalCustomerDTO.class );
+        legalPersonalCustomerDTO.setMultiPrinterList( convertObjectToObjectDTOService.convertEntityAndDTOList(
+                                                legalPersonalCustomer.getMultiPrinterList(), MultiPrinterDTO.class ) );
         return legalPersonalCustomerDTO;
     }
 
@@ -83,8 +81,8 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
         existsCnpjOrEmail( legalPersonalCustomerDTO );
         generateCustomerContract( legalPersonalCustomerDTO );
         LegalPersonalCustomer saveLegalPersonalCustomer = legalPersonalCustomerRepository
-                .save( convertObjectToObjectDTOService.convertToLegalPersonalCustomer( legalPersonalCustomerDTO ) );
-        return convertObjectToObjectDTOService.convertToLegalPersonalCustomerDTO( saveLegalPersonalCustomer );
+                .save( convertObjectToObjectDTOService.convertToEntityOrDTO( legalPersonalCustomerDTO, LegalPersonalCustomer.class ) );
+        return convertObjectToObjectDTOService.convertToEntityOrDTO( saveLegalPersonalCustomer, LegalPersonalCustomerDTO.class );
     }
 
     @Override
@@ -96,7 +94,7 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
             log.error( "[ ERROR ] Exception : Customer not found :  {}.", NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
-        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer.get() );
+        return convertObjectToObjectDTOService.convertToEntityOrDTO( legalPersonalCustomer.get(), CustomerResponseDTO.class );
     }
 
     private void existsCnpjOrEmail( LegalPersonalCustomerDTO legalPersonalCustomerDTO ) {

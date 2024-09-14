@@ -13,7 +13,7 @@ public class ConvertEntitiesAndDTOsImpl implements ConvertEntitiesAndDTOs {
     public ConvertEntitiesAndDTOsImpl( ModelMapper modelMapper ) { this.modelMapper = modelMapper; }
 
     @Override
-    public < T, U > U convert( T source, Class< U > targetClass ) {
+    public < T, U > U convertDTOOrEntity( T source, Class< U > targetClass ) {
 
         return modelMapper.map( source, targetClass );
     }

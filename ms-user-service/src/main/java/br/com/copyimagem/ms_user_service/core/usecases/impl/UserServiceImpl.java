@@ -37,10 +37,10 @@ public class UserServiceImpl implements UserService {
     public UserCreateResponse save( UserRequestDTO userRequestDTO ) {
 
         verifyIfEmailExists( userRequestDTO.getEmail(), null );
-        User user = convertEntitiesAndDTOs.convert( userRequestDTO, User.class );
+        User user = convertEntitiesAndDTOs.convertDTOOrEntity( userRequestDTO, User.class );
         user.setPassword( bCryptPasswordEncoder.encode( userRequestDTO.getPassword() ) );
         user = userRepository.save( user );
-        return convertEntitiesAndDTOs.convert( user, UserCreateResponse.class );
+        return convertEntitiesAndDTOs.convertDTOOrEntity( user, UserCreateResponse.class );
     }
 
     @Override

@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Set;
@@ -56,8 +55,8 @@ class UserServiceImplTest {
 
         when( userRepository.save( user ) ).thenReturn( user );
         when( userRepository.findByEmail( "ccarige@gmail.com" ) ).thenReturn( null );
-        when( convertEntitiesAndDTOs.convert( userRequestDTO, User.class ) ).thenReturn( user );
-        when( convertEntitiesAndDTOs.convert( user, UserCreateResponse.class ) ).thenReturn( userCreateResponse );
+        when( convertEntitiesAndDTOs.convertDTOOrEntity( userRequestDTO, User.class ) ).thenReturn( user );
+        when( convertEntitiesAndDTOs.convertDTOOrEntity( user, UserCreateResponse.class ) ).thenReturn( userCreateResponse );
         when( bcryptPasswordEncoder.encode( userRequestDTO.getPassword() ) ).thenReturn( "1A2B3C4D5E6F-encoded" );
 
         UserCreateResponse result = userServiceImpl.save( userRequestDTO );

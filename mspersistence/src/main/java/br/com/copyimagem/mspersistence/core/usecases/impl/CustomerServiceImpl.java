@@ -8,6 +8,7 @@ import br.com.copyimagem.mspersistence.core.domain.enums.FinancialSituation;
 import br.com.copyimagem.mspersistence.core.dtos.*;
 import br.com.copyimagem.mspersistence.core.exceptions.IllegalArgumentException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
+import br.com.copyimagem.mspersistence.core.usecases.interfaces.ConvertObjectToObjectDTOService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.CustomerService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.LegalPersonalCustomerService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.NaturalPersonCustomerService;
@@ -68,8 +69,7 @@ public class CustomerServiceImpl implements CustomerService {
     public List< CustomerResponseDTO > searchAllCustomers() {
 
         List< Customer > customerList = customerRepository.findAll();
-        return customerList.stream()
-                .map( convertObjectToObjectDTOService::convertToCustomerResponseDTO ).toList();
+        return convertObjectToObjectDTOService.convertEntityAndDTOList(customerList, CustomerResponseDTO.class);
     }
 
     @Override
@@ -77,8 +77,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         FinancialSituation financialSituation = FinancialSituation.valueOf( situation );
         List< Customer > customerList = customerRepository.findAllByFinancialSituation( financialSituation );
-        return customerList.stream().
-                map( convertObjectToObjectDTOService::convertToCustomerResponseDTO ).toList();
+        return convertObjectToObjectDTOService.convertEntityAndDTOList(customerList, CustomerResponseDTO.class);
     }
 
     @Override
@@ -126,7 +125,7 @@ public class CustomerServiceImpl implements CustomerService {
                                                                                         NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
-        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
+        return convertObjectToObjectDTOService.convertToEntityOrDTO( customerOptional.get(), CustomerResponseDTO.class );
     }
 
     private CustomerResponseDTO findByCpf( String valueParam ) {
@@ -147,14 +146,14 @@ public class CustomerServiceImpl implements CustomerService {
                                                                                         NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
-        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
+        return convertObjectToObjectDTOService.convertToEntityOrDTO( customerOptional.get(), CustomerResponseDTO.class );
     }
 
     private CustomerResponseDTO findByClientName( String valueParam ) {
 
-        return customerRepository.findByClientName( valueParam )
-                .map( convertObjectToObjectDTOService::convertToCustomerResponseDTO )
-                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+        Customer customer = customerRepository.findByClientName( valueParam ).orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+        return convertObjectToObjectDTOService.convertToEntityOrDTO( customer,
+                                                                     CustomerResponseDTO.class );
     }
 
     private CustomerResponseDTO findByPhoneNumber( String phoneNumber ) {
@@ -165,7 +164,7 @@ public class CustomerServiceImpl implements CustomerService {
                                                                                          NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
-        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerOptional.get() );
+        return convertObjectToObjectDTOService.convertToEntityOrDTO( customerOptional.get(), CustomerResponseDTO.class );
     }
 
     private void isNotNull( String attribute, String value ) {
@@ -230,52 +229,40 @@ public class CustomerServiceImpl implements CustomerService {
             case "cpf" -> {
                 NaturalPersonCustomer naturalPersonCustomer = ( NaturalPersonCustomer ) customer;
                 naturalPersonCustomer.setCpf( value );
-                return convertObjectToObjectDTOService
-                        .convertToUpdateCustomerDTO( customerRepository.save( naturalPersonCustomer ) );
+                return convertObjectToObjectDTOService.convertToEntityOrDTO(
+                                          customerRepository.save( naturalPersonCustomer ), UpdateCustomerDTO.class );
             }
             case "cnpj" -> {
                 LegalPersonalCustomer legalPersonalCustomer = ( LegalPersonalCustomer ) customer;
                 legalPersonalCustomer.setCnpj( value );
-                return convertObjectToObjectDTOService
-                        .convertToUpdateCustomerDTO( customerRepository.save( legalPersonalCustomer ) );
+                return convertObjectToObjectDTOService.convertToEntityOrDTO(
+                                          customerRepository.save( legalPersonalCustomer ), UpdateCustomerDTO.class );
             }
             case "primaryEmail" -> {
                 customer.setPrimaryEmail( value );
-                return convertObjectToObjectDTOService
-                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
             }
             case "phoneNumber" -> {
                 customer.setPhoneNumber( value );
-                return convertObjectToObjectDTOService
-                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
             }
             case "clientName" -> {
                 customer.setClientName( value );
-                return convertObjectToObjectDTOService
-                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
             }
             case "whatsapp" -> {
                 customer.setWhatsapp( value );
-                return convertObjectToObjectDTOService
-                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
             }
             case "bankCode" -> {
                 customer.setBankCode( value );
-                return convertObjectToObjectDTOService
-                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
             }
             case "financialSituation" -> {
                 customer.setFinancialSituation( FinancialSituation.valueOf( value ) );
-                return convertObjectToObjectDTOService
-                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
             }
             case "payDay" -> {
                 customer.setPayDay( Byte.parseByte( value ) );
-                return convertObjectToObjectDTOService
-                        .convertToUpdateCustomerDTO( customerRepository.save( customer ) );
             }
             default -> throw new IllegalArgumentException( "Attribute not found." );
         }
+        return convertObjectToObjectDTOService
+                .convertToEntityOrDTO( customerRepository.save( customer ), UpdateCustomerDTO.class );
     }
 
 }

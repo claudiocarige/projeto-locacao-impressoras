@@ -18,7 +18,7 @@ public class ConvertEntityAndDTOService implements ConvertEntityAndDTO {
 
 
     @Override
-    public < T, U > U convertDTOToEntity( T source, Class< U > targetClass ) {
+    public < T, U > U convertDTOOrEntity( T source, Class< U > targetClass ) {
 
         return modelMapper.map( source, targetClass );
     }

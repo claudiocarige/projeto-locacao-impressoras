@@ -7,6 +7,7 @@ import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.NaturalPersonCustomerDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.DataIntegrityViolationException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
+import br.com.copyimagem.mspersistence.core.usecases.interfaces.ConvertObjectToObjectDTOService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.NaturalPersonCustomerService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerContractRepository;
@@ -54,8 +55,7 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
 
         log.info( "[ INFO ] Finding all customers" );
         List< NaturalPersonCustomer > custumerList = naturalPersonCustomerRepository.findAll();
-        return custumerList.stream()
-                                .map( convertObjectToObjectDTOService::convertToNaturalPersonCustomerDTO ).toList();
+        return convertObjectToObjectDTOService.convertEntityAndDTOList( custumerList, NaturalPersonCustomerDTO.class );
     }
 
     @Override
@@ -63,8 +63,9 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
 
         log.info( "[ INFO ] Finding customer by id: {}", id );
         NaturalPersonCustomer naturalPersonCustomer = naturalPersonCustomerRepository.findById( id )
-                                             .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
-        return convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO( naturalPersonCustomer );
+                                            .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+        return convertObjectToObjectDTOService.convertToEntityOrDTO(
+                                                             naturalPersonCustomer, NaturalPersonCustomerDTO.class );
     }
 
     @Transactional
@@ -72,14 +73,16 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
     public NaturalPersonCustomerDTO saveNaturalPersonCustomer( NaturalPersonCustomerDTO naturalPersonCustomerDTO ) {
 
         log.info( "[ INFO ] Saving customer. {}", naturalPersonCustomerDTO.getClass() );
-        naturalPersonCustomerDTO.setId( null );
+                                                                             naturalPersonCustomerDTO.setId( null );
         Address address = addressRepository.save( naturalPersonCustomerDTO.getAddress() );
         saveAddress( naturalPersonCustomerDTO );
         generateCustomerContract( naturalPersonCustomerDTO );
         existsCpfOrEmail( naturalPersonCustomerDTO );
         NaturalPersonCustomer savedNaturalCustomer = naturalPersonCustomerRepository
-                   .save( convertObjectToObjectDTOService.convertToNaturalPersonCustomer( naturalPersonCustomerDTO ) );
-        return convertObjectToObjectDTOService.convertToNaturalPersonCustomerDTO( savedNaturalCustomer );
+                                        .save( convertObjectToObjectDTOService.convertToEntityOrDTO(
+                                                          naturalPersonCustomerDTO, NaturalPersonCustomer.class ) );
+        return convertObjectToObjectDTOService.convertToEntityOrDTO(
+                                                             savedNaturalCustomer, NaturalPersonCustomerDTO.class );
     }
 
     @Override
@@ -90,19 +93,18 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
             log.error( "[ ERROR ] Exception :  {}.", NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
-        return convertObjectToObjectDTOService.convertToCustomerResponseDTO( naturalPersonCustomer.get() );
+        return convertObjectToObjectDTOService.convertToEntityOrDTO(
+                                                            naturalPersonCustomer.get(), CustomerResponseDTO.class );
     }
 
     private void existsCpfOrEmail( NaturalPersonCustomerDTO naturalPersonCustomerDTO ) {
 
         if( customerRepository.existsCustomerByPrimaryEmail( naturalPersonCustomerDTO.getPrimaryEmail() ) ) {
-            log.error( "[ ERROR ] Exception : Email already exists! : {}.",
-                                                                                DataIntegrityViolationException.class );
+            log.error( "[ ERROR ] Exception : Email already exists! : {}.", DataIntegrityViolationException.class );
             throw new DataIntegrityViolationException( "Email already exists!" );
         } else if( naturalPersonCustomerRepository
-                                              .existsNaturalPersonCustomerByCpf( naturalPersonCustomerDTO.getCpf() ) ) {
-            log.error( "[ ERROR ] Exception : CPF already exists! : {}.",
-                                                                                DataIntegrityViolationException.class );
+                                        .existsNaturalPersonCustomerByCpf( naturalPersonCustomerDTO.getCpf() ) ) {
+            log.error( "[ ERROR ] Exception : CPF already exists! : {}.", DataIntegrityViolationException.class );
             throw new DataIntegrityViolationException( "CPF already exists!" );
         }
     }

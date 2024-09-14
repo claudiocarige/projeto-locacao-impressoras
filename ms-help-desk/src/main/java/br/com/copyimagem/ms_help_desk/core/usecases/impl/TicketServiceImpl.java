@@ -41,7 +41,7 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketDTO getTicketById( Long id ) {
 
-        return convertEntityAndDTO.convertDTOToEntity( findById( id ), TicketDTO.class );
+        return convertEntityAndDTO.convertDTOOrEntity( findById( id ), TicketDTO.class );
     }
 
     @Override
@@ -54,7 +54,7 @@ public class TicketServiceImpl implements TicketService {
     public TicketDTO createTicket( TicketDTO ticketDTO ) {
 
         final ResultFeignClient resultFeignClient = callToFeignClient( ticketDTO );
-        Ticket ticket = convertEntityAndDTO.convertDTOToEntity( ticketDTO, Ticket.class );
+        Ticket ticket = convertEntityAndDTO.convertDTOOrEntity( ticketDTO, Ticket.class );
         ticket.setClient_id( resultFeignClient.client().getBody().id() );
         ticket.setTechnical_id( resultFeignClient.technical().getBody().id() );
         ticket.setClientName( resultFeignClient.client().getBody().clientName() );
@@ -64,7 +64,7 @@ public class TicketServiceImpl implements TicketService {
             ticket.setPriority( TicketPriority.LOW );
         }
         ticket.setCreatedAt( LocalDateTime.now() );
-        return convertEntityAndDTO.convertDTOToEntity( ticketRepository.save( ticket ) , TicketDTO.class );
+        return convertEntityAndDTO.convertDTOOrEntity( ticketRepository.save( ticket ) , TicketDTO.class );
     }
 
     private ResultFeignClient callToFeignClient( TicketDTO ticketDTO ) {

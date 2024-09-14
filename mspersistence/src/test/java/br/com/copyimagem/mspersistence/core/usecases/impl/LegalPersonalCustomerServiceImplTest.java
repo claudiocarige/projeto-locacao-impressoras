@@ -6,8 +6,8 @@ import br.com.copyimagem.mspersistence.core.dtos.LegalPersonalCustomerDTO;
 import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.DataIntegrityViolationException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
+import br.com.copyimagem.mspersistence.core.usecases.interfaces.ConvertObjectToObjectDTOService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.AddressRepository;
-import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerContractRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.LegalPersonalCustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -68,7 +69,7 @@ class LegalPersonalCustomerServiceImplTest {
     void shoulReturnALegalPersonalCustomerDTOById() {
 
         when( legalPersonalCustomerRepository.findById( ID1L ) ).thenReturn( Optional.of( customerPj ) );
-        when( convertObjectToObjectDTOService.convertToLegalPersonalCustomerDTO( customerPj ) )
+        when( convertObjectToObjectDTOService.convertToEntityOrDTO( customerPj, LegalPersonalCustomerDTO.class ) )
                                                                                          .thenReturn( customerPjDTO );
 
         LegalPersonalCustomerDTO legalPersonalCustomerDTO =
@@ -102,8 +103,8 @@ class LegalPersonalCustomerServiceImplTest {
     void shouldReturnAListLegalPersonalCustomer() {
 
         when( legalPersonalCustomerRepository.findAll() ).thenReturn( List.of( customerPj ) );
-        when( convertObjectToObjectDTOService.convertToLegalPersonalCustomerDTO( customerPj ) )
-                                                                                          .thenReturn( customerPjDTO );
+        when( convertObjectToObjectDTOService.convertEntityAndDTOList( Collections.singletonList( customerPj ), LegalPersonalCustomerDTO.class ) )
+                                                                                          .thenReturn( Collections.singletonList( customerPjDTO ) );
 
         List< LegalPersonalCustomerDTO > legalPersonalCustomerList =
                 legalPersonalCustomerService.findAllLegalPersonalCustomer();
@@ -132,9 +133,9 @@ class LegalPersonalCustomerServiceImplTest {
                 .thenReturn( false );
         when( legalPersonalCustomerRepository.existsLegalPersonalCustomerByCnpj( CNPJ ) ).thenReturn( false );
         when( legalPersonalCustomerRepository.save( customerPj ) ).thenReturn( customerPj );
-        when( convertObjectToObjectDTOService.convertToLegalPersonalCustomerDTO( customerPj ) )
+        when( convertObjectToObjectDTOService.convertToEntityOrDTO( customerPj, LegalPersonalCustomerDTO.class ) )
                                                                                          .thenReturn( customerPjDTO );
-        when( convertObjectToObjectDTOService.convertToLegalPersonalCustomer( customerPjDTO ) )
+        when( convertObjectToObjectDTOService.convertToEntityOrDTO( customerPjDTO, LegalPersonalCustomer.class ) )
                                                                                             .thenReturn( customerPj );
         when( addressRepository.save( customerPj.getAddress() ) ).thenReturn( customerPjDTO.getAddress() );
         LegalPersonalCustomerDTO legalPersonalCustomerDTO = legalPersonalCustomerService
@@ -156,9 +157,9 @@ class LegalPersonalCustomerServiceImplTest {
                 }
         );
         verify( convertObjectToObjectDTOService, times( 1 ) )
-                .convertToLegalPersonalCustomerDTO( customerPj );
+                .convertToEntityOrDTO( customerPj, LegalPersonalCustomerDTO.class );
         verify( convertObjectToObjectDTOService, times( 1 ) )
-                .convertToLegalPersonalCustomer( customerPjDTO );
+                .convertToEntityOrDTO( customerPjDTO, LegalPersonalCustomer.class );
         verify( customerRepository, times( 1 ) )
                 .existsCustomerByPrimaryEmail( customerPjDTO.getPrimaryEmail() );
         verify( legalPersonalCustomerRepository, times( 1 ) )
@@ -207,7 +208,7 @@ class LegalPersonalCustomerServiceImplTest {
         customerResponseDTO.setClientName( customerPj.getClientName() );
         customerResponseDTO.setAddress( customerPj.getAddress() );
         when( legalPersonalCustomerRepository.findByCnpj( CNPJ ) ).thenReturn( Optional.of( customerPj ) );
-        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( customerPj ) )
+        when( convertObjectToObjectDTOService.convertToEntityOrDTO( customerPj, CustomerResponseDTO.class ) )
                                                                                    .thenReturn( customerResponseDTO );
         CustomerResponseDTO responseDTO = legalPersonalCustomerService.findByCnpj( CNPJ );
         assertAll( "CustomerResponseDTO",
@@ -244,7 +245,7 @@ class LegalPersonalCustomerServiceImplTest {
             LegalPersonalCustomer legalPersonalCustomer = oneLegalPersonalCustomer()
                                                                         .withId( id ).withCnpj( cnpj ).nowCustomerPJ();
             LegalPersonalCustomerDTO legalPersonalCustomerDTO = convertObjectToObjectDTOService
-                                                           .convertToLegalPersonalCustomerDTO( legalPersonalCustomer );
+                                       .convertToEntityOrDTO( legalPersonalCustomer, LegalPersonalCustomerDTO.class );
             legalPersonalCustomerService.saveLegalPersonalCustomer( legalPersonalCustomerDTO );
         } ).getMessage();
         assertEquals( message, exMessage );

@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface ConvertEntityAndDTO {
 
-    < T, U > U convertDTOToEntity( T source, Class< U > targetClass );
+    < T, U > U convertDTOOrEntity( T source, Class< U > targetClass );
 
     < T, U > List< U > convertEntityAndDTOList( List< T > source, Class< U > targetClass );
 

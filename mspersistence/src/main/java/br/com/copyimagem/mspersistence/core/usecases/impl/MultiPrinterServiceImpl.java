@@ -7,12 +7,14 @@ import br.com.copyimagem.mspersistence.core.dtos.MultiPrinterDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.IllegalArgumentException;
 import br.com.copyimagem.mspersistence.core.exceptions.IllegalStateException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
+import br.com.copyimagem.mspersistence.core.usecases.interfaces.ConvertObjectToObjectDTOService;
 import br.com.copyimagem.mspersistence.core.usecases.interfaces.MultiPrinterService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.MultiPrinterRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 
 @Service
 public class MultiPrinterServiceImpl implements MultiPrinterService {
@@ -36,26 +38,24 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
     @Override
     public MultiPrinterDTO findMultiPrinterById( Integer id ) {
 
-        return multiPrinterRepository.findById( id )
-                .map( convertObjectToObjectDTOService::convertToMultiPrinterDTO )
-                .orElseThrow(() -> new NoSuchElementException("MultiPrint not found"));
+        return convertObjectToObjectDTOService.convertToEntityOrDTO( multiPrinterRepository
+                .findById( id ).orElseThrow(
+                        () -> new NoSuchElementException( "MultiPrint not found" ) ), MultiPrinterDTO.class );
     }
 
     @Override
     public List< MultiPrinterDTO > findAllMultiPrinters() {
 
-        return multiPrinterRepository.findAll().stream()
-                .map( convertObjectToObjectDTOService::convertToMultiPrinterDTO )
-                .toList();
+        return convertObjectToObjectDTOService.convertEntityAndDTOList(
+                multiPrinterRepository.findAll(), MultiPrinterDTO.class );
+
     }
 
     @Override
     public List< MultiPrinterDTO > findAllMultiPrintersByCustomerId( Long customer_Id ) {
 
-        return multiPrinterRepository.findAllByCustomerId( customer_Id )
-                .stream()
-                .map( convertObjectToObjectDTOService::convertToMultiPrinterDTO )
-                .toList();
+        return convertObjectToObjectDTOService.convertEntityAndDTOList(
+                multiPrinterRepository.findAllByCustomerId( customer_Id ), MultiPrinterDTO.class );
     }
 
     @Override
@@ -63,29 +63,30 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
 
         checkSerialNumber( multiPrinterDTO.getSerialNumber() );
         MultiPrinter multiPrinter = multiPrinterRepository.save( convertObjectToObjectDTOService
-                                                                          .convertToMultiPrinter( multiPrinterDTO ) );
-        return convertObjectToObjectDTOService.convertToMultiPrinterDTO( multiPrinter );
+                .convertToEntityOrDTO( multiPrinterDTO, MultiPrinter.class ) );
+        return convertObjectToObjectDTOService.convertToEntityOrDTO( multiPrinter, MultiPrinterDTO.class );
     }
 
     @Override
     public MultiPrinterDTO setUpClientOnAMultiPrinter( Integer id, Long customer_Id ) {
 
         Customer customer = customerRepository.findById( customer_Id )
-                                             .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
         MultiPrinterDTO multiPrinterDTO = findMultiPrinterById( id );
         if( multiPrinterDTO.getCustomer_id() != null ) {
             throw new IllegalArgumentException( "This printer is already Customer." );
         }
-        if(multiPrinterDTO.getPrintType().getType().startsWith( "Color" ) ){
-            multiPrinterDTO.setPrintingFranchise( customer.getCustomerContract().getPrintingFranchiseColor());
-            multiPrinterDTO.setPrintType(customer.getCustomerContract().getPrinterTypeColor() );
-        }else{
+        if( multiPrinterDTO.getPrintType().getType().startsWith( "Color" ) ) {
+            multiPrinterDTO.setPrintingFranchise( customer.getCustomerContract().getPrintingFranchiseColor() );
+            multiPrinterDTO.setPrintType( customer.getCustomerContract().getPrinterTypeColor() );
+        } else {
             multiPrinterDTO.setPrintingFranchise( customer.getCustomerContract().getPrintingFranchisePB() );
-            multiPrinterDTO.setPrintType(customer.getCustomerContract().getPrinterTypePB() );
+            multiPrinterDTO.setPrintType( customer.getCustomerContract().getPrinterTypePB() );
         }
         multiPrinterDTO.setCustomer_id( customer_Id.toString() );
         multiPrinterDTO.setMachineStatus( MachineStatus.LOCADA );
-        MultiPrinter multiPrinter = convertObjectToObjectDTOService.convertToMultiPrinter( multiPrinterDTO );
+        MultiPrinter multiPrinter =
+                convertObjectToObjectDTOService.convertToEntityOrDTO( multiPrinterDTO, MultiPrinter.class );
         multiPrinter.setCustomer( customer );
         multiPrinterRepository.save( multiPrinter );
         return multiPrinterDTO;
@@ -95,7 +96,7 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
     public void deleteMultiPrinter( Integer id ) {
 
         MultiPrinter multiPrinter = multiPrinterRepository.findById( id )
-                                           .orElseThrow( () -> new NoSuchElementException( "MultiPrint not found" ) );
+                .orElseThrow( () -> new NoSuchElementException( "MultiPrint not found" ) );
         if( multiPrinter.getCustomer() != null ) {
             throw new IllegalArgumentException( "This printer cannot be deleted." );
         }
@@ -108,7 +109,8 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
         MultiPrinterDTO multiPrinterDTO = findMultiPrinterById( id );
         multiPrinterDTO.setCustomer_id( null );
         multiPrinterDTO.setMachineStatus( MachineStatus.DISPONIVEL );
-        multiPrinterRepository.save( convertObjectToObjectDTOService.convertToMultiPrinter( multiPrinterDTO ) );
+        multiPrinterRepository.save(
+                convertObjectToObjectDTOService.convertToEntityOrDTO( multiPrinterDTO, MultiPrinter.class ) );
         return multiPrinterDTO;
     }
 
@@ -120,8 +122,8 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
         switch( status ) {
             case "LOCADA" -> {
                 if( multiPrinterDTO.getCustomer_id() != null ) {
-                    throw new IllegalStateException ( "The printer already has a customer. " +
-                                                        "You need to deselect customer" );
+                    throw new IllegalStateException( "The printer already has a customer. " +
+                            "You need to deselect customer" );
                 }
                 row = multiPrinterRepository.updateMachineStatusById( id, MachineStatus.valueOf( status ) );
             }
@@ -130,11 +132,11 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
                 unSetUpCustomerFromMultiPrinterById( multiPrinterDTO.getId() );
             }
             case "MANUTENCAO" -> row = multiPrinterRepository
-                                                      .updateMachineStatusById( id, MachineStatus.valueOf( status ) );
+                    .updateMachineStatusById( id, MachineStatus.valueOf( status ) );
             default -> throw new IllegalArgumentException( "Invalid Status: " + status );
         }
         if( row > 0 ) {
-            multiPrinterDTO = findMultiPrinterById(id);
+            multiPrinterDTO = findMultiPrinterById( id );
         } else {
             throw new IllegalStateException( "No rows updated. Check the conditions and input values." );
         }
@@ -142,39 +144,39 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
     }
 
     @Override
-    public MultiPrinterDTO setImpressionCounter( Integer id, Integer counter, String attribute) {
+    public MultiPrinterDTO setImpressionCounter( Integer id, Integer counter, String attribute ) {
 
-        if ( !attribute.equals("impressionCounterInitial") && !attribute.equals("impressionCounterBefore") &&
-             !attribute.equals("impressionCounterNow") ) {
+        if( ! attribute.equals( "impressionCounterInitial" ) && ! attribute.equals( "impressionCounterBefore" ) &&
+                ! attribute.equals( "impressionCounterNow" ) ) {
             throw new IllegalArgumentException( "Invalid attribute: " + attribute );
         }
-        MultiPrinterDTO multiPrinterDTO = findMultiPrinterById(id);
+        MultiPrinterDTO multiPrinterDTO = findMultiPrinterById( id );
 
         int row = 0;
 
-        if( attribute.equals("impressionCounterNow") ){
-            if ( counter <= multiPrinterDTO.getImpressionCounterNow()) {
+        if( attribute.equals( "impressionCounterNow" ) ) {
+            if( counter <= multiPrinterDTO.getImpressionCounterNow() ) {
                 throw new IllegalArgumentException( "The COUNTER value must be greater than the current value." );
             }
             multiPrinterDTO.setImpressionCounterBefore( multiPrinterDTO.getImpressionCounterNow() );
             multiPrinterRepository.updateImpressionCounterByAttribute(
-                                     id, multiPrinterDTO.getImpressionCounterNow(), "impressionCounterBefore");
-            row = multiPrinterRepository.updateImpressionCounterByAttribute( id, counter , attribute);
-        }else if(attribute.equals("impressionCounterInitial")) {
+                                           id, multiPrinterDTO.getImpressionCounterNow(), "impressionCounterBefore" );
+            row = multiPrinterRepository.updateImpressionCounterByAttribute( id, counter, attribute );
+        } else if( attribute.equals( "impressionCounterInitial" ) ) {
             multiPrinterDTO.setImpressionCounterInitial( counter );
             multiPrinterDTO.setImpressionCounterBefore( 0 );
             multiPrinterDTO.setImpressionCounterNow( 0 );
             var multiPrinter = multiPrinterRepository.save( convertObjectToObjectDTOService
-                                                                           .convertToMultiPrinter( multiPrinterDTO ) );
-            return convertObjectToObjectDTOService.convertToMultiPrinterDTO( multiPrinter );
-        }else{
-            row = multiPrinterRepository.updateImpressionCounterByAttribute( id, counter , attribute);
+                                                       .convertToEntityOrDTO( multiPrinterDTO, MultiPrinter.class ) );
+            return convertObjectToObjectDTOService.convertToEntityOrDTO( multiPrinter, MultiPrinterDTO.class );
+        } else {
+            row = multiPrinterRepository.updateImpressionCounterByAttribute( id, counter, attribute );
         }
 
-        if ( row > 0) {
-            return findMultiPrinterById(id);
+        if( row > 0 ) {
+            return findMultiPrinterById( id );
         } else {
-            throw new IllegalStateException ( "No rows updated. Check the conditions and input values." );
+            throw new IllegalStateException( "No rows updated. Check the conditions and input values." );
         }
     }
 
@@ -184,4 +186,5 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
             throw new IllegalArgumentException( "Serial number already exists" );
         }
     }
+
 }

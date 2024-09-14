@@ -61,7 +61,7 @@ class TicketServiceImplTest {
     void shouldReturnATicketDTOWithSuccess() {
 
         when( ticketRepository.findById( 1L ) ).thenReturn( Optional.of( ticket ) );
-        when( convertEntityAndDTOService.convertDTOToEntity( ticket , TicketDTO.class) ).thenReturn( ticketDTO );
+        when( convertEntityAndDTOService.convertDTOOrEntity( ticket , TicketDTO.class) ).thenReturn( ticketDTO );
         TicketDTO result = ticketService.getTicketById( 1L );
         assertEquals( ticketDTO, result );
         assertEquals( ticketDTO.getId(), result.getId() );
@@ -103,9 +103,9 @@ class TicketServiceImplTest {
                       .searchCustomerByParams( "clientname", ticketDTO.getClientName() ) ).thenReturn( clientResponse );
         when( msPersistenceFeignClientService
                 .searchCustomerByParams( "clientname", ticketDTO.getTechnicalName() ) ).thenReturn( technicalResponse );
-        when( convertEntityAndDTOService.convertDTOToEntity( ticketDTO, Ticket.class) ).thenReturn( ticket );
+        when( convertEntityAndDTOService.convertDTOOrEntity( ticketDTO, Ticket.class) ).thenReturn( ticket );
         when( ticketRepository.save( ticket ) ).thenReturn( ticket );
-        when( convertEntityAndDTOService.convertDTOToEntity( ticket , TicketDTO.class) ).thenReturn( ticketDTO );
+        when( convertEntityAndDTOService.convertDTOOrEntity( ticket , TicketDTO.class) ).thenReturn( ticketDTO );
         TicketDTO result = ticketService.createTicket( ticketDTO );
 
         assertNotNull( result );
@@ -129,9 +129,9 @@ class TicketServiceImplTest {
                 .searchCustomerByParams( "clientname", ticketDTO.getClientName() ) ).thenReturn( clientResponse );
         when( msPersistenceFeignClientService
                 .searchCustomerByParams( "clientname", ticketDTO.getTechnicalName() ) ).thenReturn( technicalResponse );
-        when( convertEntityAndDTOService.convertDTOToEntity( ticketDTO, Ticket.class ) ).thenReturn( ticket );
+        when( convertEntityAndDTOService.convertDTOOrEntity( ticketDTO, Ticket.class ) ).thenReturn( ticket );
         when( ticketRepository.save( ticket ) ).thenReturn( ticket );
-        when( convertEntityAndDTOService.convertDTOToEntity( ticket , TicketDTO.class) ).thenReturn( ticketDTO );
+        when( convertEntityAndDTOService.convertDTOOrEntity( ticket , TicketDTO.class) ).thenReturn( ticketDTO );
 
         try {
             ticketService.createTicket( ticketDTO );

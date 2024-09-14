@@ -8,6 +8,7 @@ import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
 import br.com.copyimagem.mspersistence.core.dtos.UpdateCustomerDTO;
 import br.com.copyimagem.mspersistence.core.exceptions.IllegalArgumentException;
 import br.com.copyimagem.mspersistence.core.exceptions.NoSuchElementException;
+import br.com.copyimagem.mspersistence.core.usecases.interfaces.ConvertObjectToObjectDTOService;
 import br.com.copyimagem.mspersistence.infra.persistence.repositories.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -82,7 +83,7 @@ class CustomerServiceImplTest {
     void shouldReturnACustomerByID() {
 
         when( customerRepository.findById( ID1L ) ).thenReturn( Optional.of( legalPersonalCustomer ) );
-        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer ) )
+        when( convertObjectToObjectDTOService.convertToEntityOrDTO( legalPersonalCustomer, CustomerResponseDTO.class ) )
                                                                                   .thenReturn( customerResponseDTOPJ );
         CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "id", "1" );
         assertEquals( customerResponseDTOPJ, customerResponseDTO );
@@ -154,7 +155,7 @@ class CustomerServiceImplTest {
     void shouldReturnACustomerByEmail() {
 
         when( customerRepository.findByPrimaryEmail( EMAIL ) ).thenReturn( Optional.of( naturalPersonCustomer ) );
-        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( naturalPersonCustomer ) )
+        when( convertObjectToObjectDTOService.convertToEntityOrDTO( naturalPersonCustomer, CustomerResponseDTO.class ) )
                                                                                   .thenReturn( customerResponseDTOPF );
         CustomerResponseDTO customerResponseDTO = customerService.searchCustomer( "email", EMAIL );
         assertEquals( customerResponseDTOPF, customerResponseDTO );
@@ -178,7 +179,7 @@ class CustomerServiceImplTest {
     void shouldReturnACustomerByClientName() {
 
         when( customerRepository.findByClientName( customer.getClientName() ) ).thenReturn( Optional.of( customer ) );
-        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( customer ) )
+        when( convertObjectToObjectDTOService.convertToEntityOrDTO( customer, CustomerResponseDTO.class ) )
                                                                                  .thenReturn( customerResponseDTOPJ );
         CustomerResponseDTO customerResponseDTO = customerService
                                                 .searchCustomer( "clientName", "Claudio Carigé" );
@@ -203,7 +204,7 @@ class CustomerServiceImplTest {
     void shouldReturnACustomerByPhoneNumber() {
 
         when( customerRepository.findByPhoneNumber( customer.getPhoneNumber() ) ).thenReturn( Optional.of( customer ) );
-        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( customer ) )
+        when( convertObjectToObjectDTOService.convertToEntityOrDTO( customer, CustomerResponseDTO.class ) )
                                                                                   .thenReturn( customerResponseDTOPJ );
         CustomerResponseDTO customerResponseDTO = customerService
                 .searchCustomer( "phoneNumber", "7132104567" );
@@ -258,8 +259,8 @@ class CustomerServiceImplTest {
     void shouldReturnAllCustomers() {
 
         when( customerRepository.findAll() ).thenReturn( Collections.singletonList( legalPersonalCustomer ) );
-        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer ) )
-                                                                                  .thenReturn( customerResponseDTOPJ );
+        when( convertObjectToObjectDTOService.convertEntityAndDTOList( Collections.singletonList( legalPersonalCustomer ), CustomerResponseDTO.class ) )
+                                                                                  .thenReturn( Collections.singletonList( customerResponseDTOPJ ));
         List< CustomerResponseDTO > customerResponseDTO = customerService.searchAllCustomers();
         assertEquals( 1, customerResponseDTO.size() );
         assertEquals( legalPersonalCustomer.getId(), customerResponseDTO.get( 0 ).getId() );
@@ -273,8 +274,8 @@ class CustomerServiceImplTest {
         String situation = "PAGO";
         when( customerRepository.findAllByFinancialSituation( any() ) ).
                 thenReturn( Collections.singletonList( legalPersonalCustomer ) );
-        when( convertObjectToObjectDTOService.convertToCustomerResponseDTO( legalPersonalCustomer ) )
-                .thenReturn( customerResponseDTOPJ );
+        when( convertObjectToObjectDTOService.convertEntityAndDTOList(Collections.singletonList( legalPersonalCustomer), CustomerResponseDTO.class ) )
+                .thenReturn( Collections.singletonList( customerResponseDTOPJ) );
         List< CustomerResponseDTO > customerResponseDTO = customerService.searchFinancialSituation( situation );
         assertEquals( 1, customerResponseDTO.size() );
         assertEquals( legalPersonalCustomer.getId(), customerResponseDTO.get( 0 ).getId() );
@@ -301,9 +302,9 @@ class CustomerServiceImplTest {
         when( customerRepository.findById( 2L ) ).thenReturn( Optional.of( naturalPersonCustomer ) );
         when( customerRepository.save( legalPersonalCustomer ) ).thenReturn( legalPersonalCustomer );
         when( customerRepository.save( naturalPersonCustomer ) ).thenReturn( naturalPersonCustomer );
-        when( convertObjectToObjectDTOService.convertToUpdateCustomerDTO( legalPersonalCustomer ) )
+        when( convertObjectToObjectDTOService.convertToEntityOrDTO( legalPersonalCustomer, UpdateCustomerDTO.class ) )
                                                                                    .thenReturn( updateCustomerDTOPJ );
-        when( convertObjectToObjectDTOService.convertToUpdateCustomerDTO( naturalPersonCustomer ) )
+        when( convertObjectToObjectDTOService.convertToEntityOrDTO( naturalPersonCustomer, UpdateCustomerDTO.class ) )
                                                                                    .thenReturn( updateCustomerDTOPF );
         UpdateCustomerDTO updateCustomerResultDTO = customerService
                                                      .updateCustomerAttribute( attribute, val, Long.parseLong( id ) );
