@@ -1,7 +1,5 @@
 package br.com.copyimagem.ms_help_desk.core.usecases.impl;
 
-import br.com.copyimagem.ms_help_desk.core.domain.dtos.TicketDTO;
-import br.com.copyimagem.ms_help_desk.core.domain.entities.Ticket;
 import br.com.copyimagem.ms_help_desk.core.usecases.ConvertEntityAndDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
