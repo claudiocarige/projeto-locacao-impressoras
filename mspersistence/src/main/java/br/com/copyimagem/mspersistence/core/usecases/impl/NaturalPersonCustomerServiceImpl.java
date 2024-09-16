@@ -74,7 +74,7 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
 
         log.info( "[ INFO ] Saving customer. {}", naturalPersonCustomerDTO.getClass() );
                                                                              naturalPersonCustomerDTO.setId( null );
-        Address address = addressRepository.save( naturalPersonCustomerDTO.getAddress() );
+        addressRepository.save( naturalPersonCustomerDTO.getAddress() );
         saveAddress( naturalPersonCustomerDTO );
         generateCustomerContract( naturalPersonCustomerDTO );
         existsCpfOrEmail( naturalPersonCustomerDTO );

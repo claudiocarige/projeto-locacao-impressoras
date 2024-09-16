@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserCreateResponse save( UserRequestDTO userRequestDTO ) {
 
-        verifyIfEmailExists( userRequestDTO.getEmail(), null );
+        verifyIfEmailExists( userRequestDTO.getEmail() );
         User user = convertEntitiesAndDTOs.convertDTOOrEntity( userRequestDTO, User.class );
         user.setPassword( bCryptPasswordEncoder.encode( userRequestDTO.getPassword() ) );
         user = userRepository.save( user );
@@ -72,10 +72,10 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
-    private void verifyIfEmailExists( String email, Long id ) {
+    private void verifyIfEmailExists( String email ) {
 
         User user = userRepository.findByEmail( email );
-        if( user != null && ! user.getId().equals( id ) ) {
+        if( user != null && user.getId() != null ) {
             throw new DataIntegrityViolationException( "Email [ " + email + " ] already exists" );
         }
 

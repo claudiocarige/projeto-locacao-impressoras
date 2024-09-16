@@ -152,7 +152,7 @@ public class MultiPrinterServiceImpl implements MultiPrinterService {
         }
         MultiPrinterDTO multiPrinterDTO = findMultiPrinterById( id );
 
-        int row = 0;
+        int row;
 
         if( attribute.equals( "impressionCounterNow" ) ) {
             if( counter <= multiPrinterDTO.getImpressionCounterNow() ) {
