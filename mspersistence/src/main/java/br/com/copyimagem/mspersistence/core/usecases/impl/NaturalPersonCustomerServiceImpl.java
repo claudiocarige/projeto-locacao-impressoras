@@ -1,6 +1,5 @@
 package br.com.copyimagem.mspersistence.core.usecases.impl;
 
-import br.com.copyimagem.mspersistence.core.domain.entities.Address;
 import br.com.copyimagem.mspersistence.core.domain.entities.CustomerContract;
 import br.com.copyimagem.mspersistence.core.domain.entities.NaturalPersonCustomer;
 import br.com.copyimagem.mspersistence.core.dtos.CustomerResponseDTO;
@@ -87,7 +86,7 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
 
     @Override
     public CustomerResponseDTO findByCpf( String cpf ) {
-
+        log.info( "[ INFO ] Finding customer by CPF.");
         Optional< NaturalPersonCustomer > naturalPersonCustomer = naturalPersonCustomerRepository.findByCpf( cpf );
         if( naturalPersonCustomer.isEmpty() ) {
             log.error( "[ ERROR ] Exception :  {}.", NoSuchElementException.class );
@@ -98,7 +97,7 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
     }
 
     private void existsCpfOrEmail( NaturalPersonCustomerDTO naturalPersonCustomerDTO ) {
-
+        log.info( "[ INFO ] Checking if CPF or Email already exists." );
         if( customerRepository.existsCustomerByPrimaryEmail( naturalPersonCustomerDTO.getPrimaryEmail() ) ) {
             log.error( "[ ERROR ] Exception : Email already exists! : {}.", DataIntegrityViolationException.class );
             throw new DataIntegrityViolationException( "Email already exists!" );
@@ -112,6 +111,7 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
     private void generateCustomerContract( NaturalPersonCustomerDTO naturalPersonCustomerDTO ) {
 
         if( naturalPersonCustomerDTO.getCustomerContract() == null ) {
+            log.info( "[ INFO ] Generating customer contract." );
             CustomerContract contract = new CustomerContract();
             naturalPersonCustomerDTO.setCustomerContract( contract );
             customerContractRepository.save( contract );
@@ -121,8 +121,10 @@ public class NaturalPersonCustomerServiceImpl implements NaturalPersonCustomerSe
     private void saveAddress( NaturalPersonCustomerDTO naturalPersonCustomerDTO ) {
 
         if( naturalPersonCustomerDTO.getAddress() != null ) {
+            log.info( "[ INFO ] Saving address." );
             naturalPersonCustomerDTO.setAddress( addressRepository.save( naturalPersonCustomerDTO.getAddress() ) );
         } else {
+            log.error( "[ ERROR ] Exception : Address is null! : {}.", DataIntegrityViolationException.class );
             throw new DataIntegrityViolationException( "Address is null!" );
         }
     }

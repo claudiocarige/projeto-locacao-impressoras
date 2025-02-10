@@ -68,6 +68,7 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
                 convertObjectToObjectDTOService.convertToEntityOrDTO( legalPersonalCustomer, LegalPersonalCustomerDTO.class );
         legalPersonalCustomerDTO.setMultiPrinterList( convertObjectToObjectDTOService.convertEntityAndDTOList(
                                                 legalPersonalCustomer.getMultiPrinterList(), MultiPrinterDTO.class ) );
+        log.info( "[ INFO ] LegalPersonalCustomer found." );
         return legalPersonalCustomerDTO;
     }
 
@@ -75,13 +76,14 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
     @Override
     public LegalPersonalCustomerDTO saveLegalPersonalCustomer( LegalPersonalCustomerDTO legalPersonalCustomerDTO ) {
 
-        log.info( "[ INFO ] Saving LegalPersonalCustomer" );
+        log.info( "[ INFO ] Creating LegalPersonalCustomer." );
         legalPersonalCustomerDTO.setId( null );
         saveAddress( legalPersonalCustomerDTO );
         existsCnpjOrEmail( legalPersonalCustomerDTO );
         generateCustomerContract( legalPersonalCustomerDTO );
         LegalPersonalCustomer saveLegalPersonalCustomer = legalPersonalCustomerRepository
                 .save( convertObjectToObjectDTOService.convertToEntityOrDTO( legalPersonalCustomerDTO, LegalPersonalCustomer.class ) );
+        log.info( "[ INFO ] LegalPersonalCustomer created." );
         return convertObjectToObjectDTOService.convertToEntityOrDTO( saveLegalPersonalCustomer, LegalPersonalCustomerDTO.class );
     }
 
@@ -94,11 +96,12 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
             log.error( "[ ERROR ] Exception : Customer not found :  {}.", NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
+        log.info( "[ INFO ] LegalPersonalCustomer found." );
         return convertObjectToObjectDTOService.convertToEntityOrDTO( legalPersonalCustomer.get(), CustomerResponseDTO.class );
     }
 
     private void existsCnpjOrEmail( LegalPersonalCustomerDTO legalPersonalCustomerDTO ) {
-
+        log.info( "[ INFO ] Checking if CNPJ or Email already exists." );
         if( customerRepository.existsCustomerByPrimaryEmail( legalPersonalCustomerDTO.getPrimaryEmail() ) ) {
             log.error( "[ ERROR ] Exception : Email already exists! : {}.", customerRepository
                                         .existsCustomerByPrimaryEmail( legalPersonalCustomerDTO.getPrimaryEmail() ) );
@@ -112,19 +115,21 @@ public class LegalPersonalCustomerServiceImpl implements LegalPersonalCustomerSe
     }
 
     private void generateCustomerContract( LegalPersonalCustomerDTO legalPersonalCustomerDTO ) {
-
+        log.info( "[ INFO ] Generating CustomerContract." );
         if( legalPersonalCustomerDTO.getCustomerContract() == null ) {
             CustomerContract contract = new CustomerContract();
             CustomerContract savedContract = customerContractRepository.save( contract );
             legalPersonalCustomerDTO.setCustomerContract( savedContract );
+            log.info( "[ INFO ] CustomerContract generated." );
         }
     }
 
     private void saveAddress( LegalPersonalCustomerDTO legalPersonalCustomerDTO ) {
-
+        log.info( "[ INFO ] Saving Address." );
         if( legalPersonalCustomerDTO.getAddress() != null ) {
             legalPersonalCustomerDTO.setAddress( addressRepository.save( legalPersonalCustomerDTO.getAddress() ) );
         } else {
+            log.error( "[ ERROR ] Exception : Address is null! : {}.", DataIntegrityViolationException.class );
             throw new DataIntegrityViolationException( "Address is null!" );
         }
     }

@@ -52,6 +52,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerResponseDTO searchCustomer( String typeParam, String valueParam ) {
 
+        log.info( "[ INFO ] Searching Customer by : {}", typeParam );
         return
                 switch( typeParam.toLowerCase() ) {
                     case "id" -> findById( Long.parseLong( valueParam ) );
@@ -68,23 +69,26 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List< CustomerResponseDTO > searchAllCustomers() {
 
+        log.info( "[ INFO ] Searching all Customers." );
         List< Customer > customerList = customerRepository.findAll();
-        return convertObjectToObjectDTOService.convertEntityAndDTOList(customerList, CustomerResponseDTO.class);
+        return convertObjectToObjectDTOService.convertEntityAndDTOList( customerList, CustomerResponseDTO.class );
     }
 
     @Override
     public List< CustomerResponseDTO > searchFinancialSituation( String situation ) {
 
+        log.info( "[ INFO ] Searching Customers by Financial Situation." );
         FinancialSituation financialSituation = FinancialSituation.valueOf( situation );
         List< Customer > customerList = customerRepository.findAllByFinancialSituation( financialSituation );
-        return convertObjectToObjectDTOService.convertEntityAndDTOList(customerList, CustomerResponseDTO.class);
+        return convertObjectToObjectDTOService.convertEntityAndDTOList( customerList, CustomerResponseDTO.class );
     }
 
     @Override
     public CustomerContract getCustomerContract( Long id ) {
 
+        log.info( "[ INFO ] Searching Customer Contract by id : {}", id );
         Customer customer = customerRepository.findById( id )
-                                             .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
         return customer.getCustomerContract();
     }
 
@@ -94,7 +98,7 @@ public class CustomerServiceImpl implements CustomerService {
         log.info( "[ INFO ] Updating Customer attribute : {}", attribute );
         isNotNull( attribute, value );
         Customer customer = customerRepository.findById( id )
-                                             .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
+                .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
         isContainsAnyOfTheAttributes( attribute );
         needsValidations( attribute, value );
         return getUpdateCustomerAttribute( attribute, value, customer );
@@ -103,6 +107,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Customer returnCustomer( Long id ) {
 
+        log.info( "[ INFO ] Returning Customer by id : {}", id );
         return customerRepository.findById( id )
                 .orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
     }
@@ -110,40 +115,46 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerContractDTO findCustomerContractByCustomerId( Long customerId ) {
 
+        log.info( "[ INFO ] Returning Customer contract by id." );
         CustomerContract customerContract = customerRepository.findCustomerContractByCustomerId( customerId );
         return new CustomerContractDTO(
                 customerContract.getId(),
                 customerContract.getPrintingFranchisePB(), customerContract.getPrintingFranchiseColor(),
-                customerContract.getPrinterTypePB().getRate(), customerContract.getPrinterTypeColor().getRate());
+                customerContract.getPrinterTypePB().getRate(), customerContract.getPrinterTypeColor().getRate() );
     }
 
     private CustomerResponseDTO findById( Long id ) {
 
+        log.info( "[ INFO ] Finding customer by ID: {}", id );
         Optional< Customer > customerOptional = customerRepository.findById( id );
         if( customerOptional.isEmpty() ) {
             log.error( "[ ERROR ] Exception (findById() method in CustomerServiceImpl class):  {}.",
-                                                                                        NoSuchElementException.class );
+                    NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
+        log.info( "[ INFO ] Customer found: {}", customerOptional.get() );
         return convertObjectToObjectDTOService.convertToEntityOrDTO( customerOptional.get(), CustomerResponseDTO.class );
     }
 
     private CustomerResponseDTO findByCpf( String valueParam ) {
 
+        log.info( "[ INFO ] Finding customer by CPF : {}", valueParam );
         return naturalPersonCustomerService.findByCpf( valueParam );
     }
 
     private CustomerResponseDTO findByCnpj( String valueParam ) {
 
+        log.info( "[ INFO ] Finding customer by CNPJ : {}", valueParam );
         return legalPersonalCustomerService.findByCnpj( valueParam );
     }
 
     private CustomerResponseDTO findByPrimaryEmail( String email ) {
 
+        log.info( "[ INFO ] Finding customer by email: {}", email );
         Optional< Customer > customerOptional = customerRepository.findByPrimaryEmail( email );
         if( customerOptional.isEmpty() ) {
             log.error( "[ ERROR ] Exception (findByPrimaryEmail() method in CustomerServiceImpl class) :  {}.",
-                                                                                        NoSuchElementException.class );
+                    NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
         return convertObjectToObjectDTOService.convertToEntityOrDTO( customerOptional.get(), CustomerResponseDTO.class );
@@ -151,17 +162,19 @@ public class CustomerServiceImpl implements CustomerService {
 
     private CustomerResponseDTO findByClientName( String valueParam ) {
 
+        log.info( "[ INFO ] Finding customer by client name: {}", valueParam );
         Customer customer = customerRepository.findByClientName( valueParam ).orElseThrow( () -> new NoSuchElementException( "Customer not found" ) );
         return convertObjectToObjectDTOService.convertToEntityOrDTO( customer,
-                                                                     CustomerResponseDTO.class );
+                CustomerResponseDTO.class );
     }
 
     private CustomerResponseDTO findByPhoneNumber( String phoneNumber ) {
 
+        log.info( "[ INFO ] Finding customer by phone number: {}", phoneNumber );
         Optional< Customer > customerOptional = customerRepository.findByPhoneNumber( phoneNumber );
         if( customerOptional.isEmpty() ) {
             log.error( "[ ERROR ] Exception (findByPhoneNumber() method in CustomerServiceImpl class) :  {}.",
-                                                                                         NoSuchElementException.class );
+                    NoSuchElementException.class );
             throw new NoSuchElementException( "Customer not found" );
         }
         return convertObjectToObjectDTOService.convertToEntityOrDTO( customerOptional.get(), CustomerResponseDTO.class );
@@ -169,6 +182,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     private void isNotNull( String attribute, String value ) {
 
+        log.info( "[ INFO ] Checking if attribute is null." );
         String[] attributes = {"cpf", "cnpj", "primaryEmail", "phoneNumber", "clientName", "whatsapp"};
         for( String attribute1 : attributes ) {
             if( attribute1.equals( attribute ) ) {
@@ -181,41 +195,50 @@ public class CustomerServiceImpl implements CustomerService {
 
     private void isContainsAnyOfTheAttributes( String attribute ) {
 
+        log.info( "[ INFO ] Checking if attribute is in the list." );
         if( List.of( "emailList", "multiPrinterList", "monthlyPaymentList" ).contains( attribute ) ) {
+            log.error( "[ ERROR ] Exception (isContainsAnyOfTheAttributes() method in CustomerServiceImpl class) :  {}.",
+                    IllegalArgumentException.class );
             throw new IllegalArgumentException( "This attribute cannot be changed on this endpoint." );
         }
     }
 
     private void needsValidations( String attribute, String value ) {
 
+        log.info( "[ INFO ] Doing validation." );
         if( List.of( "cpf", "cnpj", "primaryEmail" ).contains( attribute ) ) {
             validateAttribute( attribute, value );
+            log.info( "[ INFO ] Validated attribute" );
         }
     }
 
     private void validateAttribute( String attribute, String value ) {
 
+        log.info( "[ INFO ] Validating attribute : {}", attribute );
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
         switch( attribute ) {
             case "cnpj" -> {
+                log.info( "[ INFO ] Validating CNPJ." );
                 Set< ConstraintViolation< LegalPersonalCustomerDTO > > cnpjViolations = validator
-                                                    .validateValue( LegalPersonalCustomerDTO.class, attribute, value );
+                        .validateValue( LegalPersonalCustomerDTO.class, attribute, value );
                 if( ! cnpjViolations.isEmpty() ) {
                     throw new IllegalArgumentException( cnpjViolations.iterator().next().getMessage() );
                 }
             }
             case "primaryEmail" -> {
+                log.info( "[ INFO ] Validating email." );
                 Set< ConstraintViolation< NaturalPersonCustomerDTO > > emailViolations = validator
-                                                    .validateValue( NaturalPersonCustomerDTO.class, attribute, value );
+                        .validateValue( NaturalPersonCustomerDTO.class, attribute, value );
                 log.info( "[ INFO ] emailViolations : {}", emailViolations );
                 if( ! emailViolations.isEmpty() ) {
                     throw new IllegalArgumentException( emailViolations.iterator().next().getMessage() );
                 }
             }
             case "cpf" -> {
+                log.info( "[ INFO ] Validating CPF." );
                 Set< ConstraintViolation< NaturalPersonCustomerDTO > > cpfViolations = validator
-                                                    .validateValue( NaturalPersonCustomerDTO.class, attribute, value );
+                        .validateValue( NaturalPersonCustomerDTO.class, attribute, value );
                 if( ! cpfViolations.isEmpty() ) {
                     throw new IllegalArgumentException( cpfViolations.iterator().next().getMessage() );
                 }
@@ -227,40 +250,55 @@ public class CustomerServiceImpl implements CustomerService {
 
         switch( attribute ) {
             case "cpf" -> {
+                log.info( "[ INFO ] Updating CPF." );
                 NaturalPersonCustomer naturalPersonCustomer = ( NaturalPersonCustomer ) customer;
                 naturalPersonCustomer.setCpf( value );
                 return convertObjectToObjectDTOService.convertToEntityOrDTO(
-                                          customerRepository.save( naturalPersonCustomer ), UpdateCustomerDTO.class );
+                        customerRepository.save( naturalPersonCustomer ), UpdateCustomerDTO.class );
             }
             case "cnpj" -> {
+                log.info( "[ INFO ] Updating CNPJ." );
                 LegalPersonalCustomer legalPersonalCustomer = ( LegalPersonalCustomer ) customer;
                 legalPersonalCustomer.setCnpj( value );
                 return convertObjectToObjectDTOService.convertToEntityOrDTO(
-                                          customerRepository.save( legalPersonalCustomer ), UpdateCustomerDTO.class );
+                        customerRepository.save( legalPersonalCustomer ), UpdateCustomerDTO.class );
             }
             case "primaryEmail" -> {
+                log.info( "[ INFO ] Updating email." );
                 customer.setPrimaryEmail( value );
             }
             case "phoneNumber" -> {
+                log.info( "[ INFO ] Updating phone number." );
                 customer.setPhoneNumber( value );
             }
             case "clientName" -> {
+                log.info( "[ INFO ] Updating client name." );
                 customer.setClientName( value );
             }
             case "whatsapp" -> {
+                log.info( "[ INFO ] Updating whatsapp." );
                 customer.setWhatsapp( value );
             }
             case "bankCode" -> {
+                log.info( "[ INFO ] Updating bank code." );
                 customer.setBankCode( value );
             }
             case "financialSituation" -> {
+                log.info( "[ INFO ] Updating financial situation." );
                 customer.setFinancialSituation( FinancialSituation.valueOf( value ) );
             }
             case "payDay" -> {
+                log.info( "[ INFO ] Updating pay day." );
                 customer.setPayDay( Byte.parseByte( value ) );
             }
-            default -> throw new IllegalArgumentException( "Attribute not found." );
+
+            default -> {
+                log.error( "[ ERROR ] Exception (getUpdateCustomerAttribute() method in CustomerServiceImpl class) :  {}.",
+                        IllegalArgumentException.class );
+                throw new IllegalArgumentException( "Attribute not found." );
+            }
         }
+        log.info( "[ INFO ] Saving customer." );
         return convertObjectToObjectDTOService
                 .convertToEntityOrDTO( customerRepository.save( customer ), UpdateCustomerDTO.class );
     }
