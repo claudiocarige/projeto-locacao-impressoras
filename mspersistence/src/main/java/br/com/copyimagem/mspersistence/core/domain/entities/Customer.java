@@ -1,6 +1,7 @@
 package br.com.copyimagem.mspersistence.core.domain.entities;
 
 
+import br.com.copyimagem.mspersistence.core.domain.AssertionConcern;
 import br.com.copyimagem.mspersistence.core.domain.enums.FinancialSituation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -16,10 +17,9 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @DiscriminatorColumn( name = "dtype" )
-public abstract class Customer implements Serializable {
+public abstract class Customer implements Serializable, AssertionConcern {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -34,7 +34,7 @@ public abstract class Customer implements Serializable {
     @Column( unique = true )
     private String primaryEmail;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection( fetch = FetchType.EAGER )
     private List< String > emailList = new ArrayList<>();
 
     private String phoneNumber;
@@ -62,9 +62,61 @@ public abstract class Customer implements Serializable {
     private List< MultiPrinter > multiPrinterList = new ArrayList<>();
 
 
+    public Customer(
+            final Long id,
+            final String clientName,
+            final String primaryEmail,
+            final String whatsapp,
+            final String phoneNumber,
+            final byte payDay,
+            final Address address ) {
+
+        this.id = id;
+        this.setClientName( clientName );
+        this.setPrimaryEmail( primaryEmail );
+        this.setWhatsapp( whatsapp );
+        this.setPhoneNumber( phoneNumber );
+        this.setPayDay( payDay );
+        this.setAddress( address );
+    }
+
     public void addMultiPrinter( MultiPrinter multiPrinter ) {
 
         multiPrinterList.add( multiPrinter );
+    }
+
+    public void setClientName( String clientName ) {
+
+        assertionArgumentNotNull( clientName, "Client name cannot be empty" );
+        assertionArgumentLength( clientName, 100, "Client name must be less than 100 characters" );
+        this.clientName = clientName;
+    }
+
+    public void setPrimaryEmail( String primaryEmail ) {
+
+        assertionArgumentNotNull( primaryEmail, "Primary email cannot be empty" );
+        assertionArgumentLength( primaryEmail, 100, "Primary email must be less than 100 characters" );
+        this.primaryEmail = primaryEmail;
+    }
+
+    public void setPhoneNumber( String phoneNumber ) {
+
+        assertionArgumentNotNull( phoneNumber, "Phone number cannot be empty" );
+        assertionArgumentLength( phoneNumber, 15, "Phone number must be less than 15 characters" );
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setWhatsapp( String whatsapp ) {
+
+        assertionArgumentNotNull( whatsapp, "Whatsapp cannot be empty" );
+        assertionArgumentLength( whatsapp, 14, "Whatsapp must be less than 15 characters" );
+        this.whatsapp = whatsapp;
+    }
+
+    public void setAddress( Address address ) {
+
+        assertionArgumentNotNull( address, "Address cannot be null" );
+        this.address = address;
     }
 
     @Override
